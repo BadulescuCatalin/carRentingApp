@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.FlavorsDemo" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <!-- Make status bar transparent -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">true</item>
+
+        <!-- Make action bar transparent (if you are using Toolbar as ActionBar) -->
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:background">@android:color/transparent</item>
+
+        <!-- For edge-to-edge content, making content appear behind the status bar -->
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+
+        <item name="android:navigationBarColor">@android:color/transparent</item> <!-- Navigation bar color -->
+        <item name="android:windowTranslucentNavigation">true</item> <!-- Make navigation bar translucent -->
+    </style>
+</resources>
