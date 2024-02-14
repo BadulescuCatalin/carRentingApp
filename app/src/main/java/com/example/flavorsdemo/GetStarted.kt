@@ -7,18 +7,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 
 @Composable
-fun GetStartedPage(modifier: Modifier = Modifier) {
+fun GetStartedPage(navController: NavHostController, modifier: Modifier = Modifier) {
 
     Image(
         painter = painterResource(id = R.drawable.login_car),
@@ -34,15 +38,19 @@ fun GetStartedPage(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.BottomCenter
     ) {
         Button(
-            onClick = { /* Handle the click here */ },
+            onClick = {
+                      navController.navigate(Screen.Register.route)
+            },
+            colors = ButtonDefaults.buttonColors(colorResource(R.color.dark_brown)),
             shape = RoundedCornerShape(50.dp), // Rounded corners
             // Apply padding for margin around the button and fillMaxWidth for horizontal size
             modifier = Modifier
                 .fillMaxWidth(0.5f) // Makes the button fill the maximum width available
                 .padding(vertical = 32.dp) // Apply horizontal padding for side margins and vertical padding for top/bottom margins if needed
-                .padding(bottom = 16.dp)
+                .padding(bottom = 24.dp)
         ) {
-            Text("Get Started",
+            Text(
+                stringResource(R.string.get_started),
                 style = TextStyle(fontSize = 16.sp),
                 modifier = Modifier
                     .padding(4.dp)) // You can adjust padding inside Text for larger height

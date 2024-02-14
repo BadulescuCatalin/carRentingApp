@@ -23,6 +23,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.flavorsdemo.ui.theme.FlavorsDemoTheme
 
 class GetStarted : ComponentActivity() {
@@ -30,21 +33,45 @@ class GetStarted : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             FlavorsDemoTheme {
-                // A surface container using the 'background' color from the theme
-                WindowCompat.setDecorFitsSystemWindows(window, false)
-                window.setFlags(
-                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+                // action bar settings
+                WindowCompat.setDecorFitsSystemWindows(window,
+                    false
                 )
+                window.setFlags(
+                    WindowManager
+                        .LayoutParams
+                        .FLAG_LAYOUT_NO_LIMITS,
+                    WindowManager
+                        .LayoutParams
+                        .FLAG_LAYOUT_NO_LIMITS
+                )
+                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier
                         .fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = MaterialTheme
+                        .colorScheme
+                        .background
                 ) {
-                    GetStartedPage()
+                    val navController = rememberNavController()
+
+                    NavHost(navController = navController,
+                        startDestination = Screen.GetStarted.route
+                    ) {
+                        composable(Screen.GetStarted.route) {
+                            GetStartedPage(navController = navController)
+                        }
+                        composable(Screen.Login.route) {
+                            Login(navController = navController)
+                        }
+                        composable(Screen.Register.route) {
+                            RegisterPage(navController = navController)
+                        }
+                    }
                 }
             }
         }
     }
 }
+
 

@@ -2,9 +2,9 @@ package com.example.flavorsdemo
 
 import android.app.Application
 
-class RenterLogin : Application() {
+class RenterMainActivity : Application() {
     override fun onCreate() {
         super.onCreate()
-        FlavorConfig.userType = "Renter"
+        FlavorConfig.userType = "Owner"
     }
 }

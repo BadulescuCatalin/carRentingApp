@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1055765220568",
+    "project_id": "carrentingapp-5537e",
+    "storage_bucket": "carrentingapp-5537e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1055765220568:android:42c72773d1123cbe2fdbad",
+        "android_client_info": {
+          "package_name": "com.example.flavorsdemo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBC1m_3iMm4Q2I3FDPEFqiNDKMXWE6tuFs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1055765220568:android:52c9cc683e91a64c2fdbad",
+        "android_client_info": {
+          "package_name": "com.example.flavorsdemo.owner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBC1m_3iMm4Q2I3FDPEFqiNDKMXWE6tuFs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

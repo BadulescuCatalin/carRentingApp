@@ -2,7 +2,7 @@
     package="com.example.flavorsdemo">
 
     <application
-        android:name=".OwnerLogin">
+        android:name=".OwnerMainActivity">
         <!-- Other configurations specific to the renter flavor -->
     </application>
 </manifest>
