@@ -1,8 +1,6 @@
 package com.example.flavorsdemo
 
-import CustomClickableTextLoginRegister
-import CustomPasswordInput
-import CustomTextField
+//import CountryDropdown
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -37,6 +35,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.flow.collect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,10 +46,16 @@ fun RegisterPage(navController: NavHostController) {
     var password by remember { mutableStateOf("") }
     var confirmedPassword by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
+    var countryCode by remember { mutableStateOf("RO") }
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
+    var isPhoneNumberCorrect by remember { mutableStateOf(true) }
+    var isPasswordCorrect by remember { mutableStateOf(true) }
+    var arePasswotdsMatching by remember { mutableStateOf(true) }
+    var expandedCountriesList by remember { mutableStateOf(false) }
+    var countrySelected by remember { mutableStateOf("Country") }
 
     Image(
         painter = painterResource(id = R.drawable.login_car),
@@ -70,15 +75,23 @@ fun RegisterPage(navController: NavHostController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+
         Text(
-            text = stringResource(id = R.string.register_here_text),
+            text = stringResource(R.string.register),
             style = TextStyle(
                 color = Color.White,
-                fontSize = 24.sp
+                fontSize = 48.sp
             ),
             modifier = Modifier.padding(16.dp)
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(56.dp))
+//        CountryDropdown(
+//            selectedCountry = countrySelected,
+//            onCountrySelected = { countrySelected = it },
+//            expanded = expandedCountriesList,
+//            onExpandedChange = { expandedCountriesList = !expandedCountriesList } // Toggle expansion
+//        )
+
         CustomTextField(
             value = firstName,
             onValueChange = { firstName = it },
@@ -93,12 +106,12 @@ fun RegisterPage(navController: NavHostController) {
             keyboard = KeyboardOptions(keyboardType = KeyboardType.Text)
         )
         Spacer(modifier = Modifier.height(16.dp))
-        CustomTextField(
-            value = phoneNumber,
-            onValueChange = { phoneNumber = it },
-            label = stringResource(id = R.string.phone_number),
-            keyboard = KeyboardOptions(keyboardType = KeyboardType.Phone)
-        )
+        CustomTextFieldPhone(
+            valuePhone = phoneNumber,
+            onValueChangePhone = { phoneNumber = it },
+            valueCountryCode = countryCode,
+            onValueChangeCountryCode = { countryCode = it },
+            isPhoneNumberCorrect = isPhoneNumberCorrect)
         Spacer(modifier = Modifier.height(16.dp))
         CustomTextField(
             value = email,
@@ -109,22 +122,31 @@ fun RegisterPage(navController: NavHostController) {
         Spacer(modifier = Modifier.height(16.dp))
         CustomPasswordInput(
             password = password,
+            theOtherPassword = confirmedPassword,
             onPasswordChange = { password = it },
             passwordVisible = passwordVisible,
             onPasswordVisibilityChange = { passwordVisible = !passwordVisible },
-            label = stringResource(id = R.string.password_text)
+            label = stringResource(id = R.string.password_text),
+            isPasswordCorrect = isPasswordCorrect,
+            arePasswordsMatching = arePasswotdsMatching
         )
         Spacer(modifier = Modifier.height(16.dp))
         CustomPasswordInput(
             password = confirmedPassword,
+            theOtherPassword = password,
             onPasswordChange = { confirmedPassword = it },
             passwordVisible = confirmPasswordVisible,
             onPasswordVisibilityChange = { confirmPasswordVisible = !confirmPasswordVisible },
-            label = stringResource(id = R.string.confirm_password_text)
+            label = stringResource(id = R.string.confirm_password_text),
+            isPasswordCorrect = isPasswordCorrect,
+            arePasswordsMatching = arePasswotdsMatching
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(64.dp))
         Button(
             onClick = {
+                isPhoneNumberCorrect = isValidPhoneNumber(phoneNumber, countryCode)
+                isPasswordCorrect = isValidPassword(password)
+                arePasswotdsMatching = checkPasswords(password, confirmedPassword)
                 if (password == confirmedPassword) {
                     Toast
                         .makeText(
@@ -142,16 +164,19 @@ fun RegisterPage(navController: NavHostController) {
                         )
                         .show()
                 }
-                //navController.navigate(Screen.Login.route)
             },
             colors = ButtonDefaults.buttonColors(colorResource(R.color.dark_brown)),
             shape = RoundedCornerShape(50.dp),
             modifier = Modifier.fillMaxWidth(0.5f)) {
-            Text(stringResource(id = R.string.register_here_text))
+            Text(stringResource(id = R.string.register))
         }
+        Spacer(modifier = Modifier.height(16.dp))
         CustomClickableTextLoginRegister(
             text = stringResource(R.string.already_have_an_account_log_in),
             onClickAction = {
+                navController.popBackStack()
+                navController.popBackStack()
+                navController.navigate(Screen.Register.route)
                 navController.navigate(Screen.Login.route)
             }
         )

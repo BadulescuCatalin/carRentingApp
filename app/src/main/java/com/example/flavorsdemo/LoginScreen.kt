@@ -1,6 +1,5 @@
 package com.example.flavorsdemo
 
-import CustomClickableTextLoginRegister
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -107,7 +106,12 @@ fun Login(navController: NavHostController) {
         CustomClickableTextLoginRegister(
             text = stringResource(id = R.string.don_t_have_an_account_text),
             onClickAction = {
+
+                navController.popBackStack()
+                navController.popBackStack()
+                navController.navigate(Screen.Login.route)
                 navController.navigate(Screen.Register.route)
+
             }
         )
         Spacer(modifier = Modifier.padding(32.dp))
