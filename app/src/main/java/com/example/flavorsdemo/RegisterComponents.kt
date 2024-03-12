@@ -1,5 +1,6 @@
 package com.example.flavorsdemo
 
+import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.icons.rounded.AccessAlarm
 import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
@@ -43,7 +42,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -55,12 +53,16 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
-import androidx.compose.ui.zIndex
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.Filter
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.ktx.Firebase
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
 import kotlinx.coroutines.delay
@@ -69,6 +71,7 @@ import java.util.Locale
 
 val countriesMap = getAllCountriesMap()
 val countriesList = countriesMap.keys.toList()
+val countriesMapReversedKeyValue = getAllCountriesMapReversed();
 
 @Composable
 fun CustomClickableTextLoginRegister(
@@ -113,7 +116,10 @@ fun CustomTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
-    keyboard: KeyboardOptions
+    keyboard: KeyboardOptions,
+    isEmailCorrect: Boolean,
+    isEmailUsed: Boolean,
+    isEmptyValue: Boolean
 ) {
     val context = LocalContext.current
     var showPopup by remember { mutableStateOf(false) }
@@ -129,7 +135,7 @@ fun CustomTextField(
             label = { Text(text = label) },
             keyboardOptions = keyboard,
             colors = TextFieldDefaults.textFieldColors(
-                containerColor = colorResource(id = R.color.light_brown), // Ensure you have this color defined in your resources
+                containerColor = colorResource(id = R.color.light_brown),
                 disabledTextColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
@@ -137,7 +143,7 @@ fun CustomTextField(
             ),
             trailingIcon = {
                 val emailPattern = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
-                if (keyboard.keyboardType == KeyboardType.Email && !checkEmail(value)) {
+                if ((keyboard.keyboardType == KeyboardType.Email && (!isEmailCorrect || isEmailUsed)) || isEmptyValue) {
                     val image = Icons.Rounded.Error
                     val description = stringResource(R.string.invalid_field)
                     IconButton(onClick = {
@@ -169,7 +175,7 @@ fun CustomTextField(
                     properties = PopupProperties()
                 ) {
                     Text(
-                        text = stringResource(R.string.invalid_email_address),
+                        text = if (isEmptyValue) label + "should not be empty" else if (isEmailUsed) stringResource(R.string.email_already_used) else stringResource(R.string.invalid_email_address),
                         modifier = Modifier
                             .padding(8.dp)
                             .background(Color.Red, RoundedCornerShape(16.dp))
@@ -190,13 +196,13 @@ fun CustomTextFieldPhone(
     onValueChangePhone: (String) -> Unit,
     valueCountryCode: String,
     onValueChangeCountryCode: (String) -> Unit,
-    isPhoneNumberCorrect: Boolean
+    isPhoneNumberCorrect: Boolean,
+    isPhonenNumberUsed: Boolean
 ) {
     val context = LocalContext.current
     var showPopup by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     var expanded by remember { mutableStateOf(false) }
-//    val countryOptions = listOf("UK", "USA", "Poland")
     Log.d("Register", countriesList.toString())
 
     var selectedCountry by remember { mutableStateOf("RO") }
@@ -353,9 +359,9 @@ fun CustomTextFieldPhone(
                     disabledIndicatorColor = Color.Transparent
                 ),
                 trailingIcon = {
-                    if (!isPhoneNumberCorrect) {
+                    if (!isPhoneNumberCorrect || isPhonenNumberUsed) {
                         val image = Icons.Rounded.Error
-                        val description = stringResource(R.string.invalid_field)
+                        val description = if ( isPhonenNumberUsed) stringResource(R.string.phone_number_already_used) else stringResource(R.string.invalid_field)
                         IconButton(onClick = {
                             showPopup = true
                             coroutineScope.launch {
@@ -537,7 +543,6 @@ fun isValidPhoneNumber(phoneNumber: String, countryCode: String): Boolean {
 fun isValidPassword(password: String): Boolean {
     val passwordPattern = "^(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*+\\-/_])(?!.*\\s).{10,}$"
     val passwordMatcher = Regex(passwordPattern)
-
     return passwordMatcher.matches(password)
 }
 
@@ -555,4 +560,54 @@ fun getAllCountriesMap(): Map<String, String> {
         val locale = Locale("", countryCode)
         locale.displayCountry
     }.toSortedMap()
+}
+
+fun getAllCountriesMapReversed(): Map<String, String> {
+    return Locale.getISOCountries().associateWith { countryCode ->
+        val locale = Locale("", countryCode)
+        locale.displayCountry
+    }.toSortedMap()
+}
+
+fun isEmailUsed1(email: String): Boolean {
+    var result = false
+    val db = FirebaseFirestore.getInstance()
+    return result
+}
+
+fun isPhoneNumberUsed(phoneNumber: String): Boolean {
+    var isUsed = false
+    val db = FirebaseFirestore.getInstance()
+    db.collection("users")
+        .get()
+        .addOnSuccessListener { result ->
+            for (document in result) {
+                if (document.data["phonenNumber"] == phoneNumber)
+                    isUsed = true
+                else
+                    isUsed = false
+            }
+        }
+        .addOnFailureListener {
+            isUsed = true
+        }
+    return isUsed
+}
+fun isEmailUsed(email: String) : Boolean {
+    val db = FirebaseFirestore.getInstance()
+    var isUsed = false
+    db.collection("users")
+        .get()
+        .addOnSuccessListener { result ->
+            for (document in result) {
+                if (document.data["emailAddress"] == email)
+                    isUsed = true
+                else
+                    isUsed = false
+            }
+        }
+        .addOnFailureListener {
+            isUsed = true
+        }
+    return isUsed
 }

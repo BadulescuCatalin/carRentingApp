@@ -20,4 +20,6 @@
     <string name="the_password_must_contain_at_least_10_characters_one_uppercase_letter_one_digit_one_special_character_and_no_spaces">The password must contain at least 10 characters, one uppercase letter, one digit, one special character and no spaces</string>
     <string name="passwords_do_not_match">Passwords do not match</string>
     <string name="motto">Your Ride Your Rules</string>
+    <string name="email_already_used">Email already used!</string>
+    <string name="phone_number_already_used">Phone number already used</string>
 </resources>

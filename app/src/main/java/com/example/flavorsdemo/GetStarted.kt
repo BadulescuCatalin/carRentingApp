@@ -45,7 +45,6 @@ fun GetStartedPage(navController: NavHostController) {
             .padding(horizontal = 8.dp)
             .padding(top = 32.dp)
     ) {
-
         Button(
             onClick = {
                 navController.navigate(Screen.GetStarted.route)

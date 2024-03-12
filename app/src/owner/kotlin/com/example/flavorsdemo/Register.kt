@@ -1,6 +1,5 @@
 package com.example.flavorsdemo
 
-//import CountryDropdown
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -35,11 +34,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import kotlinx.coroutines.flow.collect
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterPage(navController: NavHostController) {
+
     val userType = FlavorConfig.userType
     val context = LocalContext.current
     var email by remember { mutableStateOf("") }
@@ -52,10 +53,16 @@ fun RegisterPage(navController: NavHostController) {
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
     var isPhoneNumberCorrect by remember { mutableStateOf(true) }
+    var isPhoneNumberUsed by remember { mutableStateOf(false) }
     var isPasswordCorrect by remember { mutableStateOf(true) }
     var arePasswotdsMatching by remember { mutableStateOf(true) }
-    var expandedCountriesList by remember { mutableStateOf(false) }
-    var countrySelected by remember { mutableStateOf("Country") }
+    var isEmailUsed by remember { mutableStateOf(false) }
+    var isEmailCorrect by remember { mutableStateOf(true) }
+    var isEmptyFirstName by remember { mutableStateOf(false) }
+    var isEmptyLastName by remember { mutableStateOf(false) }
+
+    val auth = FirebaseAuth.getInstance()
+    val db = FirebaseFirestore.getInstance()
 
     Image(
         painter = painterResource(id = R.drawable.login_car),
@@ -85,25 +92,24 @@ fun RegisterPage(navController: NavHostController) {
             modifier = Modifier.padding(16.dp)
         )
         Spacer(modifier = Modifier.height(56.dp))
-//        CountryDropdown(
-//            selectedCountry = countrySelected,
-//            onCountrySelected = { countrySelected = it },
-//            expanded = expandedCountriesList,
-//            onExpandedChange = { expandedCountriesList = !expandedCountriesList } // Toggle expansion
-//        )
-
         CustomTextField(
             value = firstName,
             onValueChange = { firstName = it },
             label = stringResource(id = R.string.first_name),
-            keyboard = KeyboardOptions(keyboardType = KeyboardType.Text)
+            keyboard = KeyboardOptions(keyboardType = KeyboardType.Text),
+            isEmailCorrect = isEmailCorrect,
+            isEmailUsed = isEmailUsed,
+            isEmptyValue = isEmptyFirstName
         )
         Spacer(modifier = Modifier.height(16.dp))
         CustomTextField(
             value = lastName,
             onValueChange = { lastName = it },
             label = stringResource(id = R.string.last_name),
-            keyboard = KeyboardOptions(keyboardType = KeyboardType.Text)
+            keyboard = KeyboardOptions(keyboardType = KeyboardType.Text),
+            isEmailCorrect = isEmailCorrect,
+            isEmailUsed = isEmailUsed,
+            isEmptyValue = isEmptyLastName
         )
         Spacer(modifier = Modifier.height(16.dp))
         CustomTextFieldPhone(
@@ -111,13 +117,18 @@ fun RegisterPage(navController: NavHostController) {
             onValueChangePhone = { phoneNumber = it },
             valueCountryCode = countryCode,
             onValueChangeCountryCode = { countryCode = it },
-            isPhoneNumberCorrect = isPhoneNumberCorrect)
+            isPhoneNumberCorrect = isPhoneNumberCorrect,
+            isPhonenNumberUsed = isPhoneNumberUsed
+        )
         Spacer(modifier = Modifier.height(16.dp))
         CustomTextField(
             value = email,
             onValueChange = { email = it },
             label = stringResource(id = R.string.email_text),
-            keyboard = KeyboardOptions(keyboardType = KeyboardType.Email)
+            keyboard = KeyboardOptions(keyboardType = KeyboardType.Email),
+            isEmailCorrect = isEmailCorrect,
+            isEmailUsed = isEmailUsed,
+            isEmptyValue = false
         )
         Spacer(modifier = Modifier.height(16.dp))
         CustomPasswordInput(
@@ -147,19 +158,77 @@ fun RegisterPage(navController: NavHostController) {
                 isPhoneNumberCorrect = isValidPhoneNumber(phoneNumber, countryCode)
                 isPasswordCorrect = isValidPassword(password)
                 arePasswotdsMatching = checkPasswords(password, confirmedPassword)
-                if (password == confirmedPassword) {
-                    Toast
-                        .makeText(
-                            context,
-                            "User type: $userType, Email: $email, Password: $password",
-                            Toast.LENGTH_LONG
-                        )
-                        .show()
+                isEmailUsed = isEmailUsed(email)
+                isEmailCorrect = checkEmail(email)
+                isEmptyFirstName = firstName.isEmpty()
+                isEmptyLastName = lastName.isEmpty()
+                isPhoneNumberUsed = isPhoneNumberUsed(phoneNumber)
+                if (!isPhoneNumberUsed && isPhoneNumberCorrect && isPasswordCorrect && arePasswotdsMatching && isEmailCorrect && !isEmailUsed) {
+//                  if(true){
+//                    val user = User(
+//                        firstName = firstName,
+//                        lastName = lastName,
+//                        phoneNumber = phoneNumber,
+//                        country = countriesMapReversedKeyValue[countryCode] ?: countryCode,
+//                        emailAddress = email,
+//                        userType = userType
+//                    )
+//
+//// Add a new document with a generated ID
+//                    db.collection("users")
+//                        .add(user)
+//                        .addOnSuccessListener { documentReference ->
+//                            Toast.makeText(context, "DocumentSnapshot added with ID: ${documentReference.id}", Toast.LENGTH_LONG).show()
+//                        }
+//                        .addOnFailureListener { e ->
+//                            Toast.makeText(context, "Error adding document: $e", Toast.LENGTH_LONG).show()
+//                        }
+//                    db.collection("users")
+//                        .get()
+//                        .addOnSuccessListener { result ->
+//                            for (document in result) {
+//                                if (document.data["firstName"] == "Catalin")
+//                                    Toast.makeText(context, "PLMTV", Toast.LENGTH_LONG).show()
+//                                    else
+//                                Toast.makeText(context, "${document.id} => ${document.data}", Toast.LENGTH_LONG).show()
+//                            }
+//                        }
+//                        .addOnFailureListener { exception ->
+//                            Toast.makeText(context, "Error getting documents: $exception", Toast.LENGTH_LONG).show()
+//                        }
+//
+
+                    auth.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val userId = auth.currentUser?.uid ?: ""
+                                val userDetails = User (
+                                    firstName = firstName,
+                                    lastName = lastName,
+                                    phoneNumber = phoneNumber,
+                                    country = countriesMapReversedKeyValue[countryCode] ?: countryCode,
+                                    emailAddress = email,
+                                    userType = userType
+                                )
+
+                                db.collection("users")
+                        .add(userDetails)
+                        .addOnSuccessListener { documentReference ->
+                            Toast.makeText(context, "DocumentSnapshot added with ID: ${documentReference.id}", Toast.LENGTH_LONG).show()
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(context, "Error adding document: $e", Toast.LENGTH_LONG).show()
+                        }
+                            } else {
+                                // pot sa pun aici sa se afiseze pt email deja folosit
+                                Toast.makeText(context, "Registration failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                            }
+                        }
                 } else {
                     Toast
                         .makeText(
                             context,
-                            "Passwords do not match",
+                            "REGISTRATION FAILED! Please check your data!",
                             Toast.LENGTH_LONG
                         )
                         .show()
@@ -167,7 +236,8 @@ fun RegisterPage(navController: NavHostController) {
             },
             colors = ButtonDefaults.buttonColors(colorResource(R.color.dark_brown)),
             shape = RoundedCornerShape(50.dp),
-            modifier = Modifier.fillMaxWidth(0.5f)) {
+            modifier = Modifier.fillMaxWidth(0.5f)
+        ) {
             Text(stringResource(id = R.string.register))
         }
         Spacer(modifier = Modifier.height(16.dp))
