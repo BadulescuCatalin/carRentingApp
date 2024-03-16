@@ -1,5 +1,6 @@
 package com.example.flavorsdemo
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -155,84 +156,67 @@ fun RegisterPage(navController: NavHostController) {
         Spacer(modifier = Modifier.height(64.dp))
         Button(
             onClick = {
-                isPhoneNumberCorrect = isValidPhoneNumber(phoneNumber, countryCode)
-                isPasswordCorrect = isValidPassword(password)
-                arePasswotdsMatching = checkPasswords(password, confirmedPassword)
-                isEmailUsed = isEmailUsed(email)
-                isEmailCorrect = checkEmail(email)
-                isEmptyFirstName = firstName.isEmpty()
-                isEmptyLastName = lastName.isEmpty()
-                isPhoneNumberUsed = isPhoneNumberUsed(phoneNumber)
-                if (!isPhoneNumberUsed && isPhoneNumberCorrect && isPasswordCorrect && arePasswotdsMatching && isEmailCorrect && !isEmailUsed) {
-//                  if(true){
-//                    val user = User(
-//                        firstName = firstName,
-//                        lastName = lastName,
-//                        phoneNumber = phoneNumber,
-//                        country = countriesMapReversedKeyValue[countryCode] ?: countryCode,
-//                        emailAddress = email,
-//                        userType = userType
-//                    )
-//
-//// Add a new document with a generated ID
-//                    db.collection("users")
-//                        .add(user)
-//                        .addOnSuccessListener { documentReference ->
-//                            Toast.makeText(context, "DocumentSnapshot added with ID: ${documentReference.id}", Toast.LENGTH_LONG).show()
-//                        }
-//                        .addOnFailureListener { e ->
-//                            Toast.makeText(context, "Error adding document: $e", Toast.LENGTH_LONG).show()
-//                        }
-//                    db.collection("users")
-//                        .get()
-//                        .addOnSuccessListener { result ->
-//                            for (document in result) {
-//                                if (document.data["firstName"] == "Catalin")
-//                                    Toast.makeText(context, "PLMTV", Toast.LENGTH_LONG).show()
-//                                    else
-//                                Toast.makeText(context, "${document.id} => ${document.data}", Toast.LENGTH_LONG).show()
-//                            }
-//                        }
-//                        .addOnFailureListener { exception ->
-//                            Toast.makeText(context, "Error getting documents: $exception", Toast.LENGTH_LONG).show()
-//                        }
-//
-
-                    auth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                val userId = auth.currentUser?.uid ?: ""
-                                val userDetails = User (
-                                    firstName = firstName,
-                                    lastName = lastName,
-                                    phoneNumber = phoneNumber,
-                                    country = countriesMapReversedKeyValue[countryCode] ?: countryCode,
-                                    emailAddress = email,
-                                    userType = userType
-                                )
-
-                                db.collection("users")
-                        .add(userDetails)
-                        .addOnSuccessListener { documentReference ->
-                            Toast.makeText(context, "DocumentSnapshot added with ID: ${documentReference.id}", Toast.LENGTH_LONG).show()
-                        }
-                        .addOnFailureListener { e ->
-                            Toast.makeText(context, "Error adding document: $e", Toast.LENGTH_LONG).show()
-                        }
-                            } else {
-                                // pot sa pun aici sa se afiseze pt email deja folosit
-                                Toast.makeText(context, "Registration failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                db.collection("users")
+                    .whereEqualTo("emailAddress", email)
+                    .get()
+                    .addOnSuccessListener { emailResult ->
+                        val isEmailUsedTemp = emailResult.documents.isNotEmpty()
+                        db.collection("users")
+                            .whereEqualTo("phoneNumber", phoneNumber)
+                            .get()
+                            .addOnSuccessListener { phoneResult ->
+                                isEmailUsed = isEmailUsedTemp
+                                isPhoneNumberUsed = phoneResult.documents.isNotEmpty()
+                                isPhoneNumberCorrect = isValidPhoneNumber(phoneNumber, countryCode)
+                                isPasswordCorrect = isValidPassword(password)
+                                arePasswotdsMatching = checkPasswords(password, confirmedPassword)
+                                arePasswotdsMatching = checkPasswords(password, confirmedPassword)
+                                isEmailCorrect = checkEmail(email)
+                                isEmptyFirstName = firstName.isEmpty()
+                                isEmptyLastName = lastName.isEmpty()
+                                if (!isPhoneNumberUsed && isPhoneNumberCorrect && isPasswordCorrect && arePasswotdsMatching && isEmailCorrect && !isEmailUsed) {
+                                    auth.createUserWithEmailAndPassword(email, password)
+                                        .addOnCompleteListener { task ->
+                                            if (task.isSuccessful) {
+                                                val userId = auth.currentUser?.uid ?: ""
+                                                val userDetails = User(
+                                                    firstName = firstName,
+                                                    lastName = lastName,
+                                                    phoneNumber = phoneNumber,
+                                                    country = countriesMapReversedKeyValue[countryCode]
+                                                        ?: countryCode,
+                                                    emailAddress = email,
+                                                    userType = userType
+                                                )
+                                                db.collection("users")
+                                                    .add(userDetails)
+                                                    .addOnSuccessListener {
+                                                        navController.popBackStack()
+                                                        navController.popBackStack()
+                                                        navController.navigate(Screen.Register.route)
+                                                        navController.navigate(Screen.Login.route)
+                                                    }
+                                                    .addOnFailureListener { e ->
+                                                        Log.d("TAG", "Error adding user in the database", e)
+                                                    }
+                                            } else {
+                                                Log.d("TAG", "Task create user failed: ${task.exception?.message}")
+                                            }
+                                        }
+                                        .addOnFailureListener() {
+                                            Log.d("TAG", "Failure creating user: ${it.message}")
+                                        }
+                                } else {
+                                    Log.d("TAG", "User inputted invalid data or didn't fill in all the fields")
+                                }
                             }
-                        }
-                } else {
-                    Toast
-                        .makeText(
-                            context,
-                            "REGISTRATION FAILED! Please check your data!",
-                            Toast.LENGTH_LONG
-                        )
-                        .show()
-                }
+                            .addOnFailureListener() {
+                                Log.d("TAG", "Failure getting phone number: ${it.message}")
+                            }
+                    }
+                    .addOnFailureListener {
+                        Log.d("TAG", "Failure getting email: ${it.message}")
+                    }
             },
             colors = ButtonDefaults.buttonColors(colorResource(R.color.dark_brown)),
             shape = RoundedCornerShape(50.dp),
@@ -252,4 +236,6 @@ fun RegisterPage(navController: NavHostController) {
         )
     }
 }
+
+
 

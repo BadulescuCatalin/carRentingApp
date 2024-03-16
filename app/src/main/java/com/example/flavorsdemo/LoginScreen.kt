@@ -102,7 +102,6 @@ fun Login(navController: NavHostController) {
             Text(stringResource(id = R.string.login_text))
         }
         Spacer(modifier = Modifier.height(16.dp))
-        
         CustomClickableTextLoginRegister(
             text = stringResource(id = R.string.don_t_have_an_account_text),
             onClickAction = {

@@ -290,57 +290,6 @@ fun CustomTextFieldPhone(
                     }
                 }
             }
-//                MaterialTheme(colorScheme = lightColorScheme(
-//                    primary = Color.Transparent,
-//                    secondary = Color.Transparent,
-//                    background = Color.Transparent,
-//                    surface = Color.Transparent
-//                )) {
-//                    DropdownMenu(
-//                        expanded = expanded,
-//                        onDismissRequest = { expanded = false },
-//                        modifier = Modifier
-//                            .padding(top = 4.dp)
-//                            .fillMaxWidth(0.3f)
-//                            .height(240.dp)
-//                            .align(Alignment.Center)
-//                            .background(
-//                                color = colorResource(id = R.color.light_brown),
-//                                shape = RoundedCornerShape(16.dp)
-//                            )
-//
-//                    ) {
-//                        countriesList.forEachIndexed { index, country ->
-//                            DropdownMenuItem(
-//                                text = { Text(country, color = Color.Black) },
-//                                onClick = {
-//                                    selectedCountry = countriesMap[country] ?: "Country"
-//                                    onValueChangeCountryCode(countriesMap[country] ?: "Country")
-//                                    expanded = false
-//                                },
-//                            )
-//                            if (index < countriesList.size - 1) {
-//                                Divider(color = Color.LightGray)
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            TextField(
-//                value = valueCountryCode,
-//                onValueChange = { onValueChangeCountryCode(it) },
-//                shape = RoundedCornerShape(50.dp),
-//                label = { Text(text = stringResource(R.string.country_code)) },
-//                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-//                colors = TextFieldDefaults.textFieldColors(
-//                    containerColor = colorResource(id = R.color.light_brown),
-//                    disabledTextColor = Color.Transparent,
-//                    focusedIndicatorColor = Color.Transparent,
-//                    unfocusedIndicatorColor = Color.Transparent,
-//                    disabledIndicatorColor = Color.Transparent
-//                ),
-//                modifier = Modifier.fillMaxWidth(0.2f)
-//            )
             Spacer(modifier = Modifier.width(2.dp))
             TextField(
                 value = valuePhone,
@@ -361,7 +310,7 @@ fun CustomTextFieldPhone(
                 trailingIcon = {
                     if (!isPhoneNumberCorrect || isPhonenNumberUsed) {
                         val image = Icons.Rounded.Error
-                        val description = if ( isPhonenNumberUsed) stringResource(R.string.phone_number_already_used) else stringResource(R.string.invalid_field)
+                        val description = if (isPhonenNumberUsed) stringResource(R.string.phone_number_already_used) else stringResource(R.string.invalid_field)
                         IconButton(onClick = {
                             showPopup = true
                             coroutineScope.launch {
@@ -389,7 +338,7 @@ fun CustomTextFieldPhone(
                     properties = PopupProperties()
                 ) {
                     Text(
-                        text = stringResource(R.string.invalid_phone_number_or_country_code),
+                        text = if (isPhonenNumberUsed) stringResource(R.string.phone_number_already_used) else stringResource(R.string.invalid_phone_number_or_country_code),
                         modifier = Modifier
                             .padding(8.dp)
                             .background(Color.Red, RoundedCornerShape(16.dp))
@@ -567,47 +516,4 @@ fun getAllCountriesMapReversed(): Map<String, String> {
         val locale = Locale("", countryCode)
         locale.displayCountry
     }.toSortedMap()
-}
-
-fun isEmailUsed1(email: String): Boolean {
-    var result = false
-    val db = FirebaseFirestore.getInstance()
-    return result
-}
-
-fun isPhoneNumberUsed(phoneNumber: String): Boolean {
-    var isUsed = false
-    val db = FirebaseFirestore.getInstance()
-    db.collection("users")
-        .get()
-        .addOnSuccessListener { result ->
-            for (document in result) {
-                if (document.data["phonenNumber"] == phoneNumber)
-                    isUsed = true
-                else
-                    isUsed = false
-            }
-        }
-        .addOnFailureListener {
-            isUsed = true
-        }
-    return isUsed
-}
-fun isEmailUsed(email: String) : Boolean {
-    val db = FirebaseFirestore.getInstance()
-    var isUsed = false
-    db.collection("users")
-        .get()
-        .addOnSuccessListener { result ->
-            for (document in result) {
-                if (document.data["emailAddress"] == email)
-                    isUsed = true
-                else
-                    isUsed = false
-            }
-        }
-        .addOnFailureListener {
-            isUsed = true
-        }
-    return isUsed
 }
