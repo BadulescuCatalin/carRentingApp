@@ -1,7 +1,6 @@
 package com.example.flavorsdemo
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -169,7 +168,6 @@ fun RegisterPage(navController: NavHostController) {
                                 isPhoneNumberUsed = phoneResult.documents.isNotEmpty()
                                 isPhoneNumberCorrect = isValidPhoneNumber(phoneNumber, countryCode)
                                 isPasswordCorrect = isValidPassword(password)
-                                arePasswotdsMatching = checkPasswords(password, confirmedPassword)
                                 arePasswotdsMatching = checkPasswords(password, confirmedPassword)
                                 isEmailCorrect = checkEmail(email)
                                 isEmptyFirstName = firstName.isEmpty()

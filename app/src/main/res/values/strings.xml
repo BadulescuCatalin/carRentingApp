@@ -22,4 +22,6 @@
     <string name="motto">Your Ride Your Rules</string>
     <string name="email_already_used">Email already used!</string>
     <string name="phone_number_already_used">Phone number already used</string>
+    <string name="incorrect_email_or_password_text">The combination of email and password doesn\'t match. Please try again!</string>
+    <string name="remember_me_text">Remember me</string>
 </resources>

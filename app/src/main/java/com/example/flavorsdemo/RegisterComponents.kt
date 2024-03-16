@@ -1,6 +1,5 @@
 package com.example.flavorsdemo
 
-import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -57,12 +56,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.Filter
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
-import com.google.firebase.ktx.Firebase
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
 import kotlinx.coroutines.delay
@@ -175,7 +168,9 @@ fun CustomTextField(
                     properties = PopupProperties()
                 ) {
                     Text(
-                        text = if (isEmptyValue) label + "should not be empty" else if (isEmailUsed) stringResource(R.string.email_already_used) else stringResource(R.string.invalid_email_address),
+                        text = if (isEmptyValue) "$label should not be empty" else if (isEmailUsed) stringResource(
+                            R.string.email_already_used
+                        ) else stringResource(R.string.invalid_email_address),
                         modifier = Modifier
                             .padding(8.dp)
                             .background(Color.Red, RoundedCornerShape(16.dp))
@@ -310,7 +305,10 @@ fun CustomTextFieldPhone(
                 trailingIcon = {
                     if (!isPhoneNumberCorrect || isPhonenNumberUsed) {
                         val image = Icons.Rounded.Error
-                        val description = if (isPhonenNumberUsed) stringResource(R.string.phone_number_already_used) else stringResource(R.string.invalid_field)
+                        val description =
+                            if (isPhonenNumberUsed) stringResource(R.string.phone_number_already_used) else stringResource(
+                                R.string.invalid_field
+                            )
                         IconButton(onClick = {
                             showPopup = true
                             coroutineScope.launch {
@@ -338,7 +336,9 @@ fun CustomTextFieldPhone(
                     properties = PopupProperties()
                 ) {
                     Text(
-                        text = if (isPhonenNumberUsed) stringResource(R.string.phone_number_already_used) else stringResource(R.string.invalid_phone_number_or_country_code),
+                        text = if (isPhonenNumberUsed) stringResource(R.string.phone_number_already_used) else stringResource(
+                            R.string.invalid_phone_number_or_country_code
+                        ),
                         modifier = Modifier
                             .padding(8.dp)
                             .background(Color.Red, RoundedCornerShape(16.dp))
@@ -478,6 +478,88 @@ fun CustomPasswordInput(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomPasswordInputLogin(
+    password: String,
+    onPasswordChange: (String) -> Unit,
+    passwordVisible: Boolean,
+    onPasswordVisibilityChange: () -> Unit,
+    label: String,
+    passwordEmpty: Boolean
+) {
+    var showPopupPassword by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+    Column {
+        TextField(
+            value = password,
+            onValueChange = onPasswordChange,
+            shape = RoundedCornerShape(50.dp),
+            label = { Text(text = label) },
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            colors = TextFieldDefaults.textFieldColors(
+                containerColor = colorResource(R.color.light_brown),
+                disabledTextColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
+            ),
+            trailingIcon = {
+                val image =
+                    if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                val description = if (passwordVisible) "Hide password" else "Show password"
+                Row {
+                    IconButton(onClick = onPasswordVisibilityChange) {
+                        Icon(imageVector = image, contentDescription = description)
+                    }
+                    if (passwordEmpty) {
+                        val image2 = Icons.Rounded.Error
+                        val description2 = stringResource(R.string.invalid_field)
+                        IconButton(onClick = {
+                            showPopupPassword = true
+                            coroutineScope.launch {
+                                delay(1500)
+                                showPopupPassword = false
+                            }
+                        }) {
+                            Icon(
+                                imageVector = image2,
+                                contentDescription = description2,
+                                tint = Color.Red
+                            )
+                        }
+                    }
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        )
+        if (showPopupPassword) {
+            Box(
+                modifier = Modifier
+                    .padding(end = 48.dp)
+                    .align(Alignment.End)
+            ) {
+                Popup(
+                    alignment = Alignment.BottomEnd,
+                    properties = PopupProperties()
+                ) {
+                    Text(
+                        text = "$label should not be empty",
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .background(Color.Red, RoundedCornerShape(16.dp))
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+
+                        color = Color.White
+                    )
+                }
+            }
+        }
+    }
+}
+
 fun isValidPhoneNumber(phoneNumber: String, countryCode: String): Boolean {
     val phoneUtil = PhoneNumberUtil.getInstance()
     return try {
@@ -500,8 +582,7 @@ fun checkPasswords(password: String, confirmedPassword: String): Boolean {
 }
 
 fun checkEmail(email: String): Boolean {
-    val emailPattern = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
-    return email.matches(emailPattern.toRegex())
+    return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
 }
 
 fun getAllCountriesMap(): Map<String, String> {
