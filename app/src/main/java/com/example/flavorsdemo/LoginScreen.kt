@@ -1,5 +1,8 @@
 package com.example.flavorsdemo
 
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -37,7 +40,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -52,7 +58,8 @@ fun Login(navController: NavHostController) {
     var passwordVisible by remember { mutableStateOf(false) }
     var isPasswordEmpty by remember { mutableStateOf(false) }
     var rememberMeChecked by remember { mutableStateOf(false) }
-
+    var wrongCredentials by remember { mutableStateOf(false) }
+    val sharedViewModel: SharedViewModel = viewModel()
     val registerHereString = stringResource(id = R.string.register_here_text)
     val context = LocalContext.current
 
@@ -112,7 +119,9 @@ fun Login(navController: NavHostController) {
                 onCheckedChange = { rememberMeChecked = !rememberMeChecked },
                 colors = CheckboxDefaults.colors(
                     uncheckedColor = colorResource(R.color.light_brown),
-                    checkmarkColor = colorResource(R.color.light_brown)
+                    checkmarkColor = colorResource(R.color.light_brown),
+                    checkedColor = colorResource(R.color.dark_brown)
+
                 )
             )
             Text(
@@ -122,9 +131,7 @@ fun Login(navController: NavHostController) {
             )
 
         }
-        // asta de pus daca pica loginul
-        if (rememberMeChecked) {
-            // si de pus daca checked sa salvez datele sa faca login automat data viitoare
+        if (wrongCredentials) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 stringResource(id = R.string.incorrect_email_or_password_text),
@@ -143,6 +150,42 @@ fun Login(navController: NavHostController) {
                 isEmailEmpty = email.isEmpty()
                 isEmailCorrect = checkEmail(email)
                 isPasswordEmpty = password.isEmpty()
+                wrongCredentials = false
+                    if (!isEmailEmpty && isEmailCorrect && !isPasswordEmpty) {
+                        sharedViewModel.fetchUserData(email?:"")
+                        val auth = Firebase.auth
+                        auth.signInWithEmailAndPassword(email, password)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    val user = auth.currentUser
+                                    Log.d("Login", "User: $user")
+                                    if (rememberMeChecked) {
+                                        val sharedPreferences =
+                                            context.getSharedPreferences("AppUser", Context.MODE_PRIVATE)
+                                        val editor = sharedPreferences.edit()
+                                        editor.putBoolean("autologin", true)
+                                        editor.apply()
+                                    } else {
+                                        val sharedPreferences =
+                                            context.getSharedPreferences("AppUser", Context.MODE_PRIVATE)
+                                        val editor = sharedPreferences.edit()
+                                        editor.putBoolean("autologin", false)
+                                        editor.apply()
+                                    }
+                                   navController.popBackStack()
+                                    navController.popBackStack()
+                                    navController.popBackStack()
+                                    navController.navigate(Screen.Home.route)
+                                } else {
+                                    wrongCredentials = true
+                                }
+                            }
+                            .addOnFailureListener {
+                                Log.d("Login", "Failed to login: ${it.message}")
+                                wrongCredentials = true
+                            }
+
+                }
             },
             colors = ButtonDefaults.buttonColors(colorResource(R.color.dark_brown)),
             modifier = Modifier.fillMaxWidth(0.5f)
@@ -161,6 +204,6 @@ fun Login(navController: NavHostController) {
 
             }
         )
-        Spacer(modifier = Modifier.padding(32.dp))
+        Spacer(modifier = Modifier.padding(48.dp))
     }
 }

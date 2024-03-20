@@ -1,10 +1,12 @@
 package com.example.flavorsdemo
 
 data class User(
-    val firstName: String,
-    val lastName: String,
-    val phoneNumber: String,
-    val country: String,
-    val emailAddress: String,
-    val userType: String
-)
+    var firstName: String,
+    var lastName: String,
+    var phoneNumber: String,
+    var country: String,
+    var emailAddress: String,
+    var userType: String
+) {
+    constructor() : this("", "", "", "", "", "")
+}

@@ -205,7 +205,7 @@ fun CustomTextFieldPhone(
         Row {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.20f)
+                    .fillMaxWidth(0.23f)
                     .heightIn(54.dp)
                     .background(
                         color = colorResource(id = R.color.light_brown),
@@ -241,7 +241,7 @@ fun CustomTextFieldPhone(
                             onClick = { expanded = !expanded },
                             modifier = Modifier
                                 .align(Alignment.CenterEnd)
-                                .padding(start = 22.dp, top = 3.dp)
+                                .padding(start = 38.dp, top = 3.dp)
 
                         ) {
                             Icon(
