@@ -1,4 +1,4 @@
-package com.example.flavorsdemo
+package com.example.flavorsdemo.Model
 
 data class User(
     var firstName: String,

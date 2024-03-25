@@ -1,4 +1,4 @@
-package com.example.flavorsdemo
+package com.example.flavorsdemo.View
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -34,6 +34,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.flavorsdemo.FlavorConfig
+import com.example.flavorsdemo.Model.User
+import com.example.flavorsdemo.R
+import com.example.flavorsdemo.Utils.checkEmail
+import com.example.flavorsdemo.Utils.checkPasswords
+import com.example.flavorsdemo.Utils.isValidPassword
+import com.example.flavorsdemo.Utils.isValidPhoneNumber
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -195,17 +202,27 @@ fun RegisterPage(navController: NavHostController) {
                                                         navController.navigate(Screen.Login.route)
                                                     }
                                                     .addOnFailureListener { e ->
-                                                        Log.d("TAG", "Error adding user in the database", e)
+                                                        Log.d(
+                                                            "TAG",
+                                                            "Error adding user in the database",
+                                                            e
+                                                        )
                                                     }
                                             } else {
-                                                Log.d("TAG", "Task create user failed: ${task.exception?.message}")
+                                                Log.d(
+                                                    "TAG",
+                                                    "Task create user failed: ${task.exception?.message}"
+                                                )
                                             }
                                         }
                                         .addOnFailureListener() {
                                             Log.d("TAG", "Failure creating user: ${it.message}")
                                         }
                                 } else {
-                                    Log.d("TAG", "User inputted invalid data or didn't fill in all the fields")
+                                    Log.d(
+                                        "TAG",
+                                        "User inputted invalid data or didn't fill in all the fields"
+                                    )
                                 }
                             }
                             .addOnFailureListener() {

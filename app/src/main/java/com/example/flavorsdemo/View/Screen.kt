@@ -1,4 +1,4 @@
-package com.example.flavorsdemo
+package com.example.flavorsdemo.View
 
 sealed class Screen(val route : String) {
     data object GetStarted : Screen("get_started")

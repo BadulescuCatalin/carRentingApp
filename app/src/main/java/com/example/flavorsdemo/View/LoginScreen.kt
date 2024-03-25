@@ -1,8 +1,7 @@
-package com.example.flavorsdemo
+package com.example.flavorsdemo.View
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -20,8 +18,6 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,15 +33,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.flavorsdemo.Model.SharedViewModel
+import com.example.flavorsdemo.R
+import com.example.flavorsdemo.Utils.checkEmail
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -108,7 +104,7 @@ fun Login(navController: NavHostController) {
             passwordEmpty = isPasswordEmpty,
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Row (
+        Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .padding(start = 16.dp)
@@ -151,39 +147,45 @@ fun Login(navController: NavHostController) {
                 isEmailCorrect = checkEmail(email)
                 isPasswordEmpty = password.isEmpty()
                 wrongCredentials = false
-                    if (!isEmailEmpty && isEmailCorrect && !isPasswordEmpty) {
-                        sharedViewModel.fetchUserData(email?:"")
-                        val auth = Firebase.auth
-                        auth.signInWithEmailAndPassword(email, password)
-                            .addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    val user = auth.currentUser
-                                    Log.d("Login", "User: $user")
-                                    if (rememberMeChecked) {
-                                        val sharedPreferences =
-                                            context.getSharedPreferences("AppUser", Context.MODE_PRIVATE)
-                                        val editor = sharedPreferences.edit()
-                                        editor.putBoolean("autologin", true)
-                                        editor.apply()
-                                    } else {
-                                        val sharedPreferences =
-                                            context.getSharedPreferences("AppUser", Context.MODE_PRIVATE)
-                                        val editor = sharedPreferences.edit()
-                                        editor.putBoolean("autologin", false)
-                                        editor.apply()
-                                    }
-                                   navController.popBackStack()
-                                    navController.popBackStack()
-                                    navController.popBackStack()
-                                    navController.navigate(Screen.Home.route)
+                if (!isEmailEmpty && isEmailCorrect && !isPasswordEmpty) {
+                    sharedViewModel.fetchUserData(email ?: "")
+                    val auth = Firebase.auth
+                    auth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val user = auth.currentUser
+                                Log.d("Login", "User: $user")
+                                if (rememberMeChecked) {
+                                    val sharedPreferences =
+                                        context.getSharedPreferences(
+                                            "AppUser",
+                                            Context.MODE_PRIVATE
+                                        )
+                                    val editor = sharedPreferences.edit()
+                                    editor.putBoolean("autologin", true)
+                                    editor.apply()
                                 } else {
-                                    wrongCredentials = true
+                                    val sharedPreferences =
+                                        context.getSharedPreferences(
+                                            "AppUser",
+                                            Context.MODE_PRIVATE
+                                        )
+                                    val editor = sharedPreferences.edit()
+                                    editor.putBoolean("autologin", false)
+                                    editor.apply()
                                 }
-                            }
-                            .addOnFailureListener {
-                                Log.d("Login", "Failed to login: ${it.message}")
+                                navController.popBackStack()
+                                navController.popBackStack()
+                                navController.popBackStack()
+                                navController.navigate(Screen.Home.route)
+                            } else {
                                 wrongCredentials = true
                             }
+                        }
+                        .addOnFailureListener {
+                            Log.d("Login", "Failed to login: ${it.message}")
+                            wrongCredentials = true
+                        }
 
                 }
             },

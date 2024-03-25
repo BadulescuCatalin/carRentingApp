@@ -1,7 +1,7 @@
-package com.example.flavorsdemo
+package com.example.flavorsdemo.Model
 
 import androidx.lifecycle.ViewModel
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.flavorsdemo.FlavorConfig
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SharedViewModel @Inject constructor(): ViewModel() {
-    private val _userData = MutableStateFlow<User?>(null)
+    private val _userData = MutableStateFlow<User?>(User("Catalin", "Badulescu", "0725422494", "Romania", "badulescucatalin01@gmail.com", FlavorConfig.userType)) // Default value
     val userData: StateFlow<User?> = _userData
 
     fun fetchUserData(email: String) {

@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">FlavorsDemo</string>
+    <string name="get_started">Get Started</string>
+    <string name="login_text">Login</string>
+    <string name="don_t_have_an_account_text">"Don't have an account? Register "</string>
+    <string name="register_here_text">Register here</string>
+    <string name="sign_in_text">Sign in</string>
+    <string name="email_text">Email</string>
+    <string name="password_text">Password</string>
+    <string name="already_have_an_account_log_in">"Already have an account? Log in "</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="confirm_password_text">Confirm Password</string>
+    <string name="invalid_field">Invalid field♦</string>
+    <string name="invalid_email_address">Invalid email address</string>
+    <string name="invalid_phone_number_or_country_code">Invalid phone number or country code</string>
+    <string name="country_code">Phone prefix</string>
+    <string name="register">Register</string>
+    <string name="the_password_must_contain_at_least_10_characters_one_uppercase_letter_one_digit_one_special_character_and_no_spaces">The password must contain at least 10 characters, one uppercase letter, one digit, one special character and no spaces</string>
+    <string name="passwords_do_not_match">Passwords do not match</string>
+    <string name="motto">Your Ride Your Rules</string>
+    <string name="email_already_used">Email already used!</string>
+    <string name="phone_number_already_used">Phone number already used</string>
+    <string name="incorrect_email_or_password_text">The combination of email and password doesn\'t match. Please try again!</string>
+    <string name="remember_me_text">Remember me</string>
+</resources>

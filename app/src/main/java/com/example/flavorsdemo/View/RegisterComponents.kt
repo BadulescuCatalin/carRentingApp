@@ -1,4 +1,4 @@
-package com.example.flavorsdemo
+package com.example.flavorsdemo.View
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -56,11 +56,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
-import com.google.i18n.phonenumbers.PhoneNumberUtil
-import com.google.i18n.phonenumbers.Phonenumber
+import com.example.flavorsdemo.R
+import com.example.flavorsdemo.Utils.getAllCountriesMap
+import com.example.flavorsdemo.Utils.getAllCountriesMapReversed
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 val countriesMap = getAllCountriesMap()
 val countriesList = countriesMap.keys.toList()
@@ -558,43 +558,4 @@ fun CustomPasswordInputLogin(
             }
         }
     }
-}
-
-fun isValidPhoneNumber(phoneNumber: String, countryCode: String): Boolean {
-    val phoneUtil = PhoneNumberUtil.getInstance()
-    return try {
-        val numberProto: Phonenumber.PhoneNumber = phoneUtil.parse(phoneNumber, countryCode)
-        phoneUtil.isValidNumber(numberProto)
-    } catch (e: Exception) {
-        e.printStackTrace()
-        false
-    }
-}
-
-fun isValidPassword(password: String): Boolean {
-    val passwordPattern = "^(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*+\\-/_])(?!.*\\s).{10,}$"
-    val passwordMatcher = Regex(passwordPattern)
-    return passwordMatcher.matches(password)
-}
-
-fun checkPasswords(password: String, confirmedPassword: String): Boolean {
-    return password == confirmedPassword
-}
-
-fun checkEmail(email: String): Boolean {
-    return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-}
-
-fun getAllCountriesMap(): Map<String, String> {
-    return Locale.getISOCountries().associateBy { countryCode ->
-        val locale = Locale("", countryCode)
-        locale.displayCountry
-    }.toSortedMap()
-}
-
-fun getAllCountriesMapReversed(): Map<String, String> {
-    return Locale.getISOCountries().associateWith { countryCode ->
-        val locale = Locale("", countryCode)
-        locale.displayCountry
-    }.toSortedMap()
 }
