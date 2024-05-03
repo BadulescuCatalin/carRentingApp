@@ -1,4 +1,4 @@
-package com.example.flavorsdemo.View
+package com.example.flavorsdemo.View.components
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -100,6 +100,41 @@ fun CustomClickableTextLoginRegister(
                 }
         },
         style = TextStyle(color = Color.Gray, fontSize = 14.sp)
+    )
+}
+
+@Composable
+fun CustomClickableText(
+    text: String,
+    onClickAction: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val annotatedText = buildAnnotatedString {
+        pushStringAnnotation(
+            tag = "CLICK",
+            annotation = "clickableText"
+        )
+        withStyle(
+            style = SpanStyle(
+                fontSize = 16.sp,
+                fontFamily = androidx.compose.ui.text.font.FontFamily.SansSerif
+            )
+        ) {
+            append(text)
+        }
+        pop()
+    }
+
+    ClickableText(
+        text = annotatedText,
+        onClick = { offset ->
+            annotatedText.getStringAnnotations(tag = "CLICK", start = offset, end = offset)
+                .firstOrNull()?.let {
+                    onClickAction()
+                }
+        },
+        style = TextStyle(color = colorResource(id = R.color.black), fontSize = 16.sp),
+        modifier = modifier
     )
 }
 

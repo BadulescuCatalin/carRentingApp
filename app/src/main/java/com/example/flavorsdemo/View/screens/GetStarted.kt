@@ -1,4 +1,4 @@
-package com.example.flavorsdemo.View
+package com.example.flavorsdemo.View.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.flavorsdemo.R
+import com.example.flavorsdemo.View.Screen
 
 @Composable
 fun GetStartedPage(navController: NavHostController) {

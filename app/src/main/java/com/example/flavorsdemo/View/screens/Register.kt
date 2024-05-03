@@ -1,4 +1,4 @@
-package com.example.flavorsdemo.View
+package com.example.flavorsdemo.View.screens
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -41,6 +41,12 @@ import com.example.flavorsdemo.Utils.checkEmail
 import com.example.flavorsdemo.Utils.checkPasswords
 import com.example.flavorsdemo.Utils.isValidPassword
 import com.example.flavorsdemo.Utils.isValidPhoneNumber
+import com.example.flavorsdemo.View.Screen
+import com.example.flavorsdemo.View.components.CustomClickableTextLoginRegister
+import com.example.flavorsdemo.View.components.CustomPasswordInput
+import com.example.flavorsdemo.View.components.CustomTextField
+import com.example.flavorsdemo.View.components.CustomTextFieldPhone
+import com.example.flavorsdemo.View.components.countriesMapReversedKeyValue
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 

@@ -1,4 +1,4 @@
-package com.example.flavorsdemo.View
+package com.example.flavorsdemo.View.screens
 
 import android.content.Context
 import android.util.Log
@@ -40,6 +40,10 @@ import androidx.navigation.NavHostController
 import com.example.flavorsdemo.Model.SharedViewModel
 import com.example.flavorsdemo.R
 import com.example.flavorsdemo.Utils.checkEmail
+import com.example.flavorsdemo.View.Screen
+import com.example.flavorsdemo.View.components.CustomClickableTextLoginRegister
+import com.example.flavorsdemo.View.components.CustomPasswordInputLogin
+import com.example.flavorsdemo.View.components.CustomTextField
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 

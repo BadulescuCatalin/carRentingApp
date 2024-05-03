@@ -16,11 +16,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.flavorsdemo.Model.SharedViewModel
-import com.example.flavorsdemo.View.GetStartedPage
+import com.example.flavorsdemo.View.AddCar
+import com.example.flavorsdemo.View.AddImages
+import com.example.flavorsdemo.View.screens.GetStartedPage
 import com.example.flavorsdemo.View.Home
-import com.example.flavorsdemo.View.Login
-import com.example.flavorsdemo.View.RegisterPage
+import com.example.flavorsdemo.View.screens.Login
+import com.example.flavorsdemo.View.screens.RegisterPage
 import com.example.flavorsdemo.View.Screen
+import com.example.flavorsdemo.View.screens.FilterPage
 import com.example.flavorsdemo.ui.theme.FlavorsDemoTheme
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -79,6 +82,15 @@ class GetStarted : ComponentActivity() {
                         }
                         composable(Screen.Home.route) {
                             Home(navController = navController, sharedViewModel = sharedViewModel)
+                        }
+                        composable(Screen.AddCar.route) {
+                            AddCar(navController = navController)
+                        }
+                        composable(Screen.AddImages.route) {
+                            AddImages(navController = navController)
+                        }
+                        composable(Screen.FilterPage.route) {
+                            FilterPage(navController = navController)
                         }
                     }
                 }

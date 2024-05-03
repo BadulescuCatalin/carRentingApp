@@ -29,6 +29,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.flavorsdemo.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,7 +40,8 @@ fun InfoBar(
     searchValue : String,
     onValueChange: (String) -> Unit,
     showFilters: Boolean,
-    setShowFilters: () -> Unit
+    setShowFilters: () -> Unit,
+    navController: NavHostController
 ) {
     Box(
         modifier = Modifier
@@ -55,9 +57,9 @@ fun InfoBar(
                 .padding(top = 40.dp)
                 .align(Alignment.TopCenter)
         ) {
-            Text(text = "${firstName} ${lastName}",
+            Text(text = "$firstName $lastName",
                 fontSize = 16.sp,
-                color = colorResource(id = R.color.light_brown),
+                color = colorResource(id = R.color.white),
                 modifier = Modifier
                     .padding(start = 36.dp)
             )
@@ -65,7 +67,7 @@ fun InfoBar(
             Icon(
                 imageVector = Icons.Filled.Notifications,
                 contentDescription = "Notifications",
-                tint = colorResource(id = R.color.light_brown),
+                tint = colorResource(id = R.color.white),
                 modifier = Modifier
                     .size(36.dp)
                     .padding(start = 8.dp)
@@ -82,14 +84,13 @@ fun InfoBar(
                 .align(Alignment.BottomCenter)
         )
         {
-
             TextField(
                 value = searchValue,
                 onValueChange = { onValueChange(it) },
                 placeholder = { Text(text = "Search", fontSize = 14.sp) },
                 shape = RoundedCornerShape(20.dp),
                 colors = TextFieldDefaults.textFieldColors(
-                    containerColor = colorResource(id = R.color.light_brown),
+                    containerColor = colorResource(id = R.color.white),
                     disabledTextColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
@@ -113,14 +114,14 @@ fun InfoBar(
                 Image(
                     painter = painterResource(id = R.drawable.filter), // Use your drawable resource
                     contentDescription = "Expand Filter List",
-                    colorFilter = ColorFilter.tint(colorResource(id = R.color.light_brown)), // Apply tint
+                    colorFilter = ColorFilter.tint(colorResource(id = R.color.white)), // Apply tint
                     modifier = Modifier
 //                            .background(colorResource(id = R.color.light_brown))
                         .align(Alignment.CenterVertically)
 //                            .size(40.dp, 40.dp)
                         //.scale(scaleY = 0.8F, scaleX = 0.8F)
-                        .clickable { /* Handle click here
-                        */
+                        .clickable {
+                            navController.navigate(Screen.FilterPage.route)
                         }
                 )
             }
