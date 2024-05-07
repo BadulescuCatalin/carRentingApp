@@ -1,6 +1,6 @@
 package com.example.flavorsdemo.Model
 
-import com.example.flavorsdemo.View.user
+import com.example.flavorsdemo.View.screens.user
 import java.util.UUID
 
 data class Car(
@@ -19,7 +19,7 @@ data class Car(
     var numberOfDoors: String,
     var urbanFuelConsumption: String,
     var extraUrbanFuelConsumption: String,
-    var ownerId: String // ramane de vazut daca nu e company id si bag si un company
+    var officeId: String // ramane de vazut daca nu e company id si bag si un company
 ) {
-    constructor() : this(UUID.randomUUID().toString(), "", "", "", "", "", "", "", "", "", "", "", "", "", "", user?.uid ?: "")
+    constructor() : this(UUID.randomUUID().toString(), "", "", "", "", "", "", "", "", "", "", "", "", "", "", "")
 }

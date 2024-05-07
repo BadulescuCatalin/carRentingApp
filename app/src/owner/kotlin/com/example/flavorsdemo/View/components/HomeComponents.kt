@@ -1,11 +1,14 @@
-package com.example.flavorsdemo.View
+package com.example.flavorsdemo.View.components
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -30,7 +33,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
+import com.example.flavorsdemo.Model.Office
 import com.example.flavorsdemo.R
+import com.example.flavorsdemo.View.Screen
+import com.example.flavorsdemo.View.screens.fromWhere
+import com.example.flavorsdemo.View.screens.imageMapOffice
+import com.example.flavorsdemo.View.screens.office
+import com.example.flavorsdemo.View.screens.officeMainImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,20 +51,20 @@ fun InfoBar(
     onValueChange: (String) -> Unit,
     showFilters: Boolean,
     setShowFilters: () -> Unit,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(170.dp)
-            .background(colorResource(id = R.color.dark_brown))
+            .height(135.dp)
+            .background(colorResource(id = R.color.light_blue))
     ) {
         Row (
             modifier = Modifier
                 .fillMaxWidth()
 //                    .padding(16.dp)
-                .padding(bottom = 16.dp, end = 26.dp, top = 16.dp, start = 4.dp)
-                .padding(top = 40.dp)
+                .padding(bottom = 8.dp, end = 26.dp, top = 8.dp, start = 4.dp)
+                .padding(top = 32.dp)
                 .align(Alignment.TopCenter)
         ) {
             Text(text = "$firstName $lastName",
@@ -80,7 +90,7 @@ fun InfoBar(
         Row (
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 8.dp, end = 26.dp)
+                .padding(end = 26.dp)
                 .align(Alignment.BottomCenter)
         )
         {
@@ -122,9 +132,65 @@ fun InfoBar(
                         //.scale(scaleY = 0.8F, scaleX = 0.8F)
                         .clickable {
                             navController.navigate(Screen.FilterPage.route)
+
                         }
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun AddOfficeComp(navController: NavHostController) {
+    Image(painter = painterResource(id = R.drawable.add_image),
+        contentDescription = "Add Image",
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .size(100.dp)
+            .clickable {
+                office = Office()
+                officeMainImage = Uri.EMPTY
+                navController.navigate(Screen.AddOffice.route)
+            }
+    )
+}
+
+@Composable
+fun OfficeComponent(navController: NavHostController, thisOffice : Office) {
+//    val painterRes = rememberAsyncImagePainter(
+//        model = if (imageMapOffice[thisOffice.id] != Uri.EMPTY.toString()) {
+//            imageMapOffice[thisOffice.id]
+//        } else {
+//            R.drawable.company
+//        }
+//    )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = 4.dp)
+                .align(Alignment.Center)
+        ) {
+            Image(painter = painterResource(id = R.drawable.company),
+                contentDescription = "Add Image",
+                modifier = Modifier
+                    .height(100.dp)
+                    .clickable {
+                        navController.navigate(Screen.AddOffice.route)
+                        office = thisOffice
+                        officeMainImage = Uri.parse(imageMapOffice[thisOffice.id])
+                        fromWhere = "OfficeComponent"
+                    }
+                    .align(Alignment.CenterHorizontally)
+            )
+            Text(text = thisOffice.name,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally))
         }
     }
 }

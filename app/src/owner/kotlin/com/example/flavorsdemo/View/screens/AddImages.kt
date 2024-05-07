@@ -1,4 +1,4 @@
-package com.example.flavorsdemo.View
+package com.example.flavorsdemo.View.screens
 
 import ConfirmationDialog
 import TopBar
@@ -52,9 +52,11 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.flavorsdemo.Model.CarImage
 import com.example.flavorsdemo.R
+import com.example.flavorsdemo.View.Screen
+import com.example.flavorsdemo.View.screens.imageMap
+import com.example.flavorsdemo.View.screens.imageMaps
 import com.example.flavorsdemo.ViewModel.CarImageViewModel
 import com.example.flavorsdemo.ViewModel.CarViewModelOwner
-import com.google.android.play.integrity.internal.i
 import kotlinx.coroutines.launch
 
 var carImages = CarImage()
@@ -94,7 +96,7 @@ fun AddImages(navController: NavHostController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp)
-                    .background(colorResource(id = R.color.dark_brown))
+                    .background(colorResource(id = R.color.light_blue))
                     .padding(top = 8.dp)
             ) {
                 Column {
@@ -194,7 +196,10 @@ fun AddImages(navController: NavHostController) {
                                 .padding(16.dp)
                                 .padding(top = 24.dp)
                                 .padding(end = 24.dp)
-                                .padding(start = 24.dp)
+                                .padding(start = 24.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                colorResource(id = R.color.light_blue)
+                            )
                         ) {
                             Text(text = "Pick Main Image from Gallery")
                         }
@@ -222,6 +227,19 @@ fun AddImages(navController: NavHostController) {
                             fontSize = 20.sp,
                             modifier = Modifier
                                 .align(Alignment.Center)
+                        )
+                    }
+                }
+                if (imageUris.size == 0) {
+                    item {
+                        Image(
+                            painter = painterResource(R.drawable.image_placeholder),
+                            contentDescription = "placeholder",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier
+                                .padding(top = 24.dp)
+                                .fillMaxWidth()
+                                .scale(1.4F, 1.4F)
                         )
                     }
                 }
@@ -286,6 +304,9 @@ fun AddImages(navController: NavHostController) {
                             .fillMaxWidth()
                             .padding(16.dp)
                             .padding(start = 24.dp, end = 24.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            colorResource(id = R.color.light_blue)
+                        ),
                         onClick = { pickImagesLauncher.launch("image/*") } // Updated to pick multiple images
                     ) {
                         Text(text = "Pick Additional Images from Gallery")
@@ -311,6 +332,9 @@ fun AddImages(navController: NavHostController) {
                         .padding(16.dp)
                         .padding(start = 24.dp, end = 12.dp, bottom = 24.dp)
                         .align(Alignment.BottomEnd),
+                    colors = ButtonDefaults.buttonColors(
+                        colorResource(id = R.color.light_blue)
+                    ),
                     onClick = {
                         coroutineScope.launch {
                             carViewModel.addCar(car)
@@ -337,6 +361,9 @@ fun AddImages(navController: NavHostController) {
                         modifier = Modifier
                             .padding(16.dp)
                             .padding(start = 12.dp, end = 12.dp, bottom = 24.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            colorResource(id = R.color.light_blue)
+                        ),
                         onClick = {
                             showConfirmationDialog = true
                         }
@@ -347,6 +374,9 @@ fun AddImages(navController: NavHostController) {
                         modifier = Modifier
                             .padding(16.dp)
                             .padding(start = 24.dp, end = 12.dp, bottom = 24.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            colorResource(id = R.color.light_blue)
+                        ),
                         onClick = {
                             coroutineScope.launch {
                                 carViewModel.updateCar(car)

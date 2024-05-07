@@ -1,8 +1,12 @@
-package com.example.flavorsdemo.View
+package com.example.flavorsdemo.View.screens
 
 import ConfirmationDialog
+import DropDown
+import InfoTitle
 import TableRow
+import TableRows
 import TopBar
+import android.widget.Space
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,8 +24,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -33,6 +41,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
@@ -40,12 +49,15 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.flavorsdemo.Model.Car
+import com.example.flavorsdemo.Model.Office
 import com.example.flavorsdemo.R
+import com.example.flavorsdemo.View.Screen
 import com.example.flavorsdemo.ViewModel.CarViewModelOwner
 import kotlinx.coroutines.launch
 
 var car = Car()
 var fromWhere = ""
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddCar(navController: NavHostController) {
@@ -64,17 +76,22 @@ fun AddCar(navController: NavHostController) {
     var carUrbanFuelConsumption by remember { mutableStateOf(car.urbanFuelConsumption) }
     var carExtraUrbanFuelConsumption by remember { mutableStateOf(car.extraUrbanFuelConsumption) }
     var showConfirmationDialog by remember { mutableStateOf(false) }
-
+    var officeSelected by remember { mutableStateOf( if (car.officeId == "") "Assign Office" else "Office: " +
+            officesGlobal.find { it.id == car.officeId }?.name.toString())}
 
     val viewModel: CarViewModelOwner = viewModel()
     val coroutineScope = rememberCoroutineScope()
 
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorResource(id = R.color.white))
+    ) {
         Box(
             modifier = androidx.compose.ui.Modifier
                 .fillMaxWidth()
                 .height(120.dp)
-                .background(colorResource(id = R.color.dark_brown))
+                .background(colorResource(id = R.color.light_blue))
                 .padding(top = 8.dp)
         ) {
             Column {
@@ -84,106 +101,70 @@ fun AddCar(navController: NavHostController) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(color = Color.White)
         ) {
             LazyColumn() {
                 item {
-                    // Display the selected image
-
-                    Box(
-                        modifier = androidx.compose.ui.Modifier
-                            .fillMaxWidth()
-                            .height(48.dp)
-                            .padding(top = 8.dp, start = 16.dp, end = 16.dp)
-                            .background(colorResource(id = R.color.add_car_title_background))
-                            .border(
-                                border = BorderStroke(
-                                    0.5.dp,
-                                    Color.Black
-                                )
-                            ),
-                    )
-                    {
-                        Text(
-                            text = "Car Informations",
-                            fontSize = 16.sp,
-                            modifier = androidx.compose.ui.Modifier
-                                .padding(8.dp)
-                                .align(Alignment.Center),
-                            color = colorResource(id = R.color.white)
-                        )
-                    }
-                    TableRow(
+                    Spacer(modifier = Modifier.height(4.dp))
+                    InfoTitle(title = "Car Informations", icon = R.drawable.car)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TableRows(
                         text = "Brand:",
-                        placeholder = "Enter car brand",
+                        placeholder = "Brand",
                         value = carBrand,
                         onValueChange = {
                             carBrand = it
                             car.brand = it
-                        }
-                    )
-                    TableRow(
-                        text = "Model:",
-                        placeholder = "Enter car model",
-                        value = carModel,
-                        onValueChange = {
+                        },
+                        text2 = "Model:",
+                        placeholder2 = "Model",
+                        value2 = carModel,
+                        onValueChange2 = {
                             carModel = it
                             car.model = it
                         }
                     )
-                    TableRow(
+                    TableRows(
                         text = "Year:",
-                        placeholder = "Enter car manufacture year",
+                        placeholder = "Year",
                         value = carYear,
                         onValueChange = {
                             carYear = it
                             car.year = it
-                        }
-                    )
-                    TableRow(
-                        text = "Color:",
-                        placeholder = "Enter car color",
-                        value = carColor,
-                        onValueChange = {
+                        },
+                        text2 = "Color:",
+                        placeholder2 = "Color",
+                        value2 = carColor,
+                        onValueChange2 = {
                             carColor = it
                             car.color = it
                         }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Box(
-                        modifier = androidx.compose.ui.Modifier
-                            .fillMaxWidth()
-                            .height(48.dp)
-                            .padding(top = 8.dp, start = 16.dp, end = 16.dp)
-                            .background(colorResource(id = R.color.add_car_title_background))
-                            .border(
-                                border = BorderStroke(
-                                    0.5.dp,
-                                    Color.Black
-                                )
-                            ),
-                    )
-                    {
-                        Text(
-                            text = "Vehicle Specifications",
-                            fontSize = 16.sp,
-                            modifier = androidx.compose.ui.Modifier
-                                .padding(8.dp)
-                                .align(Alignment.Center),
-                            color = colorResource(id = R.color.white)
-                        )
-                    }
-                    TableRow(
+                }
+                item {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    InfoTitle(title = "Vehicle Specifications", icon = R.drawable.specifications)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TableRows(
                         text = "Type:",
-                        placeholder = "Enter car type",
+                        placeholder = "Car Type",
                         value = carType,
                         onValueChange = {
                             carType = it
                             car.type = it
+                        },
+                        text2 = "Range:",
+                        placeholder2 = "Range",
+                        value2 = carMileage,
+                        onValueChange2 = {
+                            carMileage = it
+                            car.mileage = it
                         }
                     )
                     TableRow(
-                        text = "Transmission:",
-                        placeholder = "Enter car transmission",
+                        text = "Car Transmission:",
+                        placeholder = "Transmission",
                         value = carTransmission,
                         onValueChange = {
                             carTransmission = it
@@ -191,17 +172,8 @@ fun AddCar(navController: NavHostController) {
                         }
                     )
                     TableRow(
-                        text = "Mileage:",
-                        placeholder = "Enter car mileage",
-                        value = carMileage,
-                        onValueChange = {
-                            carMileage = it
-                            car.mileage = it
-                        }
-                    )
-                    TableRow(
                         text = "Number of seats:",
-                        placeholder = "Enter number of seats",
+                        placeholder = "Number of seats",
                         value = carNumberOfSeats,
                         onValueChange = {
                             carNumberOfSeats = it
@@ -210,7 +182,7 @@ fun AddCar(navController: NavHostController) {
                     )
                     TableRow(
                         text = "Number of doors:",
-                        placeholder = "Enter number of doors",
+                        placeholder = "Number of doors",
                         value = carNumberOfDoors,
                         onValueChange = {
                             carNumberOfDoors = it
@@ -218,29 +190,11 @@ fun AddCar(navController: NavHostController) {
                         }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Box(
-                        modifier = androidx.compose.ui.Modifier
-                            .fillMaxWidth()
-                            .height(48.dp)
-                            .padding(top = 8.dp, start = 16.dp, end = 16.dp)
-                            .background(colorResource(id = R.color.add_car_title_background))
-                            .border(
-                                border = BorderStroke(
-                                    0.5.dp,
-                                    Color.Black
-                                )
-                            ),
-                    )
-                    {
-                        Text(
-                            text = "Fuel & Consumption",
-                            fontSize = 16.sp,
-                            modifier = androidx.compose.ui.Modifier
-                                .padding(8.dp)
-                                .align(Alignment.Center),
-                            color = colorResource(id = R.color.white)
-                        )
-                    }
+                }
+                item {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    InfoTitle(title = "Fuel & Consumption", icon = R.drawable.gas)
+                    Spacer(modifier = Modifier.height(8.dp))
                     TableRow(
                         text = "Fuel Type:",
                         placeholder = "Enter car fuel type",
@@ -251,8 +205,8 @@ fun AddCar(navController: NavHostController) {
                         }
                     )
                     TableRow(
-                        text = "Urban Consumption:",
-                        placeholder = "Urban consumption",
+                        text = "Urban consumption:",
+                        placeholder = "Consumption",
                         value = carUrbanFuelConsumption,
                         onValueChange = {
                             carUrbanFuelConsumption = it
@@ -260,8 +214,8 @@ fun AddCar(navController: NavHostController) {
                         }
                     )
                     TableRow(
-                        text = "Extra Urban Consumption:",
-                        placeholder = "Extra urban consumption",
+                        text = "Extra urban consumption:",
+                        placeholder = "Consumption",
                         value = carExtraUrbanFuelConsumption,
                         onValueChange = {
                             carExtraUrbanFuelConsumption = it
@@ -269,42 +223,28 @@ fun AddCar(navController: NavHostController) {
                         }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Box(
-                        modifier = androidx.compose.ui.Modifier
-                            .fillMaxWidth()
-                            .height(48.dp)
-                            .padding(top = 8.dp, start = 16.dp, end = 16.dp)
-                            .background(colorResource(id = R.color.add_car_title_background))
-                            .border(
-                                border = BorderStroke(
-                                    0.5.dp,
-                                    Color.Black
-                                )
-                            ),
-                    )
-                    {
-                        Text(
-                            text = "Cost & Description",
-                            fontSize = 16.sp,
-                            modifier = androidx.compose.ui.Modifier
-                                .padding(8.dp)
-                                .align(Alignment.Center),
-                            color = colorResource(id = R.color.white)
-                        )
-                    }
+                }
+                item {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    InfoTitle(title = "Cost & Description", icon = R.drawable.contract)
+                    Spacer(modifier = Modifier.height(8.dp))
                     TableRow(
                         text = "Price per day:",
-                        placeholder = "Enter car price",
+                        placeholder = "Car cost per day",
                         value = carPrice,
                         onValueChange = {
                             carPrice = it
                             car.price = it
                         }
                     )
+                    DropDown(officesGlobal, officeSelected)
+                    Spacer(modifier = Modifier.height(4.dp))
                     var offset by remember { mutableStateOf(0f) }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .clip(
+                                RoundedCornerShape(10.dp))
                             .padding(start = 16.dp, end = 16.dp)
                             .border(
                                 border = BorderStroke(
@@ -322,7 +262,7 @@ fun AddCar(navController: NavHostController) {
                                 carDescription = it
                                 car.description = it
                             },
-                            label = { Text("Enter car description") },
+                            label = { Text("Enter a description which will be displayed for the clients") },
                             colors = TextFieldDefaults.textFieldColors(
                                 containerColor = colorResource(id = R.color.white),
                                 disabledTextColor = Color.Transparent,
@@ -365,7 +305,10 @@ fun AddCar(navController: NavHostController) {
                         }
 
                         navController.navigate(Screen.Home.route)
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        colorResource(id = R.color.light_blue)
+                    )
                 ) {
                     Text(text = "Save")
                 }
@@ -377,28 +320,34 @@ fun AddCar(navController: NavHostController) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Bottom
                 ) {
-                        Button(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .padding(start = 12.dp, end = 12.dp, bottom = 24.dp),
-                            onClick = {
-                                showConfirmationDialog = true
-                            }
-                        ) {
-                            Text(text = "Delete")
+                    Button(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .padding(start = 12.dp, end = 12.dp, bottom = 24.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            colorResource(id = R.color.light_blue)
+                        ),
+                        onClick = {
+                            showConfirmationDialog = true
                         }
-                        Button(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .padding(start = 24.dp, end = 12.dp, bottom = 24.dp),
-                            onClick = {
-                                viewModel.updateCar(car)
-                                navController.navigate(Screen.Home.route)
-                            }
-                        ) {
-                            Text(text = "Save")
-                        }
+                    ) {
+                        Text(text = "Delete")
                     }
+                    Button(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .padding(start = 24.dp, end = 12.dp, bottom = 24.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            colorResource(id = R.color.light_blue)
+                        ),
+                        onClick = {
+                            viewModel.updateCar(car)
+                            navController.navigate(Screen.Home.route)
+                        }
+                    ) {
+                        Text(text = "Save")
+                    }
+                }
             }
         }
     }

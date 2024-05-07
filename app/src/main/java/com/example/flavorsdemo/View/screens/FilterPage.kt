@@ -9,10 +9,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +22,7 @@ import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,11 +37,11 @@ import com.example.flavorsdemo.R
 
 @Composable
 fun FilterPage(navController: NavHostController) {
-    var sortState by remember { mutableStateOf("None") }
-    var transmission by remember { mutableStateOf("All") }
-    var fuel by remember { mutableStateOf("All") }
-    var priceRangeStart by remember { mutableStateOf(0f) }
-    var priceRangeEnd by remember { mutableStateOf(500f) }
+    var sortState by remember { mutableStateOf(filterSortBy) }
+    var transmission by remember { mutableStateOf(filterTransmission) }
+    var fuel by remember { mutableStateOf(filterFuel) }
+    var priceRangeStart by remember { mutableFloatStateOf(filterPriceRangeStart) }
+    var priceRangeEnd by remember { mutableFloatStateOf(filterPriceRangeEnd) }
     val priceRange = 0f..500f
 
     Column(
@@ -49,7 +50,7 @@ fun FilterPage(navController: NavHostController) {
             .padding(top = 24.dp)
     ) {
         Icon(
-            imageVector = Icons.Default.ArrowBack,
+           imageVector = Icons.Default.ArrowBack,
             contentDescription = "Arrow Back Icon",
             tint = colorResource(id = R.color.black),
             modifier = Modifier
@@ -80,11 +81,11 @@ fun FilterPage(navController: NavHostController) {
             SortingOption(
                 label = "Price Ascending",
                 sortState = sortState,
-                onClick = { sortState = "Ascending" })
+                onClick = { sortState = "Price Ascending" })
             SortingOption(
                 label = "Price Descending",
                 sortState = sortState,
-                onClick = { sortState = "Descending" })
+                onClick = { sortState = "Price Descending" })
         }
         Text("Transmission", style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(8.dp))
@@ -167,6 +168,9 @@ fun FilterPage(navController: NavHostController) {
                     priceRangeStart = 0f
                     priceRangeEnd = 500f
                 },
+                colors = ButtonDefaults.buttonColors(
+                    colorResource(id = R.color.light_blue)
+                )
             ) {
                 Text(
                     "Reset Filters", fontSize = 18.sp
@@ -174,8 +178,16 @@ fun FilterPage(navController: NavHostController) {
             }
             Button(
                 onClick = {
-                    // Apply filters logic here
+                    filterSortBy = sortState
+                    filterTransmission = transmission
+                    filterFuel = fuel
+                    filterPriceRangeStart = priceRangeStart
+                    filterPriceRangeEnd = priceRangeEnd
+                    navController.popBackStack()
                 },
+                colors = ButtonDefaults.buttonColors(
+                    colorResource(id = R.color.light_blue)
+                )
             ) {
                 Text("Apply Filters", fontSize = 18.sp)
             }
@@ -189,7 +201,10 @@ fun SortingOption(label: String, sortState: String, onClick: () -> Unit) {
         RadioButton(
             selected = sortState == label,
             onClick = onClick,
-            colors = RadioButtonDefaults.colors()
+            colors = RadioButtonDefaults.colors(
+                selectedColor = colorResource(id = R.color.light_blue),
+                unselectedColor = colorResource(id = R.color.black)
+            )
         )
         Text(label, style = MaterialTheme.typography.bodyLarge)
     }

@@ -16,10 +16,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.flavorsdemo.Model.SharedViewModel
-import com.example.flavorsdemo.View.AddCar
-import com.example.flavorsdemo.View.AddImages
+import com.example.flavorsdemo.View.screens.AddCar
+import com.example.flavorsdemo.View.screens.AddImages
+import com.example.flavorsdemo.View.screens.AddOffice
 import com.example.flavorsdemo.View.screens.GetStartedPage
-import com.example.flavorsdemo.View.Home
+import com.example.flavorsdemo.View.screens.Home
 import com.example.flavorsdemo.View.screens.Login
 import com.example.flavorsdemo.View.screens.RegisterPage
 import com.example.flavorsdemo.View.Screen
@@ -91,6 +92,9 @@ class GetStarted : ComponentActivity() {
                         }
                         composable(Screen.FilterPage.route) {
                             FilterPage(navController = navController)
+                        }
+                        composable(Screen.AddOffice.route) {
+                            AddOffice(navController = navController)
                         }
                     }
                 }

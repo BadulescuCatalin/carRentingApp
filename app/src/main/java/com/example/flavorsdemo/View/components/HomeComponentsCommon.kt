@@ -10,12 +10,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -25,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -35,23 +38,22 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
-import com.example.flavorsdemo.Model.Car
-import com.example.flavorsdemo.R
-import com.example.flavorsdemo.ViewModel.CarImageViewModel
-import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
+import com.example.flavorsdemo.Model.Car
 import com.example.flavorsdemo.Model.CarImage
+import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.Screen
-import com.example.flavorsdemo.View.car
-import com.example.flavorsdemo.View.carImages
-import com.example.flavorsdemo.View.fromWhere
-import com.example.flavorsdemo.View.imageMap
-import com.example.flavorsdemo.View.imageMaps
+import com.example.flavorsdemo.View.screens.car
+import com.example.flavorsdemo.View.screens.carImages
+import com.example.flavorsdemo.View.screens.fromWhere
+import com.example.flavorsdemo.View.screens.imageMap
+import com.example.flavorsdemo.View.screens.imageMaps
+import com.example.flavorsdemo.ViewModel.CarImageViewModel
 
 
 @Composable
 fun CarCard(
-    thisCar : Car,
+    thisCar: Car,
     carImageViewModel: CarImageViewModel,
     navController: NavHostController
 ) {
@@ -77,7 +79,9 @@ fun CarCard(
             .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
             .clickable {
                 if (car.id != thisCar.id)
-                    carImages = CarImage(Uri.parse(imageMap[thisCar.id]), imageMaps[thisCar.id]?.map { Uri.parse(it) } ?: listOf())
+                    carImages = CarImage(
+                        Uri.parse(imageMap[thisCar.id]),
+                        imageMaps[thisCar.id]?.map { Uri.parse(it) } ?: listOf())
                 car = thisCar
                 fromWhere = "carCard"
                 navController.navigate(Screen.AddCar.route)
@@ -128,8 +132,11 @@ fun CarCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = thisCar.brand + " " + thisCar.model , fontWeight = FontWeight.Bold)
-                    Text(text = thisCar.price + " / day", color = colorResource(id = R.color.dark_brown))
+                    Text(text = thisCar.brand + " " + thisCar.model, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = thisCar.price + " / day",
+                        color = colorResource(id = R.color.light_blue)
+                    )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Divider(
@@ -213,5 +220,76 @@ fun RatingBar(rating: Float) {
             modifier = Modifier.size(24.dp)
         )
 
+    }
+}
+
+@Composable
+fun DownMenuBar(menuItemName: String, modifier: Modifier) {
+    Box(modifier = modifier) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp)
+                .clip(shape = RoundedCornerShape(10.dp)),
+             horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.home),
+                contentDescription = "Home Icon",
+                tint = colorResource(if (menuItemName == "home") R.color.light_blue else R.color.black),
+                modifier = Modifier
+                    .size(28.dp)
+                    .clickable {
+                        // navigation action
+                    }
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.calendar),
+                contentDescription = "Calendar Icon",
+                tint = colorResource(if (menuItemName == "calendar") R.color.light_blue else R.color.black),
+                modifier = Modifier
+                    .size(25.dp)
+                    .clickable {
+                        // navigation action
+                    }
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.profile),
+                contentDescription = "Profile Icon",
+                tint = colorResource(if (menuItemName == "profile") R.color.light_blue else R.color.black),
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable {
+                        // navigation action
+                    }
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.empty_heart),
+                contentDescription = "Favourites Icon",
+                tint = colorResource(if (menuItemName == "favourites") R.color.light_blue else R.color.black),
+                modifier = Modifier
+                    .size(25.dp)
+                    .clickable {
+                        // navigation action
+                    }
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.more),
+                contentDescription = "More Icon",
+                tint = colorResource(if (menuItemName == "more") R.color.light_blue else R.color.black),
+                modifier = Modifier
+                    .size(26.dp)
+                    .clickable {
+                        // navigation action
+                    }
+            )
+        }
+    }
+}
+
+@Composable
+fun LoadingImage() {
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+        CircularProgressIndicator()  // This can be replaced with any custom loading image
     }
 }
