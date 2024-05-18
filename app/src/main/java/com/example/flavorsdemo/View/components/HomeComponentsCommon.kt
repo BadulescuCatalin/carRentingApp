@@ -224,14 +224,18 @@ fun RatingBar(rating: Float) {
 }
 
 @Composable
-fun DownMenuBar(menuItemName: String, modifier: Modifier) {
+fun DownMenuBar(
+    menuItemName: String,
+    modifier: Modifier,
+    navController: NavHostController
+) {
     Box(modifier = modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp)
                 .clip(shape = RoundedCornerShape(10.dp)),
-             horizontalArrangement = Arrangement.SpaceEvenly
+             horizontalArrangement = Arrangement.SpaceAround
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.home),
@@ -240,7 +244,7 @@ fun DownMenuBar(menuItemName: String, modifier: Modifier) {
                 modifier = Modifier
                     .size(28.dp)
                     .clickable {
-                        // navigation action
+                        navController.navigate(Screen.Home.route)
                     }
             )
             Icon(
@@ -260,7 +264,7 @@ fun DownMenuBar(menuItemName: String, modifier: Modifier) {
                 modifier = Modifier
                     .size(24.dp)
                     .clickable {
-                        // navigation action
+                        navController.navigate(Screen.ProfileScreen.route)
                     }
             )
             Icon(
@@ -280,7 +284,7 @@ fun DownMenuBar(menuItemName: String, modifier: Modifier) {
                 modifier = Modifier
                     .size(26.dp)
                     .clickable {
-                        // navigation action
+                        navController.navigate(Screen.MoreScreen.route)
                     }
             )
         }
@@ -290,6 +294,6 @@ fun DownMenuBar(menuItemName: String, modifier: Modifier) {
 @Composable
 fun LoadingImage() {
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-        CircularProgressIndicator()  // This can be replaced with any custom loading image
+        CircularProgressIndicator()
     }
 }

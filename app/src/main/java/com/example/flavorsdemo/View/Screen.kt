@@ -9,4 +9,7 @@ sealed class Screen(val route : String) {
     data object  AddImages : Screen("add_images")
     data object FilterPage : Screen("filter_page")
     data object AddOffice : Screen("add_office")
+    data object OfficeMap : Screen("office_map")
+    data object MoreScreen : Screen("more")
+    data object ProfileScreen : Screen("profile")
 }

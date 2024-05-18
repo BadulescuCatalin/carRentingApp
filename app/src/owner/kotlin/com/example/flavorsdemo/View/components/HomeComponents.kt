@@ -181,10 +181,13 @@ fun OfficeComponent(navController: NavHostController, thisOffice : Office) {
                 modifier = Modifier
                     .height(100.dp)
                     .clickable {
-                        navController.navigate(Screen.AddOffice.route)
                         office = thisOffice
-                        officeMainImage = Uri.parse(imageMapOffice[thisOffice.id])
+                        officeMainImage = if (imageMapOffice.contains(thisOffice.id))
+                            Uri.parse(imageMapOffice[thisOffice.id])
+                        else
+                            Uri.EMPTY
                         fromWhere = "OfficeComponent"
+                        navController.navigate(Screen.AddOffice.route)
                     }
                     .align(Alignment.CenterHorizontally)
             )

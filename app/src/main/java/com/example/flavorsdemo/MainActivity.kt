@@ -1,21 +1,27 @@
 package com.example.flavorsdemo
 
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.flavorsdemo.Model.SharedViewModel
+import com.example.flavorsdemo.Model.User
 import com.example.flavorsdemo.View.screens.AddCar
 import com.example.flavorsdemo.View.screens.AddImages
 import com.example.flavorsdemo.View.screens.AddOffice
@@ -25,13 +31,19 @@ import com.example.flavorsdemo.View.screens.Login
 import com.example.flavorsdemo.View.screens.RegisterPage
 import com.example.flavorsdemo.View.Screen
 import com.example.flavorsdemo.View.screens.FilterPage
+import com.example.flavorsdemo.View.screens.MoreScreen
+import com.example.flavorsdemo.View.screens.OfficeMap
+import com.example.flavorsdemo.View.screens.ProfileScreen
 import com.example.flavorsdemo.ui.theme.FlavorsDemoTheme
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 
+var currentUser = User()
 @AndroidEntryPoint
 class GetStarted : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -56,6 +68,9 @@ class GetStarted : ComponentActivity() {
                         .colorScheme
                         .background
                 ) {
+                    if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), 1)
+                    }
                     val navController = rememberNavController()
                     val context = LocalContext.current
                     val sharedPreferences =
@@ -65,6 +80,15 @@ class GetStarted : ComponentActivity() {
                     val user = Firebase.auth.currentUser
                     var email = user?.email
                     sharedViewModel.fetchUserData(email?:"")
+                    val db = FirebaseFirestore.getInstance()
+                     db.collection("users")
+                        .whereEqualTo("emailAddress", email)
+                        .get()
+                        .addOnSuccessListener {
+                            for (document in it) {
+                                currentUser = document.toObject(User::class.java)
+                            }
+                        }
 //                    val email = sharedPreferences.getString("email", null)
 //                    val password = sharedPreferences.getString("password", null)
 //                    val isUserLoggedIn = email != null && password != null
@@ -95,6 +119,15 @@ class GetStarted : ComponentActivity() {
                         }
                         composable(Screen.AddOffice.route) {
                             AddOffice(navController = navController)
+                        }
+                        composable(Screen.OfficeMap.route) {
+                            OfficeMap(navController = navController)
+                        }
+                        composable(Screen.MoreScreen.route) {
+                            MoreScreen(navController = navController)
+                        }
+                        composable(Screen.ProfileScreen.route) {
+                            ProfileScreen(navController = navController)
                         }
                     }
                 }

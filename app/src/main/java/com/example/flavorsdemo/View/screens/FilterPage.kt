@@ -19,6 +19,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.RangeSlider
+import androidx.compose.material3.SliderColors
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -149,7 +151,13 @@ fun FilterPage(navController: NavHostController) {
             },
             valueRange = priceRange,
             steps = 0,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = SliderDefaults.colors(
+                thumbColor = colorResource(id = R.color.light_blue),
+                activeTrackColor = colorResource(id = R.color.light_blue),
+                inactiveTrackColor = Color.LightGray
+
+            )
         )
         Text(
             "Range: €${priceRangeStart.toInt()} - €${priceRangeEnd.toInt()}",

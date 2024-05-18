@@ -47,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -55,6 +56,7 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.flavorsdemo.Model.Office
 import com.example.flavorsdemo.R
+import com.example.flavorsdemo.Util.getLatLngFromAddress
 import com.example.flavorsdemo.View.Screen
 import com.example.flavorsdemo.View.components.TopBarOffice
 import com.example.flavorsdemo.ViewModel.OfficeImageViewModel
@@ -82,6 +84,7 @@ fun AddOffice(navController: NavHostController) {
     var showConfirmationDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
+    val context = LocalContext.current
     val officeViewModel: OfficeViewModel = viewModel()
     val officeImageViewModel: OfficeImageViewModel = viewModel()
     val mainImage = remember { mutableStateOf<Uri?>(officeMainImage) }
@@ -100,7 +103,7 @@ fun AddOffice(navController: NavHostController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(90.dp)
+                .height(120.dp)
                 .background(colorResource(id = R.color.light_blue))
                 .padding(top = 8.dp)
         ) {
@@ -142,6 +145,13 @@ fun AddOffice(navController: NavHostController) {
                         onValueChange = {
                             address = it
                             office.address = it
+                            val fullAddress = "$address, $city, $zipcode, $country"
+                            val latLng = getLatLngFromAddress(context, fullAddress)
+                            latLng?.let {
+                                // Use latLng.latitude and latLng.longitude
+                                office.latitude = latLng.latitude.toString()
+                                office.longitude = latLng.longitude.toString()
+                            }
                         }
                     )
                     TableRow(
@@ -275,7 +285,7 @@ fun AddOffice(navController: NavHostController) {
                 }
                 item {
                     Spacer(modifier = Modifier.height(4.dp))
-                    InfoTitle(title = "Office Photo(otpional)", icon = R.drawable.camera)
+                    InfoTitle(title = "Office Photo", icon = R.drawable.camera)
                     Spacer(modifier = Modifier.height(8.dp))
                     Box(
                         modifier = Modifier

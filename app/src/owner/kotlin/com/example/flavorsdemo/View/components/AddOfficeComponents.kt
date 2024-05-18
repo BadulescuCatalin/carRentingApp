@@ -66,4 +66,60 @@ fun TopBarOffice(
         )
         Text("")
     }
+    Divider(
+        color = colorResource(id = R.color.light_brown),
+        modifier = Modifier
+            .padding(top = 4.dp)
+    )
+    Row(
+        modifier = androidx.compose.ui.Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically
+    )
+    {
+        Button(
+            onClick = {
+                if (title != "Office Details") {
+                    navController.popBackStack()
+                    navController.navigate(Screen.AddOffice.route)
+                }
+            },
+            modifier = Modifier
+                .padding(start = 8.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent
+            )
+        )
+        {
+            Text(
+                text = "Office Details",
+                color = colorResource(id = R.color.white),
+            )
+
+        }
+        Divider(
+            color = colorResource(id = R.color.light_grey),
+            modifier = Modifier
+                .fillMaxHeight()
+                .width(1.dp)
+        )
+        Button(
+            onClick = {
+                if (title != "Map Location") {
+                    navController.navigate(Screen.OfficeMap.route)
+                }
+            },
+            modifier = Modifier
+                .padding(end = 16.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent
+            )
+        ) {
+            Text(
+                text = "Map Location",
+                color = colorResource(id = R.color.white)
+            )
+        }
+    }
 }

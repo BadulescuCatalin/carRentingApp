@@ -1,6 +1,7 @@
 package com.example.flavorsdemo.Model
 
-import com.example.flavorsdemo.View.screens.currentUser
+//import com.example.flavorsdemo.View.screens.currentUser
+import com.example.flavorsdemo.currentUser
 import java.util.UUID
 
 data class Office (
@@ -17,7 +18,9 @@ data class Office (
     var numberOfCameras : String,
     var numberOfAdditionalCarTrunks : String,
     var numberOfChildSeats : String,
+    var longitude : String,
+    var latitude : String
 
 ) {
-    constructor() : this(UUID.randomUUID().toString(), "", "", "", "", "", "", currentUser.phoneNumber, currentUser.emailAddress, "", "", "", "")
+    constructor() : this(UUID.randomUUID().toString(), "", "", "", "", "", "", currentUser.phoneNumber, currentUser.emailAddress, "", "", "", "", "", "")
 }

@@ -59,6 +59,7 @@ import com.example.flavorsdemo.ViewModel.CarImageViewModel
 import com.example.flavorsdemo.ViewModel.CarViewModel
 import com.example.flavorsdemo.ViewModel.OfficeImageViewModel
 import com.example.flavorsdemo.ViewModel.OfficeViewModel
+import com.example.flavorsdemo.currentUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
@@ -73,7 +74,6 @@ var filterTransmission = "All"
 var filterFuel = "All"
 var filterPriceRangeStart = 0f
 var filterPriceRangeEnd = 500f
-var currentUser = User()
 var officesGlobal = listOf<Office>()
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -286,7 +286,8 @@ fun Home(
                 .height(80.dp)
                 .clip(shape = RoundedCornerShape(10.dp))
                 .align(Alignment.BottomCenter)
-                .shadow(2.dp, spotColor = colorResource(id = R.color.light_blue))
+                .shadow(2.dp, spotColor = colorResource(id = R.color.light_blue)),
+            navController = navController
         )
     }
 
