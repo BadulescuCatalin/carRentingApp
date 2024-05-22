@@ -1,7 +1,7 @@
 package com.example.flavorsdemo
 
+import WhereTo
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -13,8 +13,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -22,18 +20,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.flavorsdemo.Model.SharedViewModel
 import com.example.flavorsdemo.Model.User
+import com.example.flavorsdemo.View.Screen
 import com.example.flavorsdemo.View.screens.AddCar
 import com.example.flavorsdemo.View.screens.AddImages
 import com.example.flavorsdemo.View.screens.AddOffice
+import com.example.flavorsdemo.View.screens.FilterPage
 import com.example.flavorsdemo.View.screens.GetStartedPage
 import com.example.flavorsdemo.View.screens.Home
 import com.example.flavorsdemo.View.screens.Login
-import com.example.flavorsdemo.View.screens.RegisterPage
-import com.example.flavorsdemo.View.Screen
-import com.example.flavorsdemo.View.screens.FilterPage
 import com.example.flavorsdemo.View.screens.MoreScreen
 import com.example.flavorsdemo.View.screens.OfficeMap
 import com.example.flavorsdemo.View.screens.ProfileScreen
+import com.example.flavorsdemo.View.screens.RegisterPage
 import com.example.flavorsdemo.ui.theme.FlavorsDemoTheme
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -41,6 +39,7 @@ import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 
 var currentUser = User()
+
 @AndroidEntryPoint
 class GetStarted : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.R)
@@ -68,9 +67,9 @@ class GetStarted : ComponentActivity() {
                         .colorScheme
                         .background
                 ) {
-                    if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), 1)
-                    }
+//                    if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                        ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), 1)
+//                    }
                     val navController = rememberNavController()
                     val context = LocalContext.current
                     val sharedPreferences =
@@ -79,9 +78,9 @@ class GetStarted : ComponentActivity() {
                     val sharedViewModel: SharedViewModel = viewModel()
                     val user = Firebase.auth.currentUser
                     var email = user?.email
-                    sharedViewModel.fetchUserData(email?:"")
+                    sharedViewModel.fetchUserData(email ?: "")
                     val db = FirebaseFirestore.getInstance()
-                     db.collection("users")
+                    db.collection("users")
                         .whereEqualTo("emailAddress", email)
                         .get()
                         .addOnSuccessListener {
@@ -94,7 +93,10 @@ class GetStarted : ComponentActivity() {
 //                    val isUserLoggedIn = email != null && password != null
                     NavHost(
                         navController = navController,
-                        startDestination = if (autologin) Screen.Home.route else Screen.GetStarted.route
+                        startDestination =
+                        if (autologin && FlavorConfig.userType == "Owner") Screen.Home.route
+                        else if (!autologin) Screen.GetStarted.route
+                        else Screen.WhereTo.route
                     ) {
                         composable(Screen.GetStarted.route) {
                             GetStartedPage(navController = navController)
@@ -128,6 +130,9 @@ class GetStarted : ComponentActivity() {
                         }
                         composable(Screen.ProfileScreen.route) {
                             ProfileScreen(navController = navController)
+                        }
+                        composable(Screen.WhereTo.route) {
+                            WhereTo(navController = navController)
                         }
                     }
                 }

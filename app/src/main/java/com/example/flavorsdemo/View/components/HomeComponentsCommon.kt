@@ -1,5 +1,6 @@
 package com.example.flavorsdemo.View.components
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.net.Uri
 import androidx.compose.foundation.Image
@@ -17,17 +18,24 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -35,22 +43,38 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.example.flavorsdemo.FlavorConfig
 import com.example.flavorsdemo.Model.Car
 import com.example.flavorsdemo.Model.CarImage
+import com.example.flavorsdemo.Model.Office
 import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.Screen
-import com.example.flavorsdemo.View.screens.car
-import com.example.flavorsdemo.View.screens.carImages
-import com.example.flavorsdemo.View.screens.fromWhere
-import com.example.flavorsdemo.View.screens.imageMap
-import com.example.flavorsdemo.View.screens.imageMaps
 import com.example.flavorsdemo.ViewModel.CarImageViewModel
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
+var car = Car()
+var fromWhere = ""
+var carImages = CarImage()
+val user = Firebase.auth.currentUser
+var imageMap = mutableMapOf<String, String>()
+var imageMapOffice = mutableMapOf<String, String>()
+var imageMaps = mutableMapOf<String, List<String>>()
+var filterSortBy = "None"
+var filterTransmission = "All"
+var filterFuel = "All"
+var filterPriceRangeStart = 0f
+var filterPriceRangeEnd = 500f
+var officesGlobal = listOf<Office>()
 
+var office = Office()
+var officeMainImage: Uri = Uri.EMPTY
+
+@SuppressLint("Range")
 @Composable
 fun CarCard(
     thisCar: Car,
@@ -268,13 +292,17 @@ fun DownMenuBar(
                     }
             )
             Icon(
-                painter = painterResource(id = R.drawable.empty_heart),
+                painter = painterResource(id = if(FlavorConfig.userType == "Owner") R.drawable.discount else R.drawable.empty_heart),
                 contentDescription = "Favourites Icon",
                 tint = colorResource(if (menuItemName == "favourites") R.color.light_blue else R.color.black),
                 modifier = Modifier
                     .size(25.dp)
                     .clickable {
-                        // navigation action
+                        if (FlavorConfig.userType == "Owner") {
+//                            navController.navigate(Screen.DiscountScreen.route)
+                        } else {
+//                            navController.navigate(Screen.FavouritesScreen.route)
+                        }
                     }
             )
             Icon(
@@ -295,5 +323,103 @@ fun DownMenuBar(
 fun LoadingImage() {
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
         CircularProgressIndicator()
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun InfoBar(
+    firstName : String,
+    lastName : String,
+    searchValue : String,
+    onValueChange: (String) -> Unit,
+    showFilters: Boolean,
+    setShowFilters: () -> Unit,
+    navController: NavHostController,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(135.dp)
+            .background(colorResource(id = R.color.light_blue))
+    ) {
+        Row (
+            modifier = Modifier
+                .fillMaxWidth()
+//                    .padding(16.dp)
+                .padding(bottom = 8.dp, end = 26.dp, top = 8.dp, start = 4.dp)
+                .padding(top = 32.dp)
+                .align(Alignment.TopCenter)
+        ) {
+            Text(text = "$firstName $lastName",
+                fontSize = 16.sp,
+                color = colorResource(id = R.color.white),
+                modifier = Modifier
+                    .padding(start = 36.dp)
+            )
+            Spacer(modifier = Modifier.weight(0.8f))
+            Icon(
+                imageVector = Icons.Filled.Notifications,
+                contentDescription = "Notifications",
+                tint = colorResource(id = R.color.white),
+                modifier = Modifier
+                    .size(36.dp)
+                    .padding(start = 8.dp)
+                    .clickable {
+                        // alta pagina
+                    }
+            )
+            Spacer(modifier = Modifier.weight(0.1f))
+        }
+        Row (
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 26.dp)
+                .align(Alignment.BottomCenter)
+        )
+        {
+            TextField(
+                value = searchValue,
+                onValueChange = { onValueChange(it) },
+                placeholder = { Text(text = "Search", fontSize = 14.sp) },
+                shape = RoundedCornerShape(20.dp),
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = colorResource(id = R.color.white),
+                    disabledTextColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent
+                ),
+                modifier = Modifier
+                    .fillMaxWidth(0.88f)
+                    .scale(scaleY = 0.8F, scaleX = 0.8F)
+                    .padding(bottom = 12.dp),
+//                        .align(Alignment.BottomCenter),
+                singleLine = true,
+                maxLines = 1
+            )
+            IconButton(
+                onClick = setShowFilters,
+                modifier = Modifier
+                    .scale(scaleY = 1F, scaleX = 1F)
+                    .padding(top = 4.dp)
+                    .padding(end = 18.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.filter), // Use your drawable resource
+                    contentDescription = "Expand Filter List",
+                    colorFilter = ColorFilter.tint(colorResource(id = R.color.white)), // Apply tint
+                    modifier = Modifier
+//                            .background(colorResource(id = R.color.light_brown))
+                        .align(Alignment.CenterVertically)
+//                            .size(40.dp, 40.dp)
+                        //.scale(scaleY = 0.8F, scaleX = 0.8F)
+                        .clickable {
+                            navController.navigate(Screen.FilterPage.route)
+
+                        }
+                )
+            }
+        }
     }
 }

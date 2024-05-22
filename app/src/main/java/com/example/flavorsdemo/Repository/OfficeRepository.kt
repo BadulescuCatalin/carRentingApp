@@ -1,9 +1,6 @@
 package com.example.flavorsdemo.Repository
 
-import com.example.flavorsdemo.Model.Car
 import com.example.flavorsdemo.Model.Office
-import com.example.flavorsdemo.View.screens.car
-import com.example.flavorsdemo.View.screens.office
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose

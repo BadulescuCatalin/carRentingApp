@@ -7,6 +7,6 @@ import dagger.hilt.android.HiltAndroidApp
 class RenterMainActivity : Application() {
     override fun onCreate() {
         super.onCreate()
-        FlavorConfig.userType = "Owner"
+        FlavorConfig.userType = "Renter"
     }
 }

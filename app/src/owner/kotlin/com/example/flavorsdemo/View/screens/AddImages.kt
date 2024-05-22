@@ -50,16 +50,17 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
-import com.example.flavorsdemo.Model.CarImage
 import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.Screen
-import com.example.flavorsdemo.View.screens.imageMap
-import com.example.flavorsdemo.View.screens.imageMaps
+import com.example.flavorsdemo.View.components.car
+import com.example.flavorsdemo.View.components.carImages
+import com.example.flavorsdemo.View.components.fromWhere
+import com.example.flavorsdemo.View.components.imageMap
+import com.example.flavorsdemo.View.components.imageMaps
 import com.example.flavorsdemo.ViewModel.CarImageViewModel
 import com.example.flavorsdemo.ViewModel.CarViewModelOwner
 import kotlinx.coroutines.launch
 
-var carImages = CarImage()
 
 @Composable
 fun AddImages(navController: NavHostController) {

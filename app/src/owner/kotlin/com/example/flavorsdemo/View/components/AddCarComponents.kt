@@ -1,4 +1,3 @@
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,7 +26,6 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -49,7 +47,7 @@ import androidx.compose.ui.unit.sp
 import com.example.flavorsdemo.Model.Office
 import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.Screen
-import com.example.flavorsdemo.View.screens.car
+import com.example.flavorsdemo.View.components.car
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -330,35 +328,6 @@ fun ConfirmationDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
         }
     )
 }
-
-@Composable
-fun InfoTitle(title: String, icon: Int) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp, start = 16.dp, end = 16.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start
-        ) {
-            Text(title, style = MaterialTheme.typography.titleLarge)
-            Icon(
-                painter = painterResource(id = icon),
-                contentDescription = "Icon",
-                modifier = Modifier
-                    .size(32.dp)
-                    .padding(start = 8.dp, top = 6.dp)
-            )
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        Divider(
-            color = Color.LightGray
-        )
-    }
-}
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

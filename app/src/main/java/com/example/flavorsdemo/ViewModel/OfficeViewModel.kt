@@ -7,11 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.example.flavorsdemo.Model.Car
 import com.example.flavorsdemo.Model.Office
 import com.example.flavorsdemo.Repository.OfficeRepository
-import com.example.flavorsdemo.View.screens.car
-import com.example.flavorsdemo.View.screens.office
+import com.example.flavorsdemo.View.components.office
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

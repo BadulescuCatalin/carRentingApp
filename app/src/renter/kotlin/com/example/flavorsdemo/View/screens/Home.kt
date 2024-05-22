@@ -2,7 +2,6 @@ package com.example.flavorsdemo.View.screens
 
 import android.app.Activity
 import android.content.pm.PackageManager
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,11 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -29,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -40,29 +35,16 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.flavorsdemo.Model.Car
-import com.example.flavorsdemo.Model.CarImage
-import com.example.flavorsdemo.Model.Office
 import com.example.flavorsdemo.Model.SharedViewModel
-import com.example.flavorsdemo.Model.User
-import com.example.flavorsdemo.OwnerMainActivity
 import com.example.flavorsdemo.R
-import com.example.flavorsdemo.View.Screen
-import com.example.flavorsdemo.View.components.AddOfficeComp
 import com.example.flavorsdemo.View.components.CarCard
 import com.example.flavorsdemo.View.components.DownMenuBar
 import com.example.flavorsdemo.View.components.InfoBar
-import com.example.flavorsdemo.View.components.OfficeComponent
-import com.example.flavorsdemo.View.components.car
-import com.example.flavorsdemo.View.components.carImages
 import com.example.flavorsdemo.View.components.filterFuel
 import com.example.flavorsdemo.View.components.filterSortBy
 import com.example.flavorsdemo.View.components.filterTransmission
-import com.example.flavorsdemo.View.components.fromWhere
 import com.example.flavorsdemo.View.components.imageMap
 import com.example.flavorsdemo.View.components.imageMapOffice
-import com.example.flavorsdemo.View.components.office
-import com.example.flavorsdemo.View.components.officeMainImage
 import com.example.flavorsdemo.View.components.officesGlobal
 import com.example.flavorsdemo.View.components.user
 import com.example.flavorsdemo.ViewModel.CarImageViewModel
@@ -72,8 +54,6 @@ import com.example.flavorsdemo.ViewModel.OfficeViewModel
 import com.example.flavorsdemo.currentUser
 import com.google.firebase.firestore.FirebaseFirestore
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(
     navController: NavHostController,
@@ -83,30 +63,28 @@ fun Home(
     officeViewModel: OfficeViewModel = viewModel(),
     officeImageViewModel: OfficeImageViewModel = viewModel(),
 ) {
-
+    if (ContextCompat.checkSelfPermission(
+            LocalContext.current,
+            android.Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        ActivityCompat.requestPermissions(
+            LocalContext.current as Activity,
+            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+            1
+        )
+    }
+    val userData by sharedViewModel.userData.collectAsState()
     val db = FirebaseFirestore.getInstance()
-    var email = user?.email
-    db.collection("users")
-        .whereEqualTo("emailAddress", email)
-        .get()
-        .addOnSuccessListener {
-            for (document in it) {
-                currentUser = document.toObject(User::class.java)
-            }
-        }
     var searchValue by remember { mutableStateOf("") }
     var showFilters by remember { mutableStateOf(false) }
-    val userData by sharedViewModel.userData.collectAsState()
+    var email = user?.email
     val cars by carViewModel.cars.observeAsState(initial = emptyList())
     val offices by officeViewModel.offices.observeAsState(initial = emptyList())
     officesGlobal = offices
     var carsFiltered by remember { mutableStateOf(cars) }
     var dummyOffice = listOf<String>("", "")
     var showLoading by remember { mutableStateOf(true) }
-
-    if (ContextCompat.checkSelfPermission(LocalContext.current, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-        ActivityCompat.requestPermissions(LocalContext.current as Activity, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), 1)
-    }
     when (filterSortBy) {
         "None" -> carsFiltered = cars
         "Car Name" -> carsFiltered = cars.sortedBy { it.brand + it.model }
@@ -144,7 +122,7 @@ fun Home(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color = colorResource(id = R.color.light_grey))
+                .background(color = colorResource(id = R.color.white))
         )
         {
             InfoBar(
@@ -171,64 +149,6 @@ fun Home(
                     )
                     {
                         Text(
-                            text = "My Office",
-                            modifier = Modifier
-                                .padding(
-                                    start = 16.dp,
-                                    top = 16.dp,
-                                    end = 16.dp,
-                                    bottom = 16.dp
-                                )
-                                .background(color = Color.Transparent),
-                            fontSize = 16.sp,
-                            color = colorResource(id = R.color.black),
-                            fontFamily = androidx.compose.ui.text.font.FontFamily.SansSerif,
-                        )
-                        Button(
-                            onClick = {
-                                office = Office()
-                                officeMainImage = Uri.EMPTY
-                                navController.navigate(Screen.AddOffice.route)
-                                fromWhere = ""
-                            },
-                            colors = ButtonDefaults.buttonColors(Color.White),
-                            modifier = Modifier
-                                .scale(0.9f)
-                        ) {
-                            Text(
-                                text = "Add Office",
-                                color = colorResource(id = R.color.black),
-                                fontSize = 14.sp,
-                                fontStyle = androidx.compose.ui.text.font.FontStyle.Normal
-                            )
-                        }
-                    }
-                }
-                item {
-                    LazyRow(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(130.dp)
-                            .padding(start = 8.dp, end = 8.dp)
-                            .background(color = colorResource(id = R.color.white))
-                    ) {
-                        items(offices.size) { item ->
-                            OfficeComponent(navController, offices[item])
-                        }
-                        item {
-                            AddOfficeComp(navController = navController)
-                        }
-                    }
-                }
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    )
-                    {
-                        Text(
                             text = "Available cars",
                             modifier = Modifier
                                 .padding(
@@ -242,36 +162,9 @@ fun Home(
                             color = colorResource(id = R.color.black),
                             fontFamily = androidx.compose.ui.text.font.FontFamily.SansSerif,
                         )
-                        Button(
-                            onClick = {
-                                navController.navigate(Screen.AddCar.route)
-                                fromWhere = ""
-                                car = Car()
-                                carImages = CarImage()
-                            },
-                            colors = ButtonDefaults.buttonColors(Color.White),
-                            modifier = Modifier
-                                .scale(0.9f)
-                        ) {
-                            Text(
-                                text = "Add car",
-                                color = colorResource(id = R.color.black),
-                                fontSize = 14.sp,
-                                fontStyle = androidx.compose.ui.text.font.FontStyle.Normal
-                            )
-                        }
                     }
                 }
                 items(carsFiltered.size) { index ->
-//                    val painter = rememberAsyncImagePainter(
-//                        model = ImageRequest.Builder(LocalContext.current)
-//                            .data(imageMap[carsFiltered[index].id])
-//                            .placeholder(R.drawable.loading)
-//                            .apply {
-//                                crossfade(true)
-//                            }
-//                            .build(),
-//                    )
                     if (searchValue == "" || carsFiltered[index].brand.contains(searchValue) || carsFiltered[index].model.contains(
                             searchValue
                         )
@@ -291,5 +184,4 @@ fun Home(
             navController = navController
         )
     }
-
 }

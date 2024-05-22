@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.flavorsdemo.Model.Car
 import com.example.flavorsdemo.Repository.CarRepositoryImpl
-import com.example.flavorsdemo.View.screens.car
+import com.example.flavorsdemo.View.components.car
 import kotlinx.coroutines.launch
 
 class CarViewModelOwner : ViewModel() {

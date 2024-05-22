@@ -1,7 +1,6 @@
 package com.example.flavorsdemo.View.screens
 
 import ConfirmationDialog
-import InfoTitle
 import TableRow
 import TableRows
 import android.net.Uri
@@ -54,17 +53,19 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
-import com.example.flavorsdemo.Model.Office
 import com.example.flavorsdemo.R
 import com.example.flavorsdemo.Util.getLatLngFromAddress
 import com.example.flavorsdemo.View.Screen
+import com.example.flavorsdemo.View.components.InfoTitle
 import com.example.flavorsdemo.View.components.TopBarOffice
+import com.example.flavorsdemo.View.components.fromWhere
+import com.example.flavorsdemo.View.components.imageMapOffice
+import com.example.flavorsdemo.View.components.office
+import com.example.flavorsdemo.View.components.officeMainImage
 import com.example.flavorsdemo.ViewModel.OfficeImageViewModel
 import com.example.flavorsdemo.ViewModel.OfficeViewModel
 import kotlinx.coroutines.launch
 
-var office = Office()
-var officeMainImage: Uri = Uri.EMPTY
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -22,12 +22,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.flavorsdemo.Model.CarImage
 import com.example.flavorsdemo.Model.Office
 import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.Screen
-import com.example.flavorsdemo.View.screens.carImages
-import com.example.flavorsdemo.View.screens.office
 
 @Composable
 fun TopBarOffice(

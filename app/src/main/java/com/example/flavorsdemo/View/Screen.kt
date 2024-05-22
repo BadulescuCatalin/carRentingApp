@@ -12,4 +12,5 @@ sealed class Screen(val route : String) {
     data object OfficeMap : Screen("office_map")
     data object MoreScreen : Screen("more")
     data object ProfileScreen : Screen("profile")
+    data object WhereTo : Screen("where_to")
 }

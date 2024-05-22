@@ -37,14 +37,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.flavorsdemo.FlavorConfig
 import com.example.flavorsdemo.Model.SharedViewModel
+import com.example.flavorsdemo.Model.User
 import com.example.flavorsdemo.R
 import com.example.flavorsdemo.Utils.checkEmail
 import com.example.flavorsdemo.View.Screen
 import com.example.flavorsdemo.View.components.CustomClickableTextLoginRegister
 import com.example.flavorsdemo.View.components.CustomPasswordInputLogin
 import com.example.flavorsdemo.View.components.CustomTextField
+import com.example.flavorsdemo.currentUser
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 
 
@@ -80,7 +84,7 @@ fun Login(navController: NavHostController) {
             ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.weight(0.55f))
+        Spacer(modifier = Modifier.weight(0.20f))
         Text(
             stringResource(R.string.sign_in_text),
             style = TextStyle(
@@ -88,7 +92,7 @@ fun Login(navController: NavHostController) {
                 fontSize = 48.sp
             )
         )
-        Spacer(modifier = Modifier.weight(0.2f))
+        Spacer(modifier = Modifier.weight(0.18f))
         CustomTextField(
             value = email,
             onValueChange = { email = it },
@@ -181,7 +185,20 @@ fun Login(navController: NavHostController) {
                                 navController.popBackStack()
                                 navController.popBackStack()
                                 navController.popBackStack()
-                                navController.navigate(Screen.Home.route)
+                                val db = FirebaseFirestore.getInstance()
+                                db.collection("users")
+                                    .whereEqualTo("emailAddress", email)
+                                    .get()
+                                    .addOnSuccessListener {
+                                        for (document in it) {
+                                            currentUser = document.toObject(User::class.java)
+                                        }
+                                    }
+                                if (FlavorConfig.userType == "Owner") {
+                                    navController.navigate(Screen.Home.route)
+                                } else {
+                                    navController.navigate(Screen.WhereTo.route)
+                                }
                             } else {
                                 wrongCredentials = true
                             }

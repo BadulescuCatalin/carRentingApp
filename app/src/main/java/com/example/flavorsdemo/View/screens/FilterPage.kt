@@ -19,7 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.RangeSlider
-import androidx.compose.material3.SliderColors
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,6 +35,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.flavorsdemo.R
+import com.example.flavorsdemo.View.components.filterFuel
+import com.example.flavorsdemo.View.components.filterPriceRangeEnd
+import com.example.flavorsdemo.View.components.filterPriceRangeStart
+import com.example.flavorsdemo.View.components.filterSortBy
+import com.example.flavorsdemo.View.components.filterTransmission
 
 @Composable
 fun FilterPage(navController: NavHostController) {

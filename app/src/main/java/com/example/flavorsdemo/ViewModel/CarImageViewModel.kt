@@ -7,8 +7,8 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.example.flavorsdemo.Model.CarImage
 import com.example.flavorsdemo.Repository.CarImageRepository
-import com.example.flavorsdemo.View.screens.carImages
-import com.example.flavorsdemo.View.screens.imageMap
+import com.example.flavorsdemo.View.components.carImages
+import com.example.flavorsdemo.View.components.imageMap
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers

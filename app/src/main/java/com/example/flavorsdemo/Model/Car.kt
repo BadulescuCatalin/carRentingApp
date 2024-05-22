@@ -1,6 +1,5 @@
 package com.example.flavorsdemo.Model
 
-import com.example.flavorsdemo.View.screens.user
 import java.util.UUID
 
 data class Car(

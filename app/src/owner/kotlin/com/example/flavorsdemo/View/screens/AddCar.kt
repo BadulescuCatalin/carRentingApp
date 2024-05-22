@@ -2,11 +2,9 @@ package com.example.flavorsdemo.View.screens
 
 import ConfirmationDialog
 import DropDown
-import InfoTitle
 import TableRow
 import TableRows
 import TopBar
-import android.widget.Space
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -27,9 +25,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -45,18 +41,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.flavorsdemo.Model.Car
-import com.example.flavorsdemo.Model.Office
 import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.Screen
+import com.example.flavorsdemo.View.components.InfoTitle
+import com.example.flavorsdemo.View.components.car
+import com.example.flavorsdemo.View.components.fromWhere
+import com.example.flavorsdemo.View.components.officesGlobal
 import com.example.flavorsdemo.ViewModel.CarViewModelOwner
 import kotlinx.coroutines.launch
 
-var car = Car()
-var fromWhere = ""
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

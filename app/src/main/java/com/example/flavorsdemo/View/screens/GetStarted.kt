@@ -44,7 +44,7 @@ fun GetStartedPage(navController: NavHostController) {
         Button(
             onClick = {
                 navController.navigate(Screen.GetStarted.route)
-                navController.navigate(Screen.Register.route)
+                navController.navigate(Screen.Login.route)
             },
             colors = ButtonDefaults.buttonColors(colorResource(R.color.dark_brown)),
             shape = RoundedCornerShape(50.dp),

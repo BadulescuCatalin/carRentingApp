@@ -1,7 +1,6 @@
 package com.example.flavorsdemo.View.screens
 
 import ConfirmationDialog
-import android.app.Activity
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -35,6 +34,10 @@ import androidx.navigation.NavHostController
 import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.Screen
 import com.example.flavorsdemo.View.components.TopBarOffice
+import com.example.flavorsdemo.View.components.fromWhere
+import com.example.flavorsdemo.View.components.imageMapOffice
+import com.example.flavorsdemo.View.components.office
+import com.example.flavorsdemo.View.components.officeMainImage
 import com.example.flavorsdemo.ViewModel.OfficeImageViewModel
 import com.example.flavorsdemo.ViewModel.OfficeViewModel
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
