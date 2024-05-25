@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Theme.FlavorsDemo" parent="android:Theme.Material.Light.NoActionBar">
         <!-- Customize your theme here. -->
@@ -19,4 +19,9 @@
         <item name="android:windowTranslucentNavigation">true</item> <!-- Make navigation bar translucent -->
     </style>
 
+    <style name="CustomDatePickerDialogTheme" parent="android:Theme.Material.Light.Dialog.Alert">
+        <item name="android:colorPrimary">@color/light_blue</item>
+        <item name="android:colorAccent">@color/light_blue</item>
+        <item name="android:colorControlActivated">@color/light_blue</item>
+    </style>
 </resources>

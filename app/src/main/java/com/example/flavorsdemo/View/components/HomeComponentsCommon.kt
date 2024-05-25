@@ -58,6 +58,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 var car = Car()
+var infoCarTab = "About"
 var fromWhere = ""
 var carImages = CarImage()
 val user = Firebase.auth.currentUser
@@ -70,7 +71,7 @@ var filterFuel = "All"
 var filterPriceRangeStart = 0f
 var filterPriceRangeEnd = 500f
 var officesGlobal = listOf<Office>()
-
+var selectedOfficeGlobal = Office()
 var office = Office()
 var officeMainImage: Uri = Uri.EMPTY
 
@@ -108,7 +109,13 @@ fun CarCard(
                         imageMaps[thisCar.id]?.map { Uri.parse(it) } ?: listOf())
                 car = thisCar
                 fromWhere = "carCard"
-                navController.navigate(Screen.AddCar.route)
+                if (FlavorConfig.userType == "Owner")
+                    navController.navigate(Screen.AddCar.route)
+                else {
+                    car = thisCar
+                    infoCarTab = "About"
+                    navController.navigate(Screen.CarInfo.route)
+                }
             },
 
         ) {
@@ -130,7 +137,7 @@ fun CarCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    RatingBar(rating = 4.5F)
+                    RatingBar(rating = 4.5F, modifier = Modifier)
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         painter = painterResource(id = R.drawable.empty_heart), // Replace with your favorite icon resource
@@ -233,8 +240,10 @@ fun CarCard(
 }
 
 @Composable
-fun RatingBar(rating: Float) {
-    Row {
+fun RatingBar(rating: Float, modifier: Modifier) {
+    Row (
+        modifier = modifier
+    ) {
         Text(text = "$rating")
         Spacer(modifier = Modifier.width(2.dp))
         Icon(

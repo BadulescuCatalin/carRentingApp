@@ -24,12 +24,15 @@ import com.example.flavorsdemo.View.Screen
 import com.example.flavorsdemo.View.screens.AddCar
 import com.example.flavorsdemo.View.screens.AddImages
 import com.example.flavorsdemo.View.screens.AddOffice
+import com.example.flavorsdemo.View.screens.CarInfo
+import com.example.flavorsdemo.View.screens.ExtraOptions
 import com.example.flavorsdemo.View.screens.FilterPage
 import com.example.flavorsdemo.View.screens.GetStartedPage
 import com.example.flavorsdemo.View.screens.Home
 import com.example.flavorsdemo.View.screens.Login
 import com.example.flavorsdemo.View.screens.MoreScreen
 import com.example.flavorsdemo.View.screens.OfficeMap
+import com.example.flavorsdemo.View.screens.PickDateAndTime
 import com.example.flavorsdemo.View.screens.ProfileScreen
 import com.example.flavorsdemo.View.screens.RegisterPage
 import com.example.flavorsdemo.ui.theme.FlavorsDemoTheme
@@ -133,6 +136,15 @@ class GetStarted : ComponentActivity() {
                         }
                         composable(Screen.WhereTo.route) {
                             WhereTo(navController = navController)
+                        }
+                        composable(Screen.PickDateAndTime.route) {
+                            PickDateAndTime(navController = navController)
+                        }
+                        composable(Screen.CarInfo.route) {
+                            CarInfo(navController = navController)
+                        }
+                        composable(Screen.ExtraOptions.route) {
+                            ExtraOptions(navController = navController)
                         }
                     }
                 }

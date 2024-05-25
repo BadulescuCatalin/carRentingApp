@@ -40,11 +40,13 @@ import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.components.CarCard
 import com.example.flavorsdemo.View.components.DownMenuBar
 import com.example.flavorsdemo.View.components.InfoBar
+import com.example.flavorsdemo.View.components.carImages
 import com.example.flavorsdemo.View.components.filterFuel
 import com.example.flavorsdemo.View.components.filterSortBy
 import com.example.flavorsdemo.View.components.filterTransmission
 import com.example.flavorsdemo.View.components.imageMap
 import com.example.flavorsdemo.View.components.imageMapOffice
+import com.example.flavorsdemo.View.components.imageMaps
 import com.example.flavorsdemo.View.components.officesGlobal
 import com.example.flavorsdemo.View.components.user
 import com.example.flavorsdemo.ViewModel.CarImageViewModel
@@ -108,6 +110,10 @@ fun Home(
     val carMainImages = carImageViewModel.carMainImages.observeAsState(mapOf()).value
     carMainImages.forEach() {
         imageMap[it.key] = it.value
+    }
+    val allCarImages = carImageViewModel.allCarImages.observeAsState(mapOf()).value
+    allCarImages.forEach() {
+        imageMaps[it.key] = it.value
     }
     val officeMainImages = officeImageViewModel.officeMainImages.observeAsState(mapOf()).value
     officeMainImages.forEach() {

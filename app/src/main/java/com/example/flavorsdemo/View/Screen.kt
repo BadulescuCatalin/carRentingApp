@@ -13,4 +13,7 @@ sealed class Screen(val route : String) {
     data object MoreScreen : Screen("more")
     data object ProfileScreen : Screen("profile")
     data object WhereTo : Screen("where_to")
+    data object PickDateAndTime : Screen("pick_date_and_time")
+    data object CarInfo : Screen("car_info")
+    data object ExtraOptions : Screen("extra_options")
 }
