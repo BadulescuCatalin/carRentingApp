@@ -55,8 +55,12 @@ import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.Screen
 import com.example.flavorsdemo.View.components.SearchBar
 import com.example.flavorsdemo.View.components.SearchBarDateAndTime
+import com.example.flavorsdemo.View.components.dateEnd
+import com.example.flavorsdemo.View.components.dateStart
 import com.example.flavorsdemo.View.components.officesGlobal
 import com.example.flavorsdemo.View.components.selectedOfficeGlobal
+import com.example.flavorsdemo.View.components.timeEnd
+import com.example.flavorsdemo.View.components.timeStart
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -227,9 +231,9 @@ fun PickDateAndTime(navController: NavHostController) {
                             )
                             .background(color = Color.Transparent)
                     ) {
-                        val date = "" + Calendar.getInstance().get(Calendar.YEAR) + "/" +
-                                (Calendar.getInstance().get(Calendar.MONTH)) + "/" +
-                                Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+                        val date = "" +Calendar.getInstance().get(Calendar.DAY_OF_MONTH)  + "/" +
+                                ((Calendar.getInstance().get(Calendar.MONTH)) + 1) + "/" +
+                                Calendar.getInstance().get(Calendar.YEAR)
                         Text(
                             text = "Date: " + pickUpDate.ifEmpty { date },
                             color = colorResource(id = R.color.black)
@@ -255,7 +259,7 @@ fun PickDateAndTime(navController: NavHostController) {
                             .background(color = Color.Transparent)
                     ) {
                         val time = "" + Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + ":" +
-                                Calendar.getInstance().get(Calendar.MINUTE)
+                                String.format("%02d" ,Calendar.getInstance().get(Calendar.MINUTE))
                         Text(
                             text = "Time: " + pickUpTime.ifEmpty { time },
                             color = colorResource(id = R.color.black)
@@ -299,9 +303,9 @@ fun PickDateAndTime(navController: NavHostController) {
                             )
                             .background(color = Color.Transparent)
                     ) {
-                        val date = "" + Calendar.getInstance().get(Calendar.YEAR) + "/" +
-                                (Calendar.getInstance().get(Calendar.MONTH)) + "/" +
-                                Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+                        val date = "" +Calendar.getInstance().get(Calendar.DAY_OF_MONTH)  + "/" +
+                                ((Calendar.getInstance().get(Calendar.MONTH)) + 1) + "/" +
+                                Calendar.getInstance().get(Calendar.YEAR)
                         Text(
                             text = "Date: " + dropOffDate.ifEmpty { date },
                             color = colorResource(id = R.color.black)
@@ -327,7 +331,7 @@ fun PickDateAndTime(navController: NavHostController) {
                             .background(color = Color.Transparent)
                     ) {
                         val time = "" + Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + ":" +
-                                Calendar.getInstance().get(Calendar.MINUTE)
+                                String.format("%02d" ,Calendar.getInstance().get(Calendar.MINUTE))
                         Text(
                             text = "Time: " + dropOffTime.ifEmpty { time },
                             color = colorResource(id = R.color.black)
@@ -343,6 +347,11 @@ fun PickDateAndTime(navController: NavHostController) {
                 Button(
                     onClick = {
                         navController.navigate(Screen.Home.route)
+                        dateStart = pickUpDate
+                        dateEnd = dropOffDate
+                        timeStart = pickUpTime
+                        timeEnd = dropOffTime
+
                     },
                     modifier = Modifier
                         .fillMaxWidth()

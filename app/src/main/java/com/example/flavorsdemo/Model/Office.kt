@@ -20,7 +20,6 @@ data class Office (
     var numberOfChildSeats : String,
     var longitude : String,
     var latitude : String
-
 ) {
     constructor() : this(UUID.randomUUID().toString(), "", "", "", "", "", "", currentUser.phoneNumber, currentUser.emailAddress, "", "", "", "", "", "")
 }

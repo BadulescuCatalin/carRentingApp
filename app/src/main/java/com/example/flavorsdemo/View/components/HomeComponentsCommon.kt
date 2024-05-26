@@ -73,6 +73,10 @@ var filterPriceRangeEnd = 500f
 var officesGlobal = listOf<Office>()
 var selectedOfficeGlobal = Office()
 var office = Office()
+var dateStart = ""
+var dateEnd = ""
+var timeStart = ""
+var timeEnd = ""
 var officeMainImage: Uri = Uri.EMPTY
 
 @SuppressLint("Range")

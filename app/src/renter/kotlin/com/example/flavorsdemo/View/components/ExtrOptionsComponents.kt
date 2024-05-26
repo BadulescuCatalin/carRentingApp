@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -83,11 +84,11 @@ fun extraDriver(searchValue: String, onValueChange: (String) -> Unit) {
                         text = "20 euro / person"
                     )
                     Button(
-                        onClick = { onValueChange(searchValue) },
+                        onClick = { onValueChange(value) },
                         modifier = Modifier
                             .padding(start = 16.dp)
                             .scale(0.8f, 0.8f)
-                            .offset(y = (-8).dp, x = 26.dp),
+                            .offset(y = (-8).dp, x = 36.dp),
                         colors = ButtonDefaults.buttonColors(
                             colorResource(id = R.color.light_blue)
                         )
@@ -106,7 +107,94 @@ fun extraDriver(searchValue: String, onValueChange: (String) -> Unit) {
 }
 
 @Composable
-fun AddGps(onValueChange: () -> Unit) {
+fun AddGps(onAddClick: () -> Unit, onRemoveClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .background(Color.White)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(30.dp))
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(8.dp)
+                .clip(RoundedCornerShape(30.dp))
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.gps),
+                contentDescription = "GPS Image",
+                modifier = Modifier
+                    .size(120.dp)
+            )
+            Column(
+                modifier = Modifier.padding(top = 10.dp, start = 4.dp)
+            ) {
+                Text(
+                    text = "Add GPS",
+//                    fontSize = 18.sp,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+                Text(
+                    text = "It's recommended for new places",
+                    fontSize = 14.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.offset(y = (-4).dp)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "20 euro"
+                    )
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.align(Alignment.CenterEnd)
+                        ) {
+                            Button(
+                                onClick = { onRemoveClick() },
+                                modifier = Modifier
+                                    .scale(0.8f, 0.8f)
+                                    .offset(y = (-8).dp, x = 8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    Color.Red // Assuming you have a color for remove button
+                                )
+                            ) {
+                                Text(
+                                    text = "Remove",
+                                    modifier = Modifier.padding(4.dp),
+                                    color = Color.White
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(
+                                onClick = { onAddClick() },
+                                modifier = Modifier
+                                    .scale(0.8f, 0.8f)
+                                    .offset(y = (-8).dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    colorResource(id = R.color.light_blue)
+                                )
+                            ) {
+                                Text(
+                                    text = "Add",
+                                    modifier = Modifier.padding(4.dp),
+                                    color = Color.White
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddBabySeats(searchValue: String, onValueChange: (String) -> Unit) {
+    var value by remember { mutableStateOf(searchValue) }
     Box(
         modifier = Modifier
             .background(Color.White)
@@ -121,37 +209,52 @@ fun AddGps(onValueChange: () -> Unit) {
                 .clip(RoundedCornerShape(30.dp))
         ) {
             Image(
-                painter = painterResource(id = R.drawable.gps),
-                contentDescription = "GPS Image",
+                painter = painterResource(id = R.drawable.baby_seat),
+                contentDescription = "Baby Seat",
                 modifier = Modifier
                     .size(120.dp)
             )
             Column(
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(start = 8.dp)
             ) {
                 Text(
-                    text = "Add GPS",
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(top = 8.dp)
+                    text = "Add Baby Seat",
+//                    fontSize = 18.sp,
+//                    modifier = Modifier.padding(top = 8.dp)
                 )
                 Text(
-                    text = "It's recommended",
+                    text = "It's recommended for children under 7 years",
                     fontSize = 14.sp,
                     color = Color.Gray,
-                    modifier = Modifier.offset(y = (-4).dp)
+                    modifier = Modifier.offset(y = (-4).dp),
+                    lineHeight = 16.sp,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                TextField(
+                    value = value,
+                    onValueChange = { value = it },
+                    placeholder = { Text(text = "No. of baby seats", fontSize = 14.sp) },
+                    colors = TextFieldDefaults.textFieldColors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        containerColor = colorResource(id = R.color.light_grey),
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth(0.7f)
+                        .offset(y = (-4).dp)
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "15 euro"
+                        text = "15 euro / seat"
                     )
                     Box(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Button(
-                            onClick = { onValueChange() },
+                            onClick = { onValueChange(value) },
                             modifier = Modifier
                                 .padding(start = 16.dp)
                                 .scale(0.8f, 0.8f)
@@ -167,6 +270,165 @@ fun AddGps(onValueChange: () -> Unit) {
                                     .padding(4.dp),
                                 color = Color.White
                             )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddCarCamera(searchValue: String, onValueChange: (String) -> Unit) {
+    var value by remember { mutableStateOf(searchValue) }
+    Box(
+        modifier = Modifier
+            .background(Color.White)
+            .padding(top = 8.dp)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(30.dp))
+
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(8.dp)
+                .clip(RoundedCornerShape(30.dp))
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.car_camera),
+                contentDescription = "Car Camera",
+                modifier = Modifier
+                    .size(120.dp)
+            )
+            Column(
+                modifier = Modifier.padding(start = 8.dp)
+            ) {
+                Text(
+                    text = "Add Car Camera",
+//                    fontSize = 18.sp,
+//                    modifier = Modifier.padding(top = 8.dp)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                TextField(
+                    value = value,
+                    onValueChange = { value = it },
+                    placeholder = { Text(text = "No. of cameras", fontSize = 14.sp) },
+                    colors = TextFieldDefaults.textFieldColors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        containerColor = colorResource(id = R.color.light_grey),
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth(0.7f)
+                        .offset(y = (-4).dp)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "10 euro / camera"
+                    )
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Button(
+                            onClick = { onValueChange(value) },
+                            modifier = Modifier
+                                .padding(start = 16.dp)
+                                .scale(0.8f, 0.8f)
+                                .offset(y = (-8).dp)
+                                .align(Alignment.CenterEnd),
+                            colors = ButtonDefaults.buttonColors(
+                                colorResource(id = R.color.light_blue)
+                            )
+                        ) {
+                            Text(
+                                text = "Add",
+                                modifier = Modifier
+                                    .padding(4.dp),
+                                color = Color.White
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AddCargoCarrier(onAddClick: () -> Unit, onRemoveClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .background(Color.White)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(30.dp))
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(8.dp)
+                .clip(RoundedCornerShape(30.dp))
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.car_cargo_carrier),
+                contentDescription = "Car Cargo Carrier",
+                modifier = Modifier
+                    .size(120.dp)
+            )
+            Column(
+                modifier = Modifier.padding(top = 10.dp, start = 4.dp)
+            ) {
+                Text(
+                    text = "Add Car Cargo Carrier",
+//                    fontSize = 18.sp,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "10 euro"
+                    )
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.align(Alignment.CenterEnd)
+                        ) {
+                            Button(
+                                onClick = { onRemoveClick() },
+                                modifier = Modifier
+                                    .scale(0.8f, 0.8f)
+                                    .offset(y = (-8).dp, x = 8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    Color.Red // Assuming you have a color for remove button
+                                )
+                            ) {
+                                Text(
+                                    text = "Remove",
+                                    modifier = Modifier.padding(4.dp),
+                                    color = Color.White
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(
+                                onClick = { onAddClick() },
+                                modifier = Modifier
+                                    .scale(0.8f, 0.8f)
+                                    .offset(y = (-8).dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    colorResource(id = R.color.light_blue)
+                                )
+                            ) {
+                                Text(
+                                    text = "Add",
+                                    modifier = Modifier.padding(4.dp),
+                                    color = Color.White
+                                )
+                            }
                         }
                     }
                 }

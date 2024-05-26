@@ -1,6 +1,9 @@
 package com.example.flavorsdemo.Model
 
+import java.util.UUID
+
 data class User(
+    var id: String,
     var firstName: String,
     var lastName: String,
     var phoneNumber: String,
@@ -8,5 +11,5 @@ data class User(
     var emailAddress: String,
     var userType: String
 ) {
-    constructor() : this("", "", "", "", "", "")
+    constructor() : this(UUID.randomUUID().toString(), "", "", "", "", "", "")
 }
