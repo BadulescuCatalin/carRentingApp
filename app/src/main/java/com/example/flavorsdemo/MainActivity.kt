@@ -1,6 +1,5 @@
 package com.example.flavorsdemo
 
-import WhereTo
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
@@ -31,10 +30,12 @@ import com.example.flavorsdemo.View.screens.GetStartedPage
 import com.example.flavorsdemo.View.screens.Home
 import com.example.flavorsdemo.View.screens.Login
 import com.example.flavorsdemo.View.screens.MoreScreen
+import com.example.flavorsdemo.View.screens.MyBooking
 import com.example.flavorsdemo.View.screens.OfficeMap
 import com.example.flavorsdemo.View.screens.PickDateAndTime
 import com.example.flavorsdemo.View.screens.ProfileScreen
 import com.example.flavorsdemo.View.screens.RegisterPage
+import com.example.flavorsdemo.View.screens.WhereTo
 import com.example.flavorsdemo.ui.theme.FlavorsDemoTheme
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -145,6 +146,9 @@ class GetStarted : ComponentActivity() {
                         }
                         composable(Screen.ExtraOptions.route) {
                             ExtraOptions(navController = navController)
+                        }
+                        composable(Screen.MyBooking.route) {
+                            MyBooking(navController = navController)
                         }
                     }
                 }

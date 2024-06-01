@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -33,14 +34,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.flavorsdemo.R
+import com.example.flavorsdemo.View.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
     onValueChange: (String) -> Unit,
-    text: String
+    text: String,
+    navController: NavHostController
 ) {
     Column(modifier = modifier) {
         TextField(
@@ -67,6 +72,7 @@ fun SearchBar(
                 .fillMaxWidth()
                 .heightIn(min = 56.dp)
         )
+
     }
 }
 
@@ -74,29 +80,40 @@ fun SearchBar(
 @Composable
 fun CustomBottomSheet() {
 
-    ModalBottomSheet(modifier = Modifier, sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = false), onDismissRequest = {
-    }, shape = RoundedCornerShape(
-        topStart = 10.dp,
-        topEnd = 10.dp
-    ),
+    ModalBottomSheet(
+        modifier = Modifier,
+        sheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = false
+        ),
+        onDismissRequest = {
+        },
+        shape = RoundedCornerShape(
+            topStart = 10.dp,
+            topEnd = 10.dp
+        ),
     ) {
         CustomBottomSheetContainer()
     }
 }
+
 @Composable
 fun CustomBottomSheetContainer() {
     Scaffold(topBar = {
         Column {
-            Text(text = "Theme", modifier = Modifier.height(75.dp)
-                .padding(start = 29.dp, top = 26.dp),fontSize = 23.sp)
+            Text(
+                text = "Theme", modifier = Modifier
+                    .height(75.dp)
+                    .padding(start = 29.dp, top = 26.dp), fontSize = 23.sp
+            )
             Divider(color = Color.Black, thickness = 1.dp)
         }
     }) {
         Column(modifier = Modifier.padding(it)) {
-            Text(text = "Select theme", modifier = Modifier
-                .padding(start = 29.dp, top = 20.dp, bottom = 10.dp)
-                .height(40.dp),fontSize = 20.sp)
+            Text(
+                text = "Select theme", modifier = Modifier
+                    .padding(start = 29.dp, top = 20.dp, bottom = 10.dp)
+                    .height(40.dp), fontSize = 20.sp
+            )
             CustomItem("Light")
             CustomItem("Dark")
             CustomItem("System default")

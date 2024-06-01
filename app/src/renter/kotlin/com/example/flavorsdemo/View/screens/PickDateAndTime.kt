@@ -53,7 +53,6 @@ import androidx.navigation.NavHostController
 import com.example.flavorsdemo.Model.Office
 import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.Screen
-import com.example.flavorsdemo.View.components.SearchBar
 import com.example.flavorsdemo.View.components.SearchBarDateAndTime
 import com.example.flavorsdemo.View.components.dateEnd
 import com.example.flavorsdemo.View.components.dateStart

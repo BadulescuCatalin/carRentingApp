@@ -321,17 +321,41 @@ fun WhereTo(navController: NavHostController) {
                     Column(
                         modifier = Modifier.padding(top = 32.dp, start = 16.dp, end = 16.dp)
                     ) {
-                        Text(
-                            text = "Where?",
-                            fontSize = 24.sp,
-                            color = colorResource(id = R.color.white)
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Where?",
+                                fontSize = 24.sp,
+                                color = colorResource(id = R.color.white)
+                            )
+                            Button(
+                                onClick = {
+                                    navController.navigate(Screen.Home.route)
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    Color.Transparent
+                                ),
+                                modifier = Modifier
+                                    .offset(x = 16.dp)
+                            ) {
+                               Text(
+                                   text = "Home",
+                                   color = colorResource(id = R.color.white)
+                               )
+                            }
+                        }
                         SearchBar(
+                            modifier = Modifier
+                                .offset(y = (-8).dp),
                             text = searchText,
                             onValueChange = {
                                 searchText = it
                                 showLazylist = true
-                            }
+                            },
+                            navController = navController
                         )
                     }
                 }

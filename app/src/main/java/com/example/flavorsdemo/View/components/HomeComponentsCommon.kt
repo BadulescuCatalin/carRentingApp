@@ -17,15 +17,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -44,7 +48,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.flavorsdemo.FlavorConfig
@@ -291,7 +297,7 @@ fun DownMenuBar(
                 modifier = Modifier
                     .size(25.dp)
                     .clickable {
-                        // navigation action
+                        navController.navigate(Screen.MyBooking.route)
                     }
             )
             Icon(
@@ -435,4 +441,58 @@ fun InfoBar(
             }
         }
     }
+}
+
+@Composable
+fun ecoInfo(onClick: () -> Unit){
+    Row (
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp, start = 16.dp)
+            .background(Color.Transparent)
+            .clickable { onClick() },
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier
+                .clip(CircleShape)
+                .background(Color.Transparent)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.eco_co2), contentDescription = null,
+                modifier = Modifier.size(25.dp),
+                contentScale = ContentScale.Crop
+            )
+        }
+        Text(
+            text = "Electric cars are eco-friendly!",
+            fontSize = 14.sp,
+            style = androidx.compose.ui.text.TextStyle(fontWeight = FontWeight.Bold),
+            color = colorResource(id = R.color.eco_green),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp)
+        )
+
+    }
+}
+
+@Composable
+fun EcoFriendlyDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Electric Car Benefits") },
+        text = {
+            Text("Electric cars reduce CO2 emissions significantly compared to diesel and petrol cars, supporting a more sustainable environment. By choosing electric, you help reduce urban pollution and decrease fossil fuel dependency.")
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss,
+                colors = ButtonDefaults.textButtonColors(contentColor = colorResource(id = R.color.eco_green))
+            ) {
+                Text(text = "Understand", color = colorResource(id = R.color.eco_green))
+            }
+        },
+//        properties = DialogProperties(usePlatformDefaultWidth = false),
+        containerColor = colorResource(id = R.color.white)
+    )
 }

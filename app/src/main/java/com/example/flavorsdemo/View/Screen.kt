@@ -16,4 +16,5 @@ sealed class Screen(val route : String) {
     data object PickDateAndTime : Screen("pick_date_and_time")
     data object CarInfo : Screen("car_info")
     data object ExtraOptions : Screen("extra_options")
+    data object MyBooking : Screen("my_booking")
 }

@@ -191,6 +191,7 @@ fun RegisterPage(navController: NavHostController) {
                                             if (task.isSuccessful) {
                                                 val userId = auth.currentUser?.uid ?: ""
                                                 val userDetails = User(
+                                                    id = userId,
                                                     firstName = firstName,
                                                     lastName = lastName,
                                                     phoneNumber = phoneNumber,

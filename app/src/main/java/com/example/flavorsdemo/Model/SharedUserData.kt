@@ -11,11 +11,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class SharedViewModel @Inject constructor(): ViewModel() {
-    private val _userData = MutableStateFlow<User?>(User("Catalin", "Badulescu", "0725422494", "Romania", "badulescucatalin01@gmail.com", FlavorConfig.userType)) // Default value
+    private val _userData = MutableStateFlow<User?>(User(UUID.randomUUID().toString(), "Catalin", "Badulescu", "0725422494", "Romania", "badulescucatalin01@gmail.com", FlavorConfig.userType)) // Default value
     val userData: StateFlow<User?> = _userData
 
     fun fetchUserData(email: String) {
@@ -32,6 +33,7 @@ class SharedViewModel @Inject constructor(): ViewModel() {
                 if (result.documents.isNotEmpty()) {
                     val document = result.documents.first() // Assuming email is unique and there's only one document
                     val user = User(
+                        id = document.id,
                         firstName = document.getString("firstName").orEmpty(),
                         lastName = document.getString("lastName").orEmpty(),
                         emailAddress = document.getString("emailAddress").orEmpty(),

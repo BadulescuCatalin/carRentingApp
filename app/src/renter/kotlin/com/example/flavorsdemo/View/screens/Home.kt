@@ -39,8 +39,10 @@ import com.example.flavorsdemo.Model.SharedViewModel
 import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.components.CarCard
 import com.example.flavorsdemo.View.components.DownMenuBar
+import com.example.flavorsdemo.View.components.EcoFriendlyDialog
 import com.example.flavorsdemo.View.components.InfoBar
 import com.example.flavorsdemo.View.components.carImages
+import com.example.flavorsdemo.View.components.ecoInfo
 import com.example.flavorsdemo.View.components.filterFuel
 import com.example.flavorsdemo.View.components.filterSortBy
 import com.example.flavorsdemo.View.components.filterTransmission
@@ -87,6 +89,7 @@ fun Home(
     var carsFiltered by remember { mutableStateOf(cars) }
     var dummyOffice = listOf<String>("", "")
     var showLoading by remember { mutableStateOf(true) }
+    var showEcoPopUp by remember { mutableStateOf(false) }
     when (filterSortBy) {
         "None" -> carsFiltered = cars
         "Car Name" -> carsFiltered = cars.sortedBy { it.brand + it.model }
@@ -119,6 +122,9 @@ fun Home(
     officeMainImages.forEach() {
         imageMapOffice[it.key] = it.value
     }
+    if (showEcoPopUp) {
+        EcoFriendlyDialog(onDismiss = { showEcoPopUp = false })
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -146,6 +152,9 @@ fun Home(
                     .fillMaxSize()
                     .padding(bottom = 75.dp),
             ) {
+                item {
+                    ecoInfo(onClick = { showEcoPopUp = !showEcoPopUp })
+                }
                 item {
                     Row(
                         modifier = Modifier
