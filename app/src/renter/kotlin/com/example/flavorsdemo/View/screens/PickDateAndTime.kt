@@ -211,7 +211,9 @@ fun PickDateAndTime(navController: NavHostController) {
                                 context,
                                 R.style.CustomDatePickerDialogTheme,
                                 { _, year, month, dayOfMonth ->
-                                    pickUpDate = "$dayOfMonth/${month + 1}/$year"
+                                    val dday = String.format("%02d", dayOfMonth)
+                                    val mmonth = String.format("%02d", month + 1)
+                                    pickUpDate = "$dday/$mmonth/$year"
                                 },
                                 calendar.get(Calendar.YEAR),
                                 calendar.get(Calendar.MONTH),
@@ -283,7 +285,9 @@ fun PickDateAndTime(navController: NavHostController) {
                                 context,
                                 R.style.CustomDatePickerDialogTheme,
                                 { _, year, month, dayOfMonth ->
-                                    dropOffDate = "$dayOfMonth/${month + 1}/$year"
+                                    val dday = String.format("%02d", dayOfMonth)
+                                    val mmonth = String.format("%02d", month + 1)
+                                    dropOffDate = "$dday/$mmonth/$year"
                                 },
                                 calendar.get(Calendar.YEAR),
                                 calendar.get(Calendar.MONTH),

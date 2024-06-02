@@ -109,6 +109,7 @@ fun Home(
         "Petrol" -> carsFiltered = carsFiltered.filter { it.fuelType == "Petrol" }
         "Diesel" -> carsFiltered = carsFiltered.filter { it.fuelType == "Diesel" }
         "Electric" -> carsFiltered = carsFiltered.filter { it.fuelType == "Electric" }
+        "Hybrid" -> carsFiltered = carsFiltered.filter { it.fuelType == "Hybrid" }
     }
     val carMainImages = carImageViewModel.carMainImages.observeAsState(mapOf()).value
     carMainImages.forEach() {

@@ -23,5 +23,8 @@
         <item name="android:colorPrimary">@color/light_blue</item>
         <item name="android:colorAccent">@color/light_blue</item>
         <item name="android:colorControlActivated">@color/light_blue</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:windowMinWidthMajor">90%</item>
+        <item name="android:windowMinWidthMinor">90%</item>
     </style>
 </resources>

@@ -140,6 +140,10 @@ fun FilterPage(navController: NavHostController) {
                 label = "Electric",
                 sortState = fuel,
                 onClick = { fuel = "Electric" })
+            SortingOption(
+                label = "Hybrid",
+                sortState = fuel,
+                onClick = { fuel = "Hybrid" })
         }
         Spacer(modifier = Modifier.height(8.dp))
         Text("Select Price Range", style = MaterialTheme.typography.titleLarge)

@@ -21,9 +21,11 @@ import com.example.flavorsdemo.Model.SharedViewModel
 import com.example.flavorsdemo.Model.User
 import com.example.flavorsdemo.View.Screen
 import com.example.flavorsdemo.View.screens.AddCar
+import com.example.flavorsdemo.View.screens.AddDiscount
 import com.example.flavorsdemo.View.screens.AddImages
 import com.example.flavorsdemo.View.screens.AddOffice
 import com.example.flavorsdemo.View.screens.CarInfo
+import com.example.flavorsdemo.View.screens.Discounts
 import com.example.flavorsdemo.View.screens.ExtraOptions
 import com.example.flavorsdemo.View.screens.FilterPage
 import com.example.flavorsdemo.View.screens.GetStartedPage
@@ -149,6 +151,12 @@ class GetStarted : ComponentActivity() {
                         }
                         composable(Screen.MyBooking.route) {
                             MyBooking(navController = navController)
+                        }
+                        composable(Screen.Discounts.route) {
+                            Discounts(navController = navController)
+                        }
+                        composable(Screen.AddDiscount.route) {
+                            AddDiscount(navController = navController)
                         }
                     }
                 }

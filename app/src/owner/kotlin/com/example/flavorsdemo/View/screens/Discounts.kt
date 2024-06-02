@@ -30,40 +30,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.flavorsdemo.Model.SharedViewModel
 import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.Screen
 import com.example.flavorsdemo.View.components.DiscountComp
+import com.example.flavorsdemo.View.components.DisplayBooking
 import com.example.flavorsdemo.View.components.DownMenuBar
 import com.example.flavorsdemo.View.components.InfoBar
+import com.example.flavorsdemo.ViewModel.BookingViewModel
 import com.example.flavorsdemo.ViewModel.DiscountViewModel
 import com.example.flavorsdemo.currentUser
-
-@Composable
-fun AddCar(navController: NavHostController) {
-
-}
-
-
-@Composable
-fun AddImages(navController: NavHostController) {
-
-}
-
-@Composable
-fun AddOffice(navController: NavHostController) {
-
-}
-
-@Composable
-fun OfficeMap(navController: NavHostController) {
-
-}
-
-@Composable
-fun AddDiscount(navController: NavHostController) {
-
-}
 
 @Composable
 fun Discounts(navController: NavHostController) {
@@ -72,9 +47,7 @@ fun Discounts(navController: NavHostController) {
     val allDiscounts by remember { discounts }
     var showFilters by remember { mutableStateOf(false) }
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = colorResource(id = R.color.light_grey))
+        modifier = Modifier.fillMaxSize().background(color = colorResource(id = R.color.light_grey))
     ) {
         Column(
             modifier = Modifier.fillMaxSize()
@@ -96,8 +69,7 @@ fun Discounts(navController: NavHostController) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp)
-                            .padding(horizontal = 16.dp)
-                            .padding(top = 16.dp),
+                            .padding(horizontal = 16.dp).padding(top = 16.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -106,12 +78,10 @@ fun Discounts(navController: NavHostController) {
                             fontSize = 20.sp,
                             color = colorResource(id = R.color.black),
                         )
-                        Button(
-                            onClick = {
-                                navController.navigate(Screen.AddDiscount.route)
-                            },
-                            colors = ButtonDefaults.buttonColors(Color.White)
-                        ) {
+                        Button(onClick = {
+                            navController.navigate(Screen.AddDiscount.route)
+                        },
+                            colors = ButtonDefaults.buttonColors(Color.White)) {
                             Text(text = "Add", fontSize = 14.sp, color = Color.Black)
                         }
                     }
@@ -135,4 +105,3 @@ fun Discounts(navController: NavHostController) {
         )
     }
 }
-

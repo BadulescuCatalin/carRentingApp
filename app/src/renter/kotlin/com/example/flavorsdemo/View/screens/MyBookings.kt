@@ -1,5 +1,7 @@
 package com.example.flavorsdemo.View.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,7 +34,10 @@ import com.example.flavorsdemo.View.components.DownMenuBar
 import com.example.flavorsdemo.View.components.InfoBar
 import com.example.flavorsdemo.ViewModel.BookingViewModel
 import com.example.flavorsdemo.currentUser
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MyBooking(navController: NavHostController) {
     val bookingViewModel: BookingViewModel = viewModel()
@@ -39,6 +45,9 @@ fun MyBooking(navController: NavHostController) {
     val myBookings by remember { bookings}
     var showFilters by remember { mutableStateOf(false) }
     myBookings.filter { it.userId == currentUser.id }
+//    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+//    var finishedBookings = myBookings.filter { LocalDate.parse(it.endDate, formatter) < LocalDate.now() }
+//    var unfinishedBookings = myBookings.filter { LocalDate.parse(it.endDate, formatter) >= LocalDate.now() }
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -70,13 +79,23 @@ fun MyBooking(navController: NavHostController) {
                 }
                 for (booking in myBookings) {
                     item {
-                        DisplayBooking(booking = booking)
+                        androidx.compose.material.Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                                .padding(horizontal = 8.dp)
+                                .height(150.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            elevation = 4.dp
+                        ) {
+                            DisplayBooking(booking = booking)
+                        }
                     }
                 }
             }
         }
         DownMenuBar(
-            "home",
+            "calendar",
             modifier = Modifier
                 .fillMaxWidth()
                 .height(80.dp)

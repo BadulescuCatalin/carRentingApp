@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,7 +36,7 @@ import com.example.flavorsdemo.currentUser
 fun MyBooking(navController: NavHostController) {
     val bookingViewModel: BookingViewModel = viewModel()
     val bookings = bookingViewModel.bookings.observeAsState(initial = emptyList())
-    val myBookings by remember { bookings}
+    val myBookings by remember { bookings }
     var showFilters by remember { mutableStateOf(false) }
     myBookings.filter { it.userId == currentUser.id }
     Box(
@@ -63,19 +64,30 @@ fun MyBooking(navController: NavHostController) {
                         fontSize = 20.sp,
                         color = colorResource(id = R.color.black),
                         modifier = Modifier
-                            .fillMaxWidth().padding(start = 16.dp, top = 16.dp)
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, top = 16.dp)
                     )
 
                 }
                 for (booking in myBookings) {
                     item {
-                        DisplayBooking(booking = booking)
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                                .padding(horizontal = 8.dp)
+                                .height(150.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            elevation = 4.dp
+                        ) {
+                            DisplayBooking(booking = booking)
+                        }
                     }
                 }
             }
         }
         DownMenuBar(
-            "home",
+            "calendar",
             modifier = Modifier
                 .fillMaxWidth()
                 .height(80.dp)

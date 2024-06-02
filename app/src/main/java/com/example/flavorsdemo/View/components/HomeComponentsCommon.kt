@@ -3,6 +3,7 @@ package com.example.flavorsdemo.View.components
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.net.Uri
+import android.widget.RatingBar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,7 +34,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,6 +52,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
@@ -56,10 +60,13 @@ import coil.request.ImageRequest
 import com.example.flavorsdemo.FlavorConfig
 import com.example.flavorsdemo.Model.Car
 import com.example.flavorsdemo.Model.CarImage
+import com.example.flavorsdemo.Model.Discount
 import com.example.flavorsdemo.Model.Office
 import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.Screen
 import com.example.flavorsdemo.ViewModel.CarImageViewModel
+import com.example.flavorsdemo.ViewModel.DiscountViewModel
+import com.example.flavorsdemo.currentUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -79,6 +86,7 @@ var filterPriceRangeEnd = 500f
 var officesGlobal = listOf<Office>()
 var selectedOfficeGlobal = Office()
 var office = Office()
+var discountGlobal = Discount()
 var dateStart = ""
 var dateEnd = ""
 var timeStart = ""
@@ -92,7 +100,10 @@ fun CarCard(
     carImageViewModel: CarImageViewModel,
     navController: NavHostController
 ) {
-
+    val discountViewModel: DiscountViewModel = viewModel()
+    val discounts = discountViewModel.discounts.observeAsState(initial = emptyList())
+    val allDiscounts by remember { discounts }
+    val discount = allDiscounts.find { it.discountType == thisCar.fuelType }
     val configuration: Configuration = LocalConfiguration.current
     val imageUrls = carImageViewModel.getImageUrls(thisCar.id).observeAsState(initial = listOf())
 //    if (!imageMap.contains(thisCar.id)) {
@@ -149,12 +160,18 @@ fun CarCard(
                 ) {
                     RatingBar(rating = 4.5F, modifier = Modifier)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Icon(
-                        painter = painterResource(id = R.drawable.empty_heart), // Replace with your favorite icon resource
-                        contentDescription = "Favorite",
-                        modifier = Modifier
-                            .size(24.dp)
-                    )
+                    if (discount != null) {
+//                        Icon(
+//                            painter = painterResource(id = R.drawable.empty_heart), // Replace with your favorite icon resource
+//                            contentDescription = "Favorite",
+//                            modifier = Modifier
+//                                .size(24.dp)
+//                        )
+                        val discountValue = discount.discountValue
+                        Text(text = "$discountValue off", color = Color.Red)
+                    } else {
+                        Text("")
+                    }
                 }
                 Image(
 //                    painter = painterResource(id = R.drawable.hyundai_sonata), // Replace with your car image resource
@@ -174,10 +191,24 @@ fun CarCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(text = thisCar.brand + " " + thisCar.model, fontWeight = FontWeight.Bold)
-                    Text(
-                        text = thisCar.price + " / day",
-                        color = colorResource(id = R.color.light_blue)
-                    )
+                    Column {
+                        if (discount != null) {
+                            val discountValue = discount.discountValue.split("%")[0].toFloat()
+                            val newPrice =
+                                thisCar.price.split("€")[0].toFloat() - (thisCar.price.split("€")[0].toFloat() * discountValue / 100)
+                            Row() {
+                                Text(
+                                    text = "$newPrice€ / day",
+                                    color = Color.Red
+                                )
+                            }
+                        } else {
+                            Text(
+                                text = thisCar.price + " / day",
+                                color = colorResource(id = R.color.light_blue)
+                            )
+                        }
+                    }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Divider(
@@ -251,7 +282,7 @@ fun CarCard(
 
 @Composable
 fun RatingBar(rating: Float, modifier: Modifier) {
-    Row (
+    Row(
         modifier = modifier
     ) {
         Text(text = "$rating")
@@ -278,7 +309,7 @@ fun DownMenuBar(
                 .fillMaxWidth()
                 .padding(top = 12.dp)
                 .clip(shape = RoundedCornerShape(10.dp)),
-             horizontalArrangement = Arrangement.SpaceAround
+            horizontalArrangement = Arrangement.SpaceAround
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.home),
@@ -311,16 +342,16 @@ fun DownMenuBar(
                     }
             )
             Icon(
-                painter = painterResource(id = if(FlavorConfig.userType == "Owner") R.drawable.discount else R.drawable.empty_heart),
+                painter = painterResource(id = R.drawable.discount),
                 contentDescription = "Favourites Icon",
                 tint = colorResource(if (menuItemName == "favourites") R.color.light_blue else R.color.black),
                 modifier = Modifier
                     .size(25.dp)
                     .clickable {
                         if (FlavorConfig.userType == "Owner") {
-//                            navController.navigate(Screen.DiscountScreen.route)
+                            navController.navigate(Screen.Discounts.route)
                         } else {
-//                            navController.navigate(Screen.FavouritesScreen.route)
+                            navController.navigate(Screen.Discounts.route)
                         }
                     }
             )
@@ -348,9 +379,9 @@ fun LoadingImage() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InfoBar(
-    firstName : String,
-    lastName : String,
-    searchValue : String,
+    firstName: String,
+    lastName: String,
+    searchValue: String,
     onValueChange: (String) -> Unit,
     showFilters: Boolean,
     setShowFilters: () -> Unit,
@@ -362,7 +393,7 @@ fun InfoBar(
             .height(135.dp)
             .background(colorResource(id = R.color.light_blue))
     ) {
-        Row (
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
 //                    .padding(16.dp)
@@ -370,7 +401,9 @@ fun InfoBar(
                 .padding(top = 32.dp)
                 .align(Alignment.TopCenter)
         ) {
-            Text(text = "$firstName $lastName",
+            var points = currentUser.points
+            Text(
+                text = "$firstName $lastName $points" + "p",
                 fontSize = 16.sp,
                 color = colorResource(id = R.color.white),
                 modifier = Modifier
@@ -390,7 +423,7 @@ fun InfoBar(
             )
             Spacer(modifier = Modifier.weight(0.1f))
         }
-        Row (
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(end = 26.dp)
@@ -444,8 +477,8 @@ fun InfoBar(
 }
 
 @Composable
-fun ecoInfo(onClick: () -> Unit){
-    Row (
+fun ecoInfo(onClick: () -> Unit) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 16.dp, start = 16.dp)
@@ -486,7 +519,8 @@ fun EcoFriendlyDialog(onDismiss: () -> Unit) {
             Text("Electric cars reduce CO2 emissions significantly compared to diesel and petrol cars, supporting a more sustainable environment. By choosing electric, you help reduce urban pollution and decrease fossil fuel dependency.")
         },
         confirmButton = {
-            TextButton(onClick = onDismiss,
+            TextButton(
+                onClick = onDismiss,
                 colors = ButtonDefaults.textButtonColors(contentColor = colorResource(id = R.color.eco_green))
             ) {
                 Text(text = "Understand", color = colorResource(id = R.color.eco_green))

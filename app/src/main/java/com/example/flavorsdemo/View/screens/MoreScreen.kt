@@ -49,17 +49,7 @@ fun MoreScreen(navController: NavHostController) {
                             modifier = Modifier.padding(start = 8.dp, top = 48.dp)
 
                         ) {
-//                            Icon(
-//                                imageVector = Icons.Default.ArrowBack,
-//                                contentDescription = "Arrow Back Icon",
-//                                tint = colorResource(id = R.color.white),
-//                                modifier = Modifier
-//                                    .padding(bottom = 8.dp, start = 16.dp)
-//                                    .size(24.dp)
-//                                    .clickable {
-//                                        navController.popBackStack()
-//                                    }
-//                            )
+
                             Text(
                                 text = "More",
                                 fontSize = 24.sp,
@@ -75,6 +65,7 @@ fun MoreScreen(navController: NavHostController) {
                     MoreScreenComponent(text = "About Vroom")
                     MoreScreenComponent(text = "Privacy Policy")
                     MoreScreenComponent(text = "Terms of Use")
+                    MoreScreenComponent(text = "How Vroom points work")
                     MoreScreenComponent(text = "FAQ")
                     Spacer(modifier = Modifier.height(8.dp))
                     InfoTitle(title = "Support", icon = R.drawable.support)

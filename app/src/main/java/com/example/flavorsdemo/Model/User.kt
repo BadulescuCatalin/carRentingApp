@@ -9,7 +9,8 @@ data class User(
     var phoneNumber: String,
     var country: String,
     var emailAddress: String,
-    var userType: String
+    var userType: String,
+    var points : Int = 0
 ) {
     constructor() : this(UUID.randomUUID().toString(), "", "", "", "", "", "")
 }
