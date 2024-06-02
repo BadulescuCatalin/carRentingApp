@@ -201,7 +201,8 @@ fun RegisterPage(navController: NavHostController) {
                                                     userType = userType
                                                 )
                                                 db.collection("users")
-                                                    .add(userDetails)
+                                                    .document(userId)
+                                                    .set(userDetails)
                                                     .addOnSuccessListener {
                                                         navController.popBackStack()
                                                         navController.popBackStack()

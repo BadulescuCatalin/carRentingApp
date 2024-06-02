@@ -54,6 +54,7 @@ import com.example.flavorsdemo.Model.Office
 import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.Screen
 import com.example.flavorsdemo.View.components.SearchBarDateAndTime
+import com.example.flavorsdemo.View.components.car
 import com.example.flavorsdemo.View.components.dateEnd
 import com.example.flavorsdemo.View.components.dateStart
 import com.example.flavorsdemo.View.components.officesGlobal
@@ -347,9 +348,11 @@ fun PickDateAndTime(navController: NavHostController) {
                     .padding(horizontal = 16.dp)
                     .fillMaxSize()
             ) {
-                Button(
+                androidx.compose.material.Button(
                     onClick = {
-                        navController.navigate(Screen.Home.route)
+                        if (car.brand == "")
+                            navController.navigate(Screen.Home.route)
+                        else navController.navigate(Screen.CarInfo.route)
                         dateStart = pickUpDate
                         dateEnd = dropOffDate
                         timeStart = pickUpTime
@@ -360,7 +363,7 @@ fun PickDateAndTime(navController: NavHostController) {
                         .fillMaxWidth()
                         .align(Alignment.BottomCenter)
                         .offset(y = 24.dp),
-                    colors = ButtonDefaults.buttonColors(
+                    colors = androidx.compose.material.ButtonDefaults.buttonColors(
                         colorResource(id = R.color.light_blue)
                     )
                 ) {

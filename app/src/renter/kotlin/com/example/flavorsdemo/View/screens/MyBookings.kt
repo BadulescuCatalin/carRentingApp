@@ -44,7 +44,7 @@ fun MyBooking(navController: NavHostController) {
     val bookings = bookingViewModel.bookings.observeAsState(initial = emptyList())
     val myBookings by remember { bookings}
     var showFilters by remember { mutableStateOf(false) }
-    myBookings.filter { it.userId == currentUser.id }
+    val myBookingsOfficial = myBookings.filter { it.userId == currentUser.id }
 //    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 //    var finishedBookings = myBookings.filter { LocalDate.parse(it.endDate, formatter) < LocalDate.now() }
 //    var unfinishedBookings = myBookings.filter { LocalDate.parse(it.endDate, formatter) >= LocalDate.now() }
@@ -77,7 +77,7 @@ fun MyBooking(navController: NavHostController) {
                     )
 
                 }
-                for (booking in myBookings) {
+                for (booking in myBookingsOfficial) {
                     item {
                         androidx.compose.material.Card(
                             modifier = Modifier

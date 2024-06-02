@@ -139,8 +139,8 @@ fun Home(
         )
         {
             InfoBar(
-                firstName = userData?.firstName ?: "",
-                lastName = userData?.lastName ?: "",
+                firstName = currentUser.firstName ?: "Catalin",
+                lastName = currentUser.lastName ?: "Badulescu",
                 searchValue = searchValue,
                 onValueChange = { searchValue = it },
                 showFilters = showFilters,

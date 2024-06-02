@@ -73,6 +73,7 @@ fun ExtraOptions(navController: NavHostController) {
     var numberOfAdditionalCarCameras by remember { mutableStateOf("") }
     var hasCargoCarrier by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) } // State to control dialog visibility
+    var showDialogPoints by remember { mutableStateOf(false) } // State to control dialog visibility
     var totalPrice by remember { mutableStateOf(0.0f) }
     // Function to handle paying online
     val context = LocalContext.current
@@ -253,7 +254,13 @@ fun ExtraOptions(navController: NavHostController) {
                             modifier = Modifier.padding(top = 4.dp)
                         )
                         Button(
-                            onClick = { showDialog = true }, // Show dialog when button is clicked
+                            onClick = {
+                                if (car.fuelType == "Electric" && currentUser.points > 0)
+                                    showDialogPoints = true
+                                else
+                                    showDialog = true
+
+                            }, // Show dialog when button is clicked
                             colors = ButtonDefaults.buttonColors(
                                 colorResource(id = R.color.light_blue)
                             )
@@ -265,8 +272,72 @@ fun ExtraOptions(navController: NavHostController) {
             }
         }
     }
-
-    // Popup dialog
+    if (showDialogPoints) {
+        AlertDialog(
+            containerColor = colorResource(id = R.color.white),
+            onDismissRequest = { showDialog = false },
+            modifier = Modifier
+                .background(Color.Transparent)
+                .clip(RoundedCornerShape(16.dp)),
+            title = { Text(text = "Use points for discount", fontSize = 24.sp) },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .background(Color.Transparent)
+                        .clip(RoundedCornerShape(16.dp))
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(colorResource(id = R.color.light_grey))
+                            .clickable { /* Handle click */ }
+                            .padding(16.dp)
+                    ) {
+                        Column {
+                            Text(text = "Pay online", fontSize = 18.sp)
+                            Text(
+                                text = "Your credit card will be debited once you finish your booking.",
+                                fontSize = 14.sp
+                            )
+                            Text(
+                                text = "$totalPrice€",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Button(
+                                onClick = {
+                                    showDialog = true
+                                    showDialogPoints = false
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    colorResource(id = R.color.light_blue)
+                                ),
+                                modifier = Modifier.align(Alignment.End)
+                            ) {
+                                Text(text = "Select", color = Color.White)
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                Button(
+                    onClick = {
+                        showDialog = true
+                        showDialogPoints = false
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        colorResource(id = R.color.light_blue)
+                    ),
+                ) {
+                    Text(text = "Close", color = Color.White)
+                }
+            }
+        )
+    }
     if (showDialog) {
         AlertDialog(
             containerColor = colorResource(id = R.color.white),
@@ -338,9 +409,12 @@ fun ExtraOptions(navController: NavHostController) {
                                     booking.price = totalPrice.toString()
                                     booking.endDate = dateEnd
                                     booking.endTime = timeEnd
-                                    booking.numberOfAdditionalDrivers = if (numberOfAdditionalDrivers == "") 0 else numberOfAdditionalDrivers.toInt()
-                                    booking.numberOfChildSeats = if (numberOfBabySeats == "") 0 else numberOfBabySeats.toInt()
-                                    booking.numberOfCameras = if (numberOfAdditionalCarCameras == "") 0 else numberOfAdditionalCarCameras.toInt()
+                                    booking.numberOfAdditionalDrivers =
+                                        if (numberOfAdditionalDrivers == "") 0 else numberOfAdditionalDrivers.toInt()
+                                    booking.numberOfChildSeats =
+                                        if (numberOfBabySeats == "") 0 else numberOfBabySeats.toInt()
+                                    booking.numberOfCameras =
+                                        if (numberOfAdditionalCarCameras == "") 0 else numberOfAdditionalCarCameras.toInt()
                                     booking.hasGps = hasGps
                                     booking.hasCargoCarrier = hasCargoCarrier
                                     booking.userId = currentUser.id
@@ -349,12 +423,17 @@ fun ExtraOptions(navController: NavHostController) {
                                     booking.endTime = timeEnd
                                     booking.startDate = dateStart
                                     booking.startTime = timeStart
+                                    val dayStart = dateStart.split("/")[0]
+                                    val dayEnd = dateEnd.split("/")[0]
+                                    val daysBetween = dayEnd.toInt() - dayStart.toInt() + 1
+                                    val pointsEarned = totalPrice  // ??????
                                     // save to firestore + mvvm
                                     coroutineScope.launch {
                                         bookingViewModel.addBooking(booking)
                                     }
                                     showDialog = false
-                                    Toast.makeText(context, "Booking added", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Booking added", Toast.LENGTH_SHORT)
+                                        .show()
                                     navController.navigate(Screen.Home.route)
 
                                 },

@@ -135,7 +135,10 @@ fun CarCard(
                 else {
                     car = thisCar
                     infoCarTab = "About"
-                    navController.navigate(Screen.CarInfo.route)
+                    if (dateEnd == "")
+                        navController.navigate(Screen.WhereTo.route)
+                    else
+                        navController.navigate(Screen.CarInfo.route)
                 }
             },
 
