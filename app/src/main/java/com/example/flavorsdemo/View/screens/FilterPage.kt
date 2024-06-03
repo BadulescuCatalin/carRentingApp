@@ -53,7 +53,7 @@ fun FilterPage(navController: NavHostController) {
     Column(
         modifier = Modifier
             .padding(16.dp)
-            .padding(top = 24.dp)
+            .padding(top = 8.dp)
     ) {
         Icon(
            imageVector = Icons.Default.ArrowBack,
@@ -171,7 +171,7 @@ fun FilterPage(navController: NavHostController) {
             "Range: €${priceRangeStart.toInt()} - €${priceRangeEnd.toInt()}",
             style = MaterialTheme.typography.bodyLarge
         )
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround

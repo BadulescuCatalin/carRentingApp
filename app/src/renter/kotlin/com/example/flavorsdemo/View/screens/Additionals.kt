@@ -102,7 +102,7 @@ fun Discounts(navController: NavHostController) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Discounts",
+                            text = "Available Discounts",
                             fontSize = 20.sp,
                             color = colorResource(id = R.color.black),
                         )
@@ -110,9 +110,9 @@ fun Discounts(navController: NavHostController) {
                             onClick = {
                                 navController.navigate(Screen.AddDiscount.route)
                             },
-                            colors = ButtonDefaults.buttonColors(Color.White)
+                            colors = ButtonDefaults.buttonColors(Color.Transparent)
                         ) {
-                            Text(text = "Add", fontSize = 14.sp, color = Color.Black)
+                            Text(text = "", fontSize = 14.sp, color = Color.Black)
                         }
                     }
                 }

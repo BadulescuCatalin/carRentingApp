@@ -2,6 +2,8 @@ package com.example.flavorsdemo.View.screens
 
 import android.app.Activity
 import android.content.pm.PackageManager
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,6 +44,7 @@ import com.example.flavorsdemo.View.components.DownMenuBar
 import com.example.flavorsdemo.View.components.EcoFriendlyDialog
 import com.example.flavorsdemo.View.components.InfoBar
 import com.example.flavorsdemo.View.components.carImages
+import com.example.flavorsdemo.View.components.discountValueGlobal
 import com.example.flavorsdemo.View.components.ecoInfo
 import com.example.flavorsdemo.View.components.filterFuel
 import com.example.flavorsdemo.View.components.filterSortBy
@@ -51,13 +54,17 @@ import com.example.flavorsdemo.View.components.imageMapOffice
 import com.example.flavorsdemo.View.components.imageMaps
 import com.example.flavorsdemo.View.components.officesGlobal
 import com.example.flavorsdemo.View.components.user
+import com.example.flavorsdemo.ViewModel.BookingViewModel
 import com.example.flavorsdemo.ViewModel.CarImageViewModel
 import com.example.flavorsdemo.ViewModel.CarViewModel
 import com.example.flavorsdemo.ViewModel.OfficeImageViewModel
 import com.example.flavorsdemo.ViewModel.OfficeViewModel
 import com.example.flavorsdemo.currentUser
 import com.google.firebase.firestore.FirebaseFirestore
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Home(
     navController: NavHostController,
@@ -78,6 +85,12 @@ fun Home(
             1
         )
     }
+    val bookingsViewModel: BookingViewModel = viewModel()
+    val bookings = bookingsViewModel.bookings.observeAsState(initial = emptyList())
+    val myBookings by remember { bookings }
+    val currentDate = LocalDate.now()
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    val dateNow = currentDate.format(formatter)
     val userData by sharedViewModel.userData.collectAsState()
     val db = FirebaseFirestore.getInstance()
     var searchValue by remember { mutableStateOf("") }
@@ -90,6 +103,18 @@ fun Home(
     var dummyOffice = listOf<String>("", "")
     var showLoading by remember { mutableStateOf(true) }
     var showEcoPopUp by remember { mutableStateOf(false) }
+//    for (car in cars) {
+//        var flag = false
+//        for (booking in myBookings) {
+//            if (car.id == booking.carId) {
+//                if (booking.startDate <= dateNow && dateNow <= booking.endDate) {
+//                    flag = true
+//                    break
+//                }
+//            }
+//        }
+//        cars.drop(cars.indexOf(car))
+//    }
     when (filterSortBy) {
         "None" -> carsFiltered = cars
         "Car Name" -> carsFiltered = cars.sortedBy { it.brand + it.model }
@@ -111,7 +136,32 @@ fun Home(
         "Electric" -> carsFiltered = carsFiltered.filter { it.fuelType == "Electric" }
         "Hybrid" -> carsFiltered = carsFiltered.filter { it.fuelType == "Hybrid" }
     }
+    carsFiltered = carsFiltered.filter { car ->
+        myBookings.find { booking ->
+            booking.carId == car.id && booking.startDate <= dateNow && booking.endDate >= dateNow
+        } == null
+    }
     val carMainImages = carImageViewModel.carMainImages.observeAsState(mapOf()).value
+
+    val totalCarCount = myBookings.size
+    val totalElectricCarCount = myBookings.filter { booking ->
+        val car = cars.find { it.id == booking.carId }
+        car?.fuelType == "Electric"
+    }.size
+    val percentage = totalElectricCarCount.toFloat() * 100.0f / totalCarCount.toFloat()
+
+
+    if (percentage >= 33) {
+        discountValueGlobal = 5F
+    } else if (percentage >= 25) {
+        discountValueGlobal = 10F
+    } else if (percentage >= 20) {
+        discountValueGlobal = 15F
+    } else if (percentage >= 15) {
+        discountValueGlobal = 20F
+    } else {
+        discountValueGlobal = 25F
+    }
     carMainImages.forEach() {
         imageMap[it.key] = it.value
     }

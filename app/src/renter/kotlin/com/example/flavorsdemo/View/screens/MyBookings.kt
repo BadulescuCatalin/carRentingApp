@@ -11,8 +11,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -23,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,6 +37,7 @@ import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.components.DisplayBooking
 import com.example.flavorsdemo.View.components.DownMenuBar
 import com.example.flavorsdemo.View.components.InfoBar
+import com.example.flavorsdemo.View.components.PopupEditField
 import com.example.flavorsdemo.ViewModel.BookingViewModel
 import com.example.flavorsdemo.currentUser
 import java.time.LocalDate
@@ -48,6 +54,9 @@ fun MyBooking(navController: NavHostController) {
 //    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 //    var finishedBookings = myBookings.filter { LocalDate.parse(it.endDate, formatter) < LocalDate.now() }
 //    var unfinishedBookings = myBookings.filter { LocalDate.parse(it.endDate, formatter) >= LocalDate.now() }
+    var displayPopup by remember { mutableStateOf(false)}
+    var buttonPressed by remember { mutableStateOf("") }
+    var btnValue by remember { mutableStateOf("") }
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -63,7 +72,37 @@ fun MyBooking(navController: NavHostController) {
                 setShowFilters = { showFilters = !showFilters },
                 navController = navController,
             )
+            if (displayPopup) {
+                AlertDialog(
+                    onDismissRequest = { displayPopup = false },
+                    modifier = Modifier
+                        .background(Color.White)
+                        .clip(RoundedCornerShape(16.dp)),
+                    containerColor = colorResource(id = R.color.white),
+                    title = { Text(text = "Edit booking") },
+                    text = { Text(text = "Are you sure you want to edit this booking?") },
+                    confirmButton = {
+                        Button(
+                            colors = ButtonDefaults.buttonColors(
+                                colorResource(id = R.color.light_blue)
+                            ),
+                            onClick = {
 
+                            }
+                        ) {
+
+                            Text("Edit")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = { displayPopup = false }
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
+                )
+            }
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {

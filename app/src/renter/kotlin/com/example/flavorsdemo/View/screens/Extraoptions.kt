@@ -3,6 +3,7 @@ package com.example.flavorsdemo.View.screens
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -62,6 +63,7 @@ import com.example.flavorsdemo.View.components.timeEnd
 import com.example.flavorsdemo.View.components.timeStart
 import com.example.flavorsdemo.ViewModel.BookingViewModel
 import com.example.flavorsdemo.currentUser
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -296,13 +298,15 @@ fun ExtraOptions(navController: NavHostController) {
                             .padding(16.dp)
                     ) {
                         Column {
-                            Text(text = "Pay online", fontSize = 18.sp)
+                            Text(text = "Get Discount", fontSize = 18.sp)
+                            val discount = currentUser.points / 10
+                            val newPrice = totalPrice - discount
                             Text(
-                                text = "Your credit card will be debited once you finish your booking.",
+                                text = "10 points = 1€. Get $discount€ discount for this booking. The new price will be:",
                                 fontSize = 14.sp
                             )
                             Text(
-                                text = "$totalPrice€",
+                                text = "$newPrice€",
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -310,6 +314,7 @@ fun ExtraOptions(navController: NavHostController) {
                                 onClick = {
                                     showDialog = true
                                     showDialogPoints = false
+                                    currentUser.points = 0
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     colorResource(id = R.color.light_blue)
@@ -426,7 +431,22 @@ fun ExtraOptions(navController: NavHostController) {
                                     val dayStart = dateStart.split("/")[0]
                                     val dayEnd = dateEnd.split("/")[0]
                                     val daysBetween = dayEnd.toInt() - dayStart.toInt() + 1
-                                    val pointsEarned = totalPrice  // ??????
+                                    val pointsEarned = (daysBetween * 5.0f + totalPrice  / 20).toInt() // 5 puncte pe zi + 5% din pret
+                                    currentUser.points += pointsEarned
+                                    val db = FirebaseFirestore.getInstance()
+                                    db.collection("users")
+                                        .document(currentUser.id)
+                                        .set(currentUser)
+                                        .addOnSuccessListener {
+                                        }
+                                        .addOnFailureListener { e ->
+                                            Log.d(
+                                                "TAG",
+                                                "Error adding user in the database",
+                                                e
+                                            )
+                                        }
+
                                     // save to firestore + mvvm
                                     coroutineScope.launch {
                                         bookingViewModel.addBooking(booking)

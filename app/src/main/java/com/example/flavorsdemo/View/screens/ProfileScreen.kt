@@ -153,7 +153,6 @@ fun ProfileScreen(navController: NavHostController) {
                         color = Color.LightGray
                     )
                     ProfileScreenComponent("Driver details", "Edit driver details", onClick = {
-
                     })
                     if (showPopup) {
                         PopupEditField(

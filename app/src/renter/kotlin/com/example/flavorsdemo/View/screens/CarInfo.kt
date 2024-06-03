@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -106,7 +107,7 @@ fun CarInfo(navController: NavHostController) {
                     contentDescription = "Car Image",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .size(200.dp)
+                        .height(200.dp)
                         .offset(x = (-32).dp, y = (-32).dp)
                 )
             }
@@ -181,7 +182,55 @@ fun CarInfo(navController: NavHostController) {
                     CarGallery()
                 }
                 else -> {
-                    // CarReviews()
+                    Column {
+                        androidx.compose.material.Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                                .padding(horizontal = 8.dp)
+                                .height(150.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            elevation = 4.dp
+                        ) {
+                            Column (
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+
+                            ) {
+                                Text("Vlad", fontSize = 16.sp)
+                                RatingBar(rating = 5f, modifier = Modifier.padding(top = 8.dp))
+                                Text(
+                                    "I recently rented a this car for a week-long business trip, and I couldn't be more satisfied with my experience",
+                                    fontSize = 16.sp
+                                )
+                            }
+                        }
+                        androidx.compose.material.Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                                .padding(horizontal = 8.dp)
+                                .height(150.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            elevation = 4.dp
+                        ) {
+                            Column (
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+
+                            ) {
+                                Text("Catalin", fontSize = 16.sp)
+                                RatingBar(rating = 4f, modifier = Modifier.padding(top = 8.dp))
+                                Text(
+                                    "Me and my family rented the car for a weekend getaway, and overall, it was a great experience",
+                                    fontSize = 16.sp
+                                )
+                            }
+                        }
+                    }
+
                 }
             }
         }

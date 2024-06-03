@@ -3,6 +3,7 @@ package com.example.flavorsdemo.View.components
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.AlertDialog
@@ -104,6 +106,10 @@ fun ProfileScreenComponent(text: String, textValue: String, onClick: () -> Unit)
 fun PopupEditField(title: String, value:String, onConfirm: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = { onDismiss() },
+        modifier = Modifier
+            .background(Color.White)
+            .clip(RoundedCornerShape(16.dp)),
+        containerColor = colorResource(id = R.color.white),
         title = { Text(text = "Edit $title") },
         text = { Text(text = "Are you sure you want to edit $title") },
         confirmButton = {

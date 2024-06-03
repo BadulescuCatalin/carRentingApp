@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -48,7 +49,9 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
@@ -84,6 +87,7 @@ var filterFuel = "All"
 var filterPriceRangeStart = 0f
 var filterPriceRangeEnd = 500f
 var officesGlobal = listOf<Office>()
+var discountValueGlobal = 0.0f
 var selectedOfficeGlobal = Office()
 var office = Office()
 var discountGlobal = Discount()
@@ -103,7 +107,13 @@ fun CarCard(
     val discountViewModel: DiscountViewModel = viewModel()
     val discounts = discountViewModel.discounts.observeAsState(initial = emptyList())
     val allDiscounts by remember { discounts }
-    val discount = allDiscounts.find { it.discountType == thisCar.fuelType }
+    var discount = allDiscounts.find { it.discountType == thisCar.fuelType }
+    if (thisCar.fuelType == "Electric" && discount != null && discount.discountValue.split("%")[0].toFloat() < discountValueGlobal) discount.discountValue =
+        discountValueGlobal.toString() + "%"
+    else if (thisCar.fuelType == "Electric" && discount == null) {
+        discount = Discount()
+        discount.discountValue = discountValueGlobal.toString() + "%"
+    }
     val configuration: Configuration = LocalConfiguration.current
     val imageUrls = carImageViewModel.getImageUrls(thisCar.id).observeAsState(initial = listOf())
 //    if (!imageMap.contains(thisCar.id)) {
@@ -171,7 +181,17 @@ fun CarCard(
 //                                .size(24.dp)
 //                        )
                         val discountValue = discount.discountValue
-                        Text(text = "$discountValue off", color = Color.Red)
+                        Text(
+                            text = "-$discountValue", color = Color.White,
+                            modifier = Modifier
+                                .clip(
+                                    RoundedCornerShape(10.dp)
+                                )
+                                .background(Color.Red)
+                                .padding(6.dp),
+                            fontSize = 15.sp
+                        )
+
                     } else {
                         Text("")
                     }
@@ -199,10 +219,25 @@ fun CarCard(
                             val discountValue = discount.discountValue.split("%")[0].toFloat()
                             val newPrice =
                                 thisCar.price.split("€")[0].toFloat() - (thisCar.price.split("€")[0].toFloat() * discountValue / 100)
-                            Row() {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.End
+
+                            ) {
                                 Text(
                                     text = "$newPrice€ / day",
                                     color = Color.Red
+                                )
+                                Text(
+                                    text = thisCar.price + " / day",
+                                    color = Color.Gray,
+                                    style = TextStyle(textDecoration = TextDecoration.LineThrough),
+                                    modifier = Modifier
+                                        .padding(start = 4.dp)
+                                        .offset(y = 2.dp)
                                 )
                             }
                         } else {
