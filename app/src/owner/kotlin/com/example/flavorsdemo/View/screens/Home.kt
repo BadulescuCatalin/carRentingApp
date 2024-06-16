@@ -1,8 +1,11 @@
 package com.example.flavorsdemo.View.screens
 
 import android.app.Activity
+import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Location
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -71,8 +74,34 @@ import com.example.flavorsdemo.ViewModel.CarViewModel
 import com.example.flavorsdemo.ViewModel.OfficeImageViewModel
 import com.example.flavorsdemo.ViewModel.OfficeViewModel
 import com.example.flavorsdemo.currentUser
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.FirebaseFirestore
 
+lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+
+fun fetchLocation(context: Context, action: (LatLng) -> Unit) {
+    if (ActivityCompat.checkSelfPermission(
+            context,
+            android.Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED
+        && ActivityCompat.checkSelfPermission(
+            context,
+            android.Manifest.permission.ACCESS_COARSE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        return
+    }
+
+    fusedLocationProviderClient.lastLocation.addOnSuccessListener { location: Location? ->
+        if (location != null) {
+            action(LatLng(location.latitude, location.longitude))
+        } else {
+            Toast.makeText(context, "Location not found", Toast.LENGTH_SHORT).show()
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,6 +114,12 @@ fun Home(
     officeImageViewModel: OfficeImageViewModel = viewModel(),
 ) {
 
+    val context = LocalContext.current
+    fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+    fetchLocation(context) { location ->
+        office.latitude = location.latitude.toString()
+        office.longitude = location.longitude.toString()
+    }
     val db = FirebaseFirestore.getInstance()
     var email = user?.email
     db.collection("users")

@@ -1,8 +1,14 @@
 package com.example.flavorsdemo.View.screens
 
 import ConfirmationDialog
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
 import android.net.Uri
 import android.os.Build
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +35,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.flavorsdemo.R
@@ -40,6 +48,9 @@ import com.example.flavorsdemo.View.components.office
 import com.example.flavorsdemo.View.components.officeMainImage
 import com.example.flavorsdemo.ViewModel.OfficeImageViewModel
 import com.example.flavorsdemo.ViewModel.OfficeViewModel
+import com.example.flavorsdemo.currentUser
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -50,23 +61,59 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
 
+
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun OfficeMap(navController: NavHostController) {
+    val context = LocalContext.current
+    var currentLocation by remember { mutableStateOf<LatLng?>(null) }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            fetchLocation(context) { location ->
+                currentLocation = location
+            }
+        } else {
+            Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        if (ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fetchLocation(context) { location ->
+                currentLocation = location
+            }
+        } else {
+            permissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+    if (office.latitude == "" && office.longitude == "" && currentLocation != null) {
+        office.latitude = currentLocation!!.latitude.toString()
+        office.longitude = currentLocation!!.longitude.toString()
+    }
     val markerState = rememberMarkerState(
         position = LatLng(office.latitude.toDouble(), office.longitude.toDouble())
     )
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(markerState.position, 18f)
     }
-    var uiSettings by remember { mutableStateOf(MapUiSettings()) }
+    var uiSettings by remember { mutableStateOf(MapUiSettings(zoomControlsEnabled = false)) }
     var showConfirmationDialog by remember { mutableStateOf(false) }
 
     val coroutineScope = rememberCoroutineScope()
 
-    val context = LocalContext.current
     val officeViewModel: OfficeViewModel = viewModel()
     val officeImageViewModel: OfficeImageViewModel = viewModel()
+
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -91,6 +138,7 @@ fun OfficeMap(navController: NavHostController) {
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
                 cameraPositionState = cameraPositionState,
+                uiSettings = uiSettings,
             ) {
                 Marker(
                     state = markerState,
@@ -117,6 +165,7 @@ fun OfficeMap(navController: NavHostController) {
                         .padding(start = 24.dp, end = 12.dp, bottom = 24.dp)
                         .align(Alignment.BottomEnd),
                     onClick = {
+                        office.userId = currentUser.id
                         coroutineScope.launch {
                             officeViewModel.addOffice(office)
                         }

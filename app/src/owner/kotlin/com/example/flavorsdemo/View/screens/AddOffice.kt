@@ -3,7 +3,11 @@ package com.example.flavorsdemo.View.screens
 import ConfirmationDialog
 import TableRow
 import TableRows
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -50,6 +54,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
@@ -64,8 +69,10 @@ import com.example.flavorsdemo.View.components.office
 import com.example.flavorsdemo.View.components.officeMainImage
 import com.example.flavorsdemo.ViewModel.OfficeImageViewModel
 import com.example.flavorsdemo.ViewModel.OfficeViewModel
+import com.example.flavorsdemo.currentUser
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -130,6 +137,13 @@ fun AddOffice(navController: NavHostController) {
                         onValueChange = {
                             city = it
                             office.city = it
+                            val fullAddress = "$address, $city, $zipcode, $country"
+                            val latLng = getLatLngFromAddress(context, fullAddress)
+                            latLng?.let {
+                                // Use latLng.latitude and latLng.longitude
+                                office.latitude = latLng.latitude.toString()
+                                office.longitude = latLng.longitude.toString()
+                            }
                         },
                         text2 = "Country",
                         placeholder2 = "Country",
@@ -137,6 +151,13 @@ fun AddOffice(navController: NavHostController) {
                         onValueChange2 = {
                             country = it
                             office.country = it
+                            val fullAddress = "$address, $city, $zipcode, $country"
+                            val latLng = getLatLngFromAddress(context, fullAddress)
+                            latLng?.let {
+                                // Use latLng.latitude and latLng.longitude
+                                office.latitude = latLng.latitude.toString()
+                                office.longitude = latLng.longitude.toString()
+                            }
                         }
                     )
                     TableRow(
@@ -162,6 +183,13 @@ fun AddOffice(navController: NavHostController) {
                         onValueChange = {
                             zipcode = it
                             office.zipcode = it
+                            val fullAddress = "$address, $city, $zipcode, $country"
+                            val latLng = getLatLngFromAddress(context, fullAddress)
+                            latLng?.let {
+                                // Use latLng.latitude and latLng.longitude
+                                office.latitude = latLng.latitude.toString()
+                                office.longitude = latLng.longitude.toString()
+                            }
                         }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -375,6 +403,10 @@ fun AddOffice(navController: NavHostController) {
                         .padding(start = 24.dp, end = 12.dp, bottom = 24.dp)
                         .align(Alignment.BottomEnd),
                     onClick = {
+                        // check all fields are completed
+
+//                        if (office)
+                        office.userId = currentUser.id
                         coroutineScope.launch {
                             officeViewModel.addOffice(office)
                         }
@@ -436,5 +468,4 @@ fun AddOffice(navController: NavHostController) {
             }
         }
     }
-
 }

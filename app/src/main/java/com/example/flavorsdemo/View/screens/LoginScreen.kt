@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -155,7 +156,8 @@ fun Login(navController: NavHostController) {
                 isEmailCorrect = checkEmail(email)
                 isPasswordEmpty = password.isEmpty()
                 wrongCredentials = false
-                if (!isEmailEmpty && isEmailCorrect && !isPasswordEmpty) {
+                if (!isEmailEmpty && isEmailCorrect && !isPasswordEmpty
+                    && currentUser.userType == FlavorConfig.userType) {
                     sharedViewModel.fetchUserData(email ?: "")
                     val auth = Firebase.auth
                     auth.signInWithEmailAndPassword(email, password)

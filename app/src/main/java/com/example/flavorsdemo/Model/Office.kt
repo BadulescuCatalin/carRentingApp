@@ -6,6 +6,7 @@ import java.util.UUID
 
 data class Office (
     val id : String,
+    var userId : String,
     var zipcode: String,
     var address: String,
     var city: String,
@@ -21,5 +22,5 @@ data class Office (
     var longitude : String,
     var latitude : String
 ) {
-    constructor() : this(UUID.randomUUID().toString(), "", "", "", "", "", "", currentUser.phoneNumber, currentUser.emailAddress, "", "", "", "", "", "")
+    constructor() : this(UUID.randomUUID().toString(),"", "", "", "", "", "", "", currentUser.phoneNumber, currentUser.emailAddress, "", "", "", "", "", "")
 }
