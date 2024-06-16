@@ -21,12 +21,12 @@ fun isValidPassword(password: String): Boolean {
     return passwordMatcher.matches(password)
 }
 
-fun checkPasswords(password: String, confirmedPassword: String): Boolean {
-    return password == confirmedPassword
-}
-
 fun checkEmail(email: String): Boolean {
     return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+}
+
+fun checkPasswords(password: String, confirmedPassword: String): Boolean {
+    return password == confirmedPassword
 }
 
 fun getAllCountriesMap(): Map<String, String> {

@@ -139,8 +139,8 @@ fun AddImages(navController: NavHostController) {
                         }
                         Box(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 16.dp)
+                                .fillMaxWidth(0.9f)
+                                .padding(top = 16.dp, start = 24.dp)
                         ) {
                             Image(
                                 painter = rememberAsyncImagePainter(
@@ -150,12 +150,17 @@ fun AddImages(navController: NavHostController) {
                                 ),
 
                                 contentDescription = "Selected Image",
-                                contentScale = ContentScale.Fit,
+//                                contentScale = ContentScale.Fit,
+//                                modifier = Modifier
+//                                    .fillMaxWidth()
+//                                    .padding(top = 16.dp)
+//                                    .height(200.dp)
+////                                    .fillMaxHeight(0.4F)
+////                                    .scale(1.4F, 1.4F)
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 16.dp)
-                                    .fillMaxHeight(0.4F)
-                                    .scale(1.4F, 1.4F)
+                                    .height(200.dp)
+                                    .fillMaxWidth(),
+                                contentScale = ContentScale.FillWidth
                             )
 
                             Button(
@@ -166,7 +171,7 @@ fun AddImages(navController: NavHostController) {
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
                                     .background(Color.Transparent)
-                                    .padding(end = 24.dp)
+//                                    .padding(end = 24.dp)
                                     .offset(x = 2.dp, y = (-24).dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Transparent

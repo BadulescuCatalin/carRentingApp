@@ -150,7 +150,7 @@ fun AddDiscount(navController: NavHostController) {
                                         if (type == "Diesel Cars") "Diesel" else
                                             if (type == "Petrol Cars") "Petrol" else type
                                 selectedType = type
-                                discountGlobal.discountType = type
+                                discountGlobal.discountType = acutalType
                                 expanded = false
                             },
                             modifier = Modifier.background(Color.White) // Background color of dropdown items

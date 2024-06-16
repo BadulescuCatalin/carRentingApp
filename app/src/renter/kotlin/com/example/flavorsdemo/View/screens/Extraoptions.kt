@@ -315,6 +315,7 @@ fun ExtraOptions(navController: NavHostController) {
                                     showDialog = true
                                     showDialogPoints = false
                                     currentUser.points = 0
+                                    totalPrice = newPrice
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     colorResource(id = R.color.light_blue)

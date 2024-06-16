@@ -41,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap.Companion.Butt
 import androidx.compose.ui.platform.LocalContext
@@ -348,7 +349,7 @@ fun PickDateAndTime(navController: NavHostController) {
                     .padding(horizontal = 16.dp)
                     .fillMaxSize()
             ) {
-                androidx.compose.material.Button(
+                androidx.compose.material3.Button(
                     onClick = {
                         if (car.brand == "")
                             navController.navigate(Screen.Home.route)
@@ -362,8 +363,10 @@ fun PickDateAndTime(navController: NavHostController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .align(Alignment.BottomCenter)
-                        .offset(y = 24.dp),
-                    colors = androidx.compose.material.ButtonDefaults.buttonColors(
+                        .offset(y = 24.dp)
+                        .background(colorResource(id = R.color.light_blue))
+                        .clip(RoundedCornerShape(5.dp)),
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
                         colorResource(id = R.color.light_blue)
                     )
                 ) {

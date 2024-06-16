@@ -187,8 +187,8 @@ fun CarInfo(navController: NavHostController) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 4.dp)
-                                .padding(horizontal = 8.dp)
-                                .height(150.dp),
+                                .padding(horizontal = 8.dp),
+//                                .height(150.dp),
                             shape = RoundedCornerShape(16.dp),
                             elevation = 4.dp
                         ) {
@@ -210,8 +210,8 @@ fun CarInfo(navController: NavHostController) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 4.dp)
-                                .padding(horizontal = 8.dp)
-                                .height(150.dp),
+                                .padding(horizontal = 8.dp),
+//                                .height(150.dp),
                             shape = RoundedCornerShape(16.dp),
                             elevation = 4.dp
                         ) {
