@@ -60,4 +60,20 @@ class DiscountRepositoryImpl : DiscountRepository {
 
         awaitClose { listener.remove() }
     }
+
+    suspend fun updateDiscountOfficeIds(discounts: List<Discount>, newId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        val db = FirebaseFirestore.getInstance()
+
+        try {
+            for (discount in discounts) {
+                db.collection("discounts")
+                    .document(discount.id)
+                    .update("officeId", newId)
+                    .await()
+            }
+            onSuccess()
+        } catch (e: Exception) {
+            onFailure(e)
+        }
+    }
 }

@@ -1,5 +1,8 @@
 package com.example.flavorsdemo.View.screens
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,16 +32,37 @@ import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.components.DisplayBooking
 import com.example.flavorsdemo.View.components.DownMenuBar
 import com.example.flavorsdemo.View.components.InfoBar
+import com.example.flavorsdemo.View.components.countriesList
+import com.example.flavorsdemo.View.components.officesGlobal
 import com.example.flavorsdemo.ViewModel.BookingViewModel
+import com.example.flavorsdemo.ViewModel.OfficeViewModel
 import com.example.flavorsdemo.currentUser
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MyBooking(navController: NavHostController) {
     val bookingViewModel: BookingViewModel = viewModel()
+    val officeViewModel: OfficeViewModel = viewModel()
+    val offices by officeViewModel.offices.observeAsState(initial = emptyList())
+    val myOffices = offices.filter { it.userId == currentUser.id }
     val bookings = bookingViewModel.bookings.observeAsState(initial = emptyList())
-    val myBookings by remember { bookings }
+    val currentDate = LocalDate.now()
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    val formattedDate = currentDate.format(formatter)
+
+    val myCompanyBookings = bookings.value.filter { it ->
+        it.officeId in myOffices.map { it.id } &&
+                (LocalDate.parse(formattedDate, formatter).isBefore(LocalDate.parse(it.endDate,formatter)) &&
+                LocalDate.parse(formattedDate, formatter).isAfter(LocalDate.parse(it.startDate,formatter)) ||
+                LocalDate.parse(formattedDate, formatter).isEqual(LocalDate.parse(it.endDate,formatter)) ||
+                LocalDate.parse(formattedDate, formatter).isEqual(LocalDate.parse(it.startDate,formatter)))
+
+    }
+    Log.d("MyBooking", myCompanyBookings.toString())
+//    val myBookings by remember { mutableStateOf(myCompanyBookings) }
     var showFilters by remember { mutableStateOf(false) }
-    myBookings.filter { it.userId == currentUser.id }
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -69,7 +93,7 @@ fun MyBooking(navController: NavHostController) {
                     )
 
                 }
-                for (booking in myBookings) {
+                for (booking in myCompanyBookings) {
                     item {
                         Card(
                             modifier = Modifier

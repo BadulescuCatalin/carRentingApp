@@ -41,4 +41,14 @@ class DiscountViewModel : ViewModel() {
             }
         )
     }
+
+    suspend fun updateDiscountsOfficeIds(discounts : List<Discount>, officeId: String) {
+        discountRepository.updateDiscountOfficeIds(discounts, officeId,
+            onSuccess = {
+                discountGlobal = Discount()
+            },
+            onFailure = {
+                discountGlobal = Discount()
+            })
+    }
 }

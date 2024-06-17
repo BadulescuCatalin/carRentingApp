@@ -1,5 +1,6 @@
 package com.example.flavorsdemo.View.screens
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,15 +27,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.flavorsdemo.Model.User
 import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.components.CircularImage
 import com.example.flavorsdemo.View.components.DownMenuBar
 import com.example.flavorsdemo.View.components.PopupEditField
 import com.example.flavorsdemo.View.components.ProfileScreenComponent
+import com.example.flavorsdemo.ViewModel.CarImageViewModel
 import com.example.flavorsdemo.currentUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -49,6 +54,10 @@ fun ProfileScreen(navController: NavHostController) {
     var showPopup by remember { mutableStateOf(false) }
     var buttonPressed by remember { mutableStateOf("") }
     var btnValue by remember { mutableStateOf("") }
+    val carImageViewModel: CarImageViewModel = viewModel()
+
+    carImageViewModel.fetchUserImage(currentUser.id)
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -81,7 +90,7 @@ fun ProfileScreen(navController: NavHostController) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                CircularImage(icon = R.drawable.eu)
+                                CircularImage(icon = R.drawable.profile_image)
                                 Column() {
                                     Text(
                                         text = currentUser.firstName + " " + currentUser.lastName,
@@ -94,6 +103,15 @@ fun ProfileScreen(navController: NavHostController) {
                                     Button(
                                         onClick = {
                                             Firebase.auth.signOut()
+                                            val sharedPreferences =
+                                                context.getSharedPreferences(
+                                                    "AppUser",
+                                                    Context.MODE_PRIVATE
+                                                )
+                                            val editor = sharedPreferences.edit()
+                                            editor.putBoolean("autologin", false)
+                                            editor.apply()
+                                            currentUser = User()
                                             navController.navigate("login")
                                         },
                                         modifier = Modifier

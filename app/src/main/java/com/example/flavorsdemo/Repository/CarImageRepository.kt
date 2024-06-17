@@ -93,4 +93,11 @@ class CarImageRepository {
         }
     }
 
+    suspend fun uploadUserImage(imageUri: Uri, userId: String, identifier: String): String {
+        val imagePath = "user/$userId/$identifier.jpg"
+        val imageRef = storageRef.child(imagePath)
+        val uploadTask = imageRef.putFile(imageUri).await()
+        return uploadTask.storage.downloadUrl.await().toString()
+    }
+
 }

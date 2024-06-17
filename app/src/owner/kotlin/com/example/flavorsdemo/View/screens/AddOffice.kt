@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material3.Button
@@ -310,81 +311,81 @@ fun AddOffice(navController: NavHostController) {
                                 )
                         )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(124.dp))
                 }
-                item {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    InfoTitle(title = "Office Photo", icon = R.drawable.camera)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp)
-                    ) {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = mainImage.value,
-                                error = painterResource(R.drawable.image_placeholder),
-                                placeholder = painterResource(R.drawable.image_placeholder)
-                            ),
-
-                            contentDescription = "Selected Image",
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 16.dp)
-                                .fillMaxHeight(0.4F)
-                                .scale(1.4F, 1.4F)
-                        )
-
-                        Button(
-                            onClick = {
-                                mainImage.value = null
-                                officeMainImage = Uri.EMPTY
-                            },
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .background(Color.Transparent)
-                                .padding(end = 24.dp)
-                                .offset(x = 2.dp, y = (-24).dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Transparent
-                            )
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .background(
-                                        color = colorResource(id = R.color.black),
-                                        shape = CircleShape
-                                    )
-
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Cancel,
-                                    contentDescription = "Delete Main Image",
-                                    tint = colorResource(id = R.color.white),
-                                    modifier = Modifier.background(Color.Transparent)
-
-                                )
-                            }
-                        }
-                    }
-                    Button(
-                        onClick = { pickMainImageLauncher.launch("image/*") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .padding(top = 24.dp)
-                            .padding(end = 24.dp)
-                            .padding(start = 24.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            colorResource(id = R.color.light_blue)
-                        )
-                    ) {
-                        Text(text = "Pick Office Photo from Gallery")
-                    }
-                    Spacer(modifier = Modifier.height(96.dp))
-                }
+//                item {
+//                    Spacer(modifier = Modifier.height(4.dp))
+//                    InfoTitle(title = "Office Photo", icon = R.drawable.camera)
+//                    Spacer(modifier = Modifier.height(8.dp))
+//                    Box(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(top = 16.dp)
+//                    ) {
+//                        Image(
+//                            painter = rememberAsyncImagePainter(
+//                                model = mainImage.value,
+//                                error = painterResource(R.drawable.image_placeholder),
+//                                placeholder = painterResource(R.drawable.image_placeholder)
+//                            ),
+//
+//                            contentDescription = "Selected Image",
+//                            contentScale = ContentScale.Fit,
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .padding(top = 16.dp)
+//                                .fillMaxHeight(0.4F)
+//                                .scale(1.4F, 1.4F)
+//                        )
+//
+//                        Button(
+//                            onClick = {
+//                                mainImage.value = null
+//                                officeMainImage = Uri.EMPTY
+//                            },
+//                            modifier = Modifier
+//                                .align(Alignment.TopEnd)
+//                                .background(Color.Transparent)
+//                                .padding(end = 24.dp)
+//                                .offset(x = 2.dp, y = (-24).dp),
+//                            colors = ButtonDefaults.buttonColors(
+//                                containerColor = Color.Transparent
+//                            )
+//                        ) {
+//                            Box(
+//                                modifier = Modifier
+//                                    .background(
+//                                        color = colorResource(id = R.color.black),
+//                                        shape = CircleShape
+//                                    )
+//
+//                            ) {
+//                                Icon(
+//                                    imageVector = Icons.Default.Cancel,
+//                                    contentDescription = "Delete Main Image",
+//                                    tint = colorResource(id = R.color.white),
+//                                    modifier = Modifier.background(Color.Transparent)
+//
+//                                )
+//                            }
+//                        }
+//                    }
+//                    Button(
+//                        onClick = { pickMainImageLauncher.launch("image/*") },
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(16.dp)
+//                            .padding(top = 24.dp)
+//                            .padding(end = 24.dp)
+//                            .padding(start = 24.dp),
+//                        colors = ButtonDefaults.buttonColors(
+//                            colorResource(id = R.color.light_blue)
+//                        )
+//                    ) {
+//                        Text(text = "Pick Office Photo from Gallery")
+//                    }
+//                    Spacer(modifier = Modifier.height(96.dp))
+//                }
             }
             if (showConfirmationDialog) {
                 ConfirmationDialog(onConfirm = {
@@ -404,18 +405,29 @@ fun AddOffice(navController: NavHostController) {
                         .align(Alignment.BottomEnd),
                     onClick = {
                         // check all fields are completed
-
+                        if ( office.city == "" || office.country == "" || office.address == "" || office.zipcode == "" ||
+                            office.name == "" || office.description == "" || office.phone == "" || office.email == "" ||
+                            office.numberOfGps == "" || office.numberOfCameras == "" ||
+                            office.numberOfAdditionalCarTrunks == "" || office.numberOfChildSeats == ""
+                        ) {
+                            Toast.makeText(
+                                context,
+                                "Please complete all fields",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
 //                        if (office)
-                        office.userId = currentUser.id
-                        coroutineScope.launch {
-                            officeViewModel.addOffice(office)
+                            office.userId = currentUser.id
+                            coroutineScope.launch {
+                                officeViewModel.addOffice(office)
+                            }
+                            coroutineScope.launch {
+                                officeImageViewModel.uploadOfficeImages(officeMainImage, office.id)
+                                imageMapOffice[office.id] = officeMainImage.toString()
+                                officeMainImage = Uri.EMPTY
+                            }
+                            navController.navigate(Screen.Home.route)
                         }
-                        coroutineScope.launch {
-                            officeImageViewModel.uploadOfficeImages(officeMainImage, office.id)
-                            imageMapOffice[office.id] = officeMainImage.toString()
-                            officeMainImage = Uri.EMPTY
-                        }
-                        navController.navigate(Screen.Home.route)
                     },
                     colors = ButtonDefaults.buttonColors(
                         colorResource(id = R.color.light_blue)
@@ -452,14 +464,29 @@ fun AddOffice(navController: NavHostController) {
                             colorResource(id = R.color.light_blue)
                         ),
                         onClick = {
-                            officeViewModel.updateOffice(office)
-                            coroutineScope.launch {
-                                officeImageViewModel.deleteImage("offices/${office.id}/main.jpg")
-                                officeImageViewModel.uploadOfficeImages(officeMainImage, office.id)
-                                imageMapOffice[office.id] = officeMainImage.toString()
-                                officeMainImage = Uri.EMPTY
+                            if (office.city == "" || office.country == "" || office.address == "" || office.zipcode == "" ||
+                                office.name == "" || office.description == "" || office.phone == "" || office.email == "" ||
+                                office.numberOfGps == "" || office.numberOfCameras == "" ||
+                                office.numberOfAdditionalCarTrunks == "" || office.numberOfChildSeats == ""
+                            ) {
+                                Toast.makeText(
+                                    context,
+                                    "Please complete all fields",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                officeViewModel.updateOffice(office)
+                                coroutineScope.launch {
+                                    officeImageViewModel.deleteImage("offices/${office.id}/main.jpg")
+                                    officeImageViewModel.uploadOfficeImages(
+                                        officeMainImage,
+                                        office.id
+                                    )
+                                    imageMapOffice[office.id] = officeMainImage.toString()
+                                    officeMainImage = Uri.EMPTY
+                                }
+                                navController.navigate(Screen.Home.route)
                             }
-                            navController.navigate(Screen.Home.route)
                         }
                     ) {
                         Text(text = "Save")

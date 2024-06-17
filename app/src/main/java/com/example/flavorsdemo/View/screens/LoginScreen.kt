@@ -156,13 +156,16 @@ fun Login(navController: NavHostController) {
                 isEmailCorrect = checkEmail(email)
                 isPasswordEmpty = password.isEmpty()
                 wrongCredentials = false
+                sharedViewModel.fetchUserData(email ?: "")
+                val userDataa = sharedViewModel.userData.value
                 if (!isEmailEmpty && isEmailCorrect && !isPasswordEmpty
-                    && currentUser.userType == FlavorConfig.userType) {
+                    && userDataa != null && userDataa.userType == FlavorConfig.userType) {
                     sharedViewModel.fetchUserData(email ?: "")
                     val auth = Firebase.auth
                     auth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
+                                currentUser = sharedViewModel.userData.value!!
                                 val user = auth.currentUser
                                 Log.d("Login", "User: $user")
                                 if (rememberMeChecked) {

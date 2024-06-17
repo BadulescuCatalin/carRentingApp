@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -165,16 +166,28 @@ fun OfficeMap(navController: NavHostController) {
                         .padding(start = 24.dp, end = 12.dp, bottom = 24.dp)
                         .align(Alignment.BottomEnd),
                     onClick = {
-                        office.userId = currentUser.id
-                        coroutineScope.launch {
-                            officeViewModel.addOffice(office)
+                        if ( office.city == "" || office.country == "" || office.address == "" || office.zipcode == "" ||
+                            office.name == "" || office.description == "" || office.phone == "" || office.email == "" ||
+                            office.numberOfGps == "" || office.numberOfCameras == "" ||
+                            office.numberOfAdditionalCarTrunks == "" || office.numberOfChildSeats == ""
+                        ) {
+                            Toast.makeText(
+                                context,
+                                "Please complete all fields",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            office.userId = currentUser.id
+                            coroutineScope.launch {
+                                officeViewModel.addOffice(office)
+                            }
+                            coroutineScope.launch {
+                                officeImageViewModel.uploadOfficeImages(officeMainImage, office.id)
+                                imageMapOffice[office.id] = officeMainImage.toString()
+                                officeMainImage = Uri.EMPTY
+                            }
+                            navController.navigate(Screen.Home.route)
                         }
-                        coroutineScope.launch {
-                            officeImageViewModel.uploadOfficeImages(officeMainImage, office.id)
-                            imageMapOffice[office.id] = officeMainImage.toString()
-                            officeMainImage = Uri.EMPTY
-                        }
-                        navController.navigate(Screen.Home.route)
                     },
                     colors = ButtonDefaults.buttonColors(
                         colorResource(id = R.color.light_blue)
@@ -211,14 +224,29 @@ fun OfficeMap(navController: NavHostController) {
                             colorResource(id = R.color.light_blue)
                         ),
                         onClick = {
-                            officeViewModel.updateOffice(office)
-                            coroutineScope.launch {
-                                officeImageViewModel.deleteImage("offices/${office.id}/main.jpg")
-                                officeImageViewModel.uploadOfficeImages(officeMainImage, office.id)
-                                imageMapOffice[office.id] = officeMainImage.toString()
-                                officeMainImage = Uri.EMPTY
+                            if ( office.city == "" || office.country == "" || office.address == "" || office.zipcode == "" ||
+                                office.name == "" || office.description == "" || office.phone == "" || office.email == "" ||
+                                office.numberOfGps == "" || office.numberOfCameras == "" ||
+                                office.numberOfAdditionalCarTrunks == "" || office.numberOfChildSeats == ""
+                            ) {
+                                Toast.makeText(
+                                    context,
+                                    "Please complete all fields",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                officeViewModel.updateOffice(office)
+                                coroutineScope.launch {
+                                    officeImageViewModel.deleteImage("offices/${office.id}/main.jpg")
+                                    officeImageViewModel.uploadOfficeImages(
+                                        officeMainImage,
+                                        office.id
+                                    )
+                                    imageMapOffice[office.id] = officeMainImage.toString()
+                                    officeMainImage = Uri.EMPTY
+                                }
+                                navController.navigate(Screen.Home.route)
                             }
-                            navController.navigate(Screen.Home.route)
                         }
                     ) {
                         Text(text = "Save")

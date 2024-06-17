@@ -28,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,6 +59,7 @@ import com.example.flavorsdemo.View.components.InfoBar
 import com.example.flavorsdemo.View.components.OfficeComponent
 import com.example.flavorsdemo.View.components.car
 import com.example.flavorsdemo.View.components.carImages
+import com.example.flavorsdemo.View.components.discountGlobal
 import com.example.flavorsdemo.View.components.filterFuel
 import com.example.flavorsdemo.View.components.filterSortBy
 import com.example.flavorsdemo.View.components.filterTransmission
@@ -71,6 +73,7 @@ import com.example.flavorsdemo.View.components.officesGlobal
 import com.example.flavorsdemo.View.components.user
 import com.example.flavorsdemo.ViewModel.CarImageViewModel
 import com.example.flavorsdemo.ViewModel.CarViewModel
+import com.example.flavorsdemo.ViewModel.DiscountViewModel
 import com.example.flavorsdemo.ViewModel.OfficeImageViewModel
 import com.example.flavorsdemo.ViewModel.OfficeViewModel
 import com.example.flavorsdemo.currentUser
@@ -78,6 +81,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 
 lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
@@ -122,35 +126,49 @@ fun Home(
     }
     val db = FirebaseFirestore.getInstance()
     var email = user?.email
-    db.collection("users")
-        .whereEqualTo("emailAddress", email)
-        .get()
-        .addOnSuccessListener {
-            for (document in it) {
-                currentUser = document.toObject(User::class.java)
-            }
-        }
+//    db.collection("users")
+//        .whereEqualTo("emailAddress", email)
+//        .get()
+//        .addOnSuccessListener {
+//            for (document in it) {
+//                currentUser = document.toObject(User::class.java)
+//            }
+//        }
     var searchValue by remember { mutableStateOf("") }
     var showFilters by remember { mutableStateOf(false) }
     val userData by sharedViewModel.userData.collectAsState()
     val cars by carViewModel.cars.observeAsState(initial = emptyList())
+
     val offices by officeViewModel.offices.observeAsState(initial = emptyList())
     officesGlobal = offices
-    var carsFiltered by remember { mutableStateOf(cars) }
+    val myOffices = offices.filter { it.userId == currentUser.id }
+    var officesString = ""
+    myOffices.forEach() {
+        officesString += it.id + ","
+    }
+    val discountsViewModel: DiscountViewModel = viewModel()
+    val coroutineScope = rememberCoroutineScope()
+    val discounts = discountsViewModel.discounts.observeAsState(initial = emptyList())
+    val discountsToEdit = discounts.value.filter { it.officeId in officesString }
+    coroutineScope.launch {
+            discountsViewModel.updateDiscountsOfficeIds(discountsToEdit, officesString)
+    }
+    discountGlobal.officeId = officesString
     var dummyOffice = listOf<String>("", "")
     var showLoading by remember { mutableStateOf(true) }
-
+    val myCars = cars.filter { it -> it.officeId in myOffices.map { it.id } }
     if (ContextCompat.checkSelfPermission(LocalContext.current, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
         ActivityCompat.requestPermissions(LocalContext.current as Activity, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), 1)
     }
+    var carsFiltered by remember { mutableStateOf(myCars) }
     when (filterSortBy) {
-        "None" -> carsFiltered = cars
-        "Car Name" -> carsFiltered = cars.sortedBy { it.brand + it.model }
-        "Price Ascending" -> carsFiltered = cars.sortedBy { it.price.split("€")[0].toDouble() }
+        "None" -> carsFiltered = myCars
+        "Car Name" -> carsFiltered = myCars.sortedBy { it.brand + it.model }
+        "Price Ascending" -> carsFiltered = myCars.sortedBy { it.price.split("€")[0].toDouble() }
         "Price Descending" -> carsFiltered =
-            cars.sortedByDescending { it.price.split("€")[0].toDouble() }
+            myCars.sortedByDescending { it.price.split("€")[0].toDouble() }
 
-        "Car Rating" -> carsFiltered = cars // de calculat rating
+        "Car Rating" -> carsFiltered = myCars // de calculat rating
     }
     when (filterTransmission) {
         "All" -> carsFiltered = carsFiltered
@@ -188,8 +206,8 @@ fun Home(
         )
         {
             InfoBar(
-                firstName = userData?.firstName ?: "",
-                lastName = userData?.lastName ?: "",
+                firstName = currentUser.firstName ?: "",
+                lastName = currentUser.lastName ?: "",
                 searchValue = searchValue,
                 onValueChange = { searchValue = it },
                 showFilters = showFilters,
@@ -252,12 +270,12 @@ fun Home(
                             .padding(start = 8.dp, end = 8.dp)
                             .background(color = colorResource(id = R.color.white))
                     ) {
-                        items(offices.size) { item ->
-                            OfficeComponent(navController, offices[item])
+                        items(myOffices.size) { item ->
+                            OfficeComponent(navController, myOffices[item])
                         }
-                        item {
-                            AddOfficeComp(navController = navController)
-                        }
+//                        item {
+//                            AddOfficeComp(navController = navController)
+//                        }
                     }
                 }
                 item {

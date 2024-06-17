@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -48,7 +49,10 @@ import com.example.flavorsdemo.View.components.InfoTitle
 import com.example.flavorsdemo.View.components.discountGlobal
 import com.example.flavorsdemo.ViewModel.DiscountViewModel
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,14 +63,25 @@ fun AddDiscount(navController: NavHostController) {
     var description by remember { mutableStateOf(discountGlobal.description) }
     var discountVal by remember { mutableStateOf(discountGlobal.discountValue) }
     var discountType by remember { mutableStateOf(discountGlobal.discountType) }
+    if (discountGlobal.discountType == "") discountType = "All"
     var startDate by remember { mutableStateOf(discountGlobal.startDate) }
     var endDate by remember { mutableStateOf(discountGlobal.endDate) }
     val discountTypes =
         listOf("All", "Electric Cars", "Hybrid Cars", "Diesel Cars", "Petrol Cars", "Car Brand")
-    val idx = discountTypes.indexOf(discountGlobal.discountType)
+    val idxOf =
+        when (discountGlobal.discountType) {
+            "All" -> 0
+            "Electric" -> 1
+            "Hybrid" -> 2
+            "Diesel" -> 3
+            "Petrol" -> 4
+            else -> 5
+        }
+
     var expanded by remember { mutableStateOf(false) }
-    var selectedType by remember { mutableStateOf(discountTypes[if (idx != -1) idx else 0]) }
+    var selectedType by remember { mutableStateOf(discountTypes[if (idxOf != -1) idxOf else 0]) }
     var carBrand by remember { mutableStateOf("") }
+    if (idxOf == 5) carBrand = discountGlobal.discountType
     val textFieldColors = TextFieldDefaults.textFieldColors(
         containerColor = Color.White, // Background color of the TextField
         disabledTextColor = Color.Black,
@@ -148,7 +163,8 @@ fun AddDiscount(navController: NavHostController) {
                                 val acutalType = if (type == "Electric Cars") "Electric" else
                                     if (type == "Hybrid Cars") "Hybrid" else
                                         if (type == "Diesel Cars") "Diesel" else
-                                            if (type == "Petrol Cars") "Petrol" else type
+                                            if (type == "Petrol Cars") "Petrol" else
+                                                "All"
                                 selectedType = type
                                 discountGlobal.discountType = acutalType
                                 expanded = false
@@ -171,7 +187,7 @@ fun AddDiscount(navController: NavHostController) {
                         value = carBrand,
                         onValueChange = {
                             carBrand = it
-                            discountGlobal.discountType += " $it"
+                            discountGlobal.discountType = it
                         },
                         placeholder = { Text("Car Brand", color = Color.LightGray) },
                         colors = textFieldColors
@@ -250,6 +266,16 @@ fun AddDiscount(navController: NavHostController) {
                             calendar.get(Calendar.MONTH),
                             calendar.get(Calendar.DAY_OF_MONTH),
                         )
+                        datePickerDialog.datePicker.minDate = calendar.timeInMillis
+                        if (discountGlobal.endDate != "") {
+                            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                            val maxDate: Date = dateFormat.parse(discountGlobal.endDate) ?: Date()
+                            datePickerDialog.datePicker.maxDate = maxDate.time
+                        } else {
+                            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                            val maxDate: Date = dateFormat.parse("31/12/2030") ?: Date()
+                            datePickerDialog.datePicker.maxDate = maxDate.time
+                        }
                         datePickerDialog.show()
                     },
                     colors = ButtonDefaults.buttonColors(
@@ -276,21 +302,28 @@ fun AddDiscount(navController: NavHostController) {
                 Spacer(modifier = Modifier.height(10.dp))
                 Button(
                     onClick = {
-                        val calendar = Calendar.getInstance()
-                        val datePickerDialog = DatePickerDialog(
-                            context,
-                            R.style.CustomDatePickerDialogTheme,
-                            { _, year, month, dayOfMonth ->
-                                val dday = String.format("%02d", dayOfMonth)
-                                val mmonth = String.format("%02d", month + 1)
-                                endDate = "$dday/$mmonth/$year"
-                                discountGlobal.endDate = endDate
-                            },
-                            calendar.get(Calendar.YEAR),
-                            calendar.get(Calendar.MONTH),
-                            calendar.get(Calendar.DAY_OF_MONTH),
-                        )
-                        datePickerDialog.show()
+                        if (discountGlobal.startDate == "") {
+                            Toast.makeText(context, "Please select the first day", Toast.LENGTH_SHORT).show()
+                        } else {
+                            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                            val minDate: Date = dateFormat.parse(discountGlobal.startDate) ?: Date()
+                            val calendar = Calendar.getInstance()
+                            val datePickerDialog = DatePickerDialog(
+                                context,
+                                R.style.CustomDatePickerDialogTheme,
+                                { _, year, month, dayOfMonth ->
+                                    val dday = String.format("%02d", dayOfMonth)
+                                    val mmonth = String.format("%02d", month + 1)
+                                    endDate = "$dday/$mmonth/$year"
+                                    discountGlobal.endDate = endDate
+                                },
+                                calendar.get(Calendar.YEAR),
+                                calendar.get(Calendar.MONTH),
+                                calendar.get(Calendar.DAY_OF_MONTH),
+                            )
+                            datePickerDialog.datePicker.minDate = minDate.time
+                            datePickerDialog.show()
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(
                         Color.Transparent
@@ -320,7 +353,7 @@ fun AddDiscount(navController: NavHostController) {
                             discountsViewModel.deleteDiscount(discountGlobal)
                         }
                         Toast.makeText(context, "Discount deleted", Toast.LENGTH_SHORT).show()
-                        navController.navigate(Screen.Home.route)
+                        navController.navigate(Screen.Discounts.route)
                     },
                     colors = ButtonDefaults.buttonColors(colorResource(id = R.color.light_blue)),
                     modifier = Modifier.align(Alignment.BottomStart).padding(start = 16.dp, bottom = 48.dp)
@@ -337,7 +370,7 @@ fun AddDiscount(navController: NavHostController) {
                             discountsViewModel.updateDiscount(discountGlobal)
                     }
                     Toast.makeText(context, "Discount saved", Toast.LENGTH_SHORT).show()
-                    navController.navigate(Screen.Home.route)
+                    navController.navigate(Screen.Discounts.route)
                 },
                 colors = ButtonDefaults.buttonColors(colorResource(id = R.color.light_blue)),
                 modifier = Modifier.align(Alignment.BottomEnd).padding(end = 16.dp, bottom = 48.dp)

@@ -3,6 +3,7 @@ package com.example.flavorsdemo.View.screens
 import ConfirmationDialog
 import TopBar
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -172,7 +173,7 @@ fun AddImages(navController: NavHostController) {
                                     .align(Alignment.TopEnd)
                                     .background(Color.Transparent)
 //                                    .padding(end = 24.dp)
-                                    .offset(x = 2.dp, y = (-24).dp),
+                                    .offset(x = 8.dp, y = (-24).dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Transparent
                                 )
@@ -279,7 +280,7 @@ fun AddImages(navController: NavHostController) {
                                 .align(Alignment.TopEnd)
                                 .background(Color.Transparent)
                                 .padding(end = 24.dp)
-                                .offset(x = 2.dp, y = (-16).dp),
+                                .offset(x = (-2).dp, y = (-14).dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.Transparent
                             )
@@ -342,15 +343,30 @@ fun AddImages(navController: NavHostController) {
                         colorResource(id = R.color.light_blue)
                     ),
                     onClick = {
-                        coroutineScope.launch {
-                            carViewModel.addCar(car)
+                        if (car.brand == "" || car.model == "" || car.year == "" ||
+                            car.price == "" || car.mileage == "" || car.color == "" ||
+                            car.fuelType == "" || car.transmission == "" ||
+                            car.description == "" || car.numberOfSeats == "" ||
+                            car.type == "" || car.numberOfDoors == "" ||
+                            car.extraUrbanFuelConsumption == "" || car.officeId == "" ||
+                            carImages.mainImage == Uri.EMPTY
+                        ) {
+                            Toast.makeText(
+                                navController.context,
+                                "Please fill all the fields and add the main image!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            coroutineScope.launch {
+                                carViewModel.addCar(car)
+                            }
+                            coroutineScope.launch {
+                                carImageViewModel.uploadCarImages(carImages, car.id)
+                                imageMap[car.id] = carImages.mainImage.toString()
+                                imageMaps[car.id] = carImages.imageList.map { it.toString() }
+                            }
+                            navController.navigate(Screen.Home.route)
                         }
-                        coroutineScope.launch {
-                            carImageViewModel.uploadCarImages(carImages, car.id)
-                            imageMap[car.id] = carImages.mainImage.toString()
-                            imageMaps[car.id] = carImages.imageList.map { it.toString() }
-                        }
-                        navController.navigate(Screen.Home.route)
                     }
                 ) {
                     Text(text = "Save")
@@ -384,20 +400,35 @@ fun AddImages(navController: NavHostController) {
                             colorResource(id = R.color.light_blue)
                         ),
                         onClick = {
-                            coroutineScope.launch {
-                                carViewModel.updateCar(car)
-                            }
-                            coroutineScope.launch {
-                                //
-                                carImageViewModel.deleteImage("cars/${car.id}/main.jpg")
-                                carImages.imageList.forEachIndexed { index, uri ->
-                                    carImageViewModel.deleteImage("cars/${car.id}/${index}.jpg")
+                            if (car.brand == "" || car.model == "" || car.year == "" ||
+                                car.price == "" || car.mileage == "" || car.color == "" ||
+                                car.fuelType == "" || car.transmission == "" ||
+                                car.description == "" || car.numberOfSeats == "" ||
+                                car.type == "" || car.numberOfDoors == "" ||
+                                car.extraUrbanFuelConsumption == "" || car.officeId == "" ||
+                                carImages.mainImage == Uri.EMPTY
+                            ) {
+                                Toast.makeText(
+                                    navController.context,
+                                    "Please fill all the fields and add the main image!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                coroutineScope.launch {
+                                    carViewModel.updateCar(car)
                                 }
-                                carImageViewModel.uploadCarImages(carImages, car.id)
-                                imageMap[car.id] = carImages.mainImage.toString()
-                                imageMaps[car.id] = carImages.imageList.map { it.toString() }
+                                coroutineScope.launch {
+                                    //
+                                    carImageViewModel.deleteImage("cars/${car.id}/main.jpg")
+                                    carImages.imageList.forEachIndexed { index, uri ->
+                                        carImageViewModel.deleteImage("cars/${car.id}/${index}.jpg")
+                                    }
+                                    carImageViewModel.uploadCarImages(carImages, car.id)
+                                    imageMap[car.id] = carImages.mainImage.toString()
+                                    imageMaps[car.id] = carImages.imageList.map { it.toString() }
+                                }
+                                navController.navigate(Screen.Home.route)
                             }
-                            navController.navigate(Screen.Home.route)
                         }
                     ) {
                         Text(text = "Save")

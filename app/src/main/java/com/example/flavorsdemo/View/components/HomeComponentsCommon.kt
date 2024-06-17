@@ -52,6 +52,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
@@ -94,9 +95,10 @@ var discountGlobal = Discount()
 var dateStart = ""
 var dateEnd = ""
 var timeStart = ""
+var userProfileImage = Uri.EMPTY.toString()
 var timeEnd = ""
 var officeMainImage: Uri = Uri.EMPTY
-
+val auxiliarComponent = 0
 @SuppressLint("Range")
 @Composable
 fun CarCard(
@@ -104,13 +106,18 @@ fun CarCard(
     carImageViewModel: CarImageViewModel,
     navController: NavHostController
 ) {
+    userProfileImage = "https://firebasestorage.googleapis.com/v0/b/carrentingapp-5537e.appspot.com/o/default%2Fprofile_image.jpg?alt=media&token=d9ff6858-0f12-48af-a721-d4bcb4ead832"
+    carImageViewModel.fetchUserImage(currentUser.id)
     val discountViewModel: DiscountViewModel = viewModel()
     val discounts = discountViewModel.discounts.observeAsState(initial = emptyList())
     val allDiscounts by remember { discounts }
-    var discount = allDiscounts.find { it.discountType == thisCar.fuelType }
-    if (thisCar.fuelType == "Electric" && discount != null && discount.discountValue.split("%")[0].toFloat() < discountValueGlobal) discount.discountValue =
-        discountValueGlobal.toString() + "%"
-    else if (thisCar.fuelType == "Electric" && discount == null) {
+    val validDiscounts = allDiscounts.filter {
+        it.discountType.lowercase() == thisCar.fuelType.lowercase() || it.discountType == "All" || thisCar.brand == it.discountType
+    }
+    var discount = validDiscounts.maxByOrNull { it.discountValue.split("%")[0].toFloat() }
+    if (thisCar.fuelType == "Electric" && discount != null && discount.discountValue.split("%")[0].toFloat() < discountValueGlobal)
+        discount.discountValue = discountValueGlobal.toString() + "%"
+    else if (thisCar.fuelType == "Electric" && (discount == null || discount.discountValue.split("%")[0].toFloat() < discountValueGlobal)) {
         discount = Discount()
         discount.discountValue = discountValueGlobal.toString() + "%"
     }
@@ -173,7 +180,7 @@ fun CarCard(
                 ) {
                     RatingBar(rating = 4.5F, modifier = Modifier)
                     Spacer(modifier = Modifier.width(8.dp))
-                    if (discount != null) {
+                    if (discount != null && discount.discountValue.split("%")[0].toFloat() > 0.0F){
 //                        Icon(
 //                            painter = painterResource(id = R.drawable.empty_heart), // Replace with your favorite icon resource
 //                            contentDescription = "Favorite",
@@ -215,7 +222,7 @@ fun CarCard(
                 ) {
                     Text(text = thisCar.brand + " " + thisCar.model, fontWeight = FontWeight.Bold)
                     Column {
-                        if (discount != null) {
+                        if (discount != null && discount.discountValue.split("%")[0].toFloat() > 0.0F) {
                             val discountValue = discount.discountValue.split("%")[0].toFloat()
                             val newPrice =
                                 thisCar.price.split("€")[0].toFloat() - (thisCar.price.split("€")[0].toFloat() * discountValue / 100)
@@ -441,7 +448,7 @@ fun InfoBar(
         ) {
             var points = currentUser.points
             Text(
-                text = "$firstName $lastName $points" + "p",
+                text = if(FlavorConfig.userType == "Owner") "$firstName $lastName  " else "$firstName $lastName $points" + "p",
                 fontSize = 16.sp,
                 color = colorResource(id = R.color.white),
                 modifier = Modifier

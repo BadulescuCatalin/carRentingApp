@@ -5,6 +5,8 @@ import DropDown
 import TableRow
 import TableRows
 import TopBar
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,6 +25,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,9 +50,11 @@ import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.Screen
 import com.example.flavorsdemo.View.components.InfoTitle
 import com.example.flavorsdemo.View.components.car
+import com.example.flavorsdemo.View.components.carImages
 import com.example.flavorsdemo.View.components.fromWhere
 import com.example.flavorsdemo.View.components.officesGlobal
 import com.example.flavorsdemo.ViewModel.CarViewModelOwner
+import com.example.flavorsdemo.currentUser
 import kotlinx.coroutines.launch
 
 
@@ -225,14 +230,15 @@ fun AddCar(navController: NavHostController) {
                     Spacer(modifier = Modifier.height(8.dp))
                     TableRow(
                         text = "Price per day:",
-                        placeholder = "Car cost per day",
+                        placeholder = "Car cost (example: 50€)",
                         value = carPrice,
                         onValueChange = {
                             carPrice = it
                             car.price = it
                         }
                     )
-                    DropDown(officesGlobal, officeSelected)
+                    val myOffices = officesGlobal.filter { it.userId == currentUser.id }
+                    DropDown(myOffices, officeSelected)
                     Spacer(modifier = Modifier.height(4.dp))
                     var offset by remember { mutableStateOf(0f) }
                     Row(
@@ -295,11 +301,25 @@ fun AddCar(navController: NavHostController) {
                         .padding(start = 24.dp, end = 12.dp, bottom = 24.dp)
                         .align(Alignment.BottomEnd),
                     onClick = {
-                        coroutineScope.launch {
-                            viewModel.addCar(car)
-                        }
+                        if (car.brand == "" || car.model == "" || car.year == "" ||
+                            car.price == "" || car.mileage == "" || car.color == "" ||
+                            car.fuelType == "" || car.transmission == "" ||
+                            car.description == "" || car.numberOfSeats == "" ||
+                            car.type == "" || car.numberOfDoors == "" ||
+                            car.extraUrbanFuelConsumption == "" || car.officeId == "" ||
+                            carImages.mainImage == Uri.EMPTY) {
+                            Toast.makeText(
+                                navController.context,
+                                "Please fill all the fields and add the main image!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }  else {
+                            coroutineScope.launch {
+                                viewModel.addCar(car)
+                            }
 
-                        navController.navigate(Screen.Home.route)
+                            navController.navigate(Screen.Home.route)
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(
                         colorResource(id = R.color.light_blue)
@@ -336,8 +356,22 @@ fun AddCar(navController: NavHostController) {
                             colorResource(id = R.color.light_blue)
                         ),
                         onClick = {
-                            viewModel.updateCar(car)
-                            navController.navigate(Screen.Home.route)
+                            if (car.brand == "" || car.model == "" || car.year == "" ||
+                                car.price == "" || car.mileage == "" || car.color == "" ||
+                                car.fuelType == "" || car.transmission == "" ||
+                                car.description == "" || car.numberOfSeats == "" ||
+                                car.type == "" || car.numberOfDoors == "" ||
+                                car.extraUrbanFuelConsumption == "" || car.officeId == "" ||
+                                carImages.mainImage == Uri.EMPTY) {
+                                Toast.makeText(
+                                    navController.context,
+                                    "Please fill all the fields and add the main image!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }  else {
+                                viewModel.updateCar(car)
+                                navController.navigate(Screen.Home.route)
+                            }
                         }
                     ) {
                         Text(text = "Save")
