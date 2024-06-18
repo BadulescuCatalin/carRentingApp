@@ -3,6 +3,7 @@ package com.example.flavorsdemo.View.screens
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.graphics.drawable.Icon
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,6 +24,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material.Text
@@ -58,24 +60,30 @@ import com.example.flavorsdemo.View.components.SearchBarDateAndTime
 import com.example.flavorsdemo.View.components.car
 import com.example.flavorsdemo.View.components.dateEnd
 import com.example.flavorsdemo.View.components.dateStart
+import com.example.flavorsdemo.View.components.discountGlobal
 import com.example.flavorsdemo.View.components.officesGlobal
 import com.example.flavorsdemo.View.components.selectedOfficeGlobal
 import com.example.flavorsdemo.View.components.timeEnd
 import com.example.flavorsdemo.View.components.timeStart
+import com.google.android.play.integrity.internal.al
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun PickDateAndTime(navController: NavHostController) {
-    var pickUpDate by remember { mutableStateOf("") }
-    var pickUpTime by remember { mutableStateOf("") }
-    var dropOffDate by remember { mutableStateOf("") }
-    var dropOffTime by remember { mutableStateOf("") }
+    var pickUpDate by remember { mutableStateOf(dateStart) }
+    var pickUpTime by remember { mutableStateOf(if (timeStart == "")  "10:00" else timeStart) }
+    var dropOffDate by remember { mutableStateOf(dateEnd) }
+    var dropOffTime by remember { mutableStateOf(if (timeEnd == "")  "10:00" else timeEnd) }
     var showDialogPickUp by remember { mutableStateOf(false) }
     var showDialogDropOff by remember { mutableStateOf(false) }
     val context = LocalContext.current
     var selectedOffice by remember { mutableStateOf<Office?>(null) }
-    var searchText by remember { mutableStateOf("") }
+    var searchText by remember { mutableStateOf(selectedOfficeGlobal.name) }
+
     var showLazylist by remember { mutableStateOf(false) }
     val filteredOffices = if (searchText.isEmpty()) {
         emptyList()
@@ -146,7 +154,7 @@ fun PickDateAndTime(navController: NavHostController) {
         ) {
             Text(text = "Location", fontSize = 20.sp, fontWeight = FontWeight.Bold)
             SearchBarDateAndTime(
-                text = selectedOfficeGlobal.name,
+                text = searchText,
                 onValueChange = {
                     searchText = it
                     showLazylist = true
@@ -157,7 +165,7 @@ fun PickDateAndTime(navController: NavHostController) {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp)
+                        .padding(start = 16.dp, end = 16.dp).padding(end = 8.dp)
                         .background(Color.White)
                         .height(200.dp)
                 ) {
@@ -168,6 +176,7 @@ fun PickDateAndTime(navController: NavHostController) {
                                 modifier = Modifier
                                     .clickable {
                                         selectedOffice = suggestion
+                                        selectedOfficeGlobal = suggestion
                                         searchText = suggestion.name
                                         showLazylist = false
                                     }
@@ -221,6 +230,16 @@ fun PickDateAndTime(navController: NavHostController) {
                                 calendar.get(Calendar.MONTH),
                                 calendar.get(Calendar.DAY_OF_MONTH),
                             )
+                            datePickerDialog.datePicker.minDate = calendar.timeInMillis
+                            if (dropOffDate != "") {
+                                val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                val maxDate: Date = dateFormat.parse(dropOffDate) ?: Date()
+                                datePickerDialog.datePicker.maxDate = maxDate.time
+                            } else {
+                                val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                val maxDate: Date = dateFormat.parse("31/12/2030") ?: Date()
+                                datePickerDialog.datePicker.maxDate = maxDate.time
+                            }
                             datePickerDialog.show()
                         },
                         colors = ButtonDefaults.buttonColors(
@@ -282,20 +301,27 @@ fun PickDateAndTime(navController: NavHostController) {
                     Spacer(modifier = Modifier.height(10.dp))
                     Button(
                         onClick = {
-                            val calendar = Calendar.getInstance()
-                            val datePickerDialog = DatePickerDialog(
-                                context,
-                                R.style.CustomDatePickerDialogTheme,
-                                { _, year, month, dayOfMonth ->
-                                    val dday = String.format("%02d", dayOfMonth)
-                                    val mmonth = String.format("%02d", month + 1)
-                                    dropOffDate = "$dday/$mmonth/$year"
-                                },
-                                calendar.get(Calendar.YEAR),
-                                calendar.get(Calendar.MONTH),
-                                calendar.get(Calendar.DAY_OF_MONTH),
-                            )
-                            datePickerDialog.show()
+                            if (pickUpDate == "") {
+                                Toast.makeText(context, "Please select the first day", Toast.LENGTH_SHORT).show()
+                            } else {
+                                val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                val minDate: Date = dateFormat.parse(pickUpDate) ?: Date()
+                                val calendar = Calendar.getInstance()
+                                val datePickerDialog = DatePickerDialog(
+                                    context,
+                                    R.style.CustomDatePickerDialogTheme,
+                                    { _, year, month, dayOfMonth ->
+                                        val dday = String.format("%02d", dayOfMonth)
+                                        val mmonth = String.format("%02d", month + 1)
+                                        dropOffDate = "$dday/$mmonth/$year"
+                                    },
+                                    calendar.get(Calendar.YEAR),
+                                    calendar.get(Calendar.MONTH),
+                                    calendar.get(Calendar.DAY_OF_MONTH),
+                                )
+                                datePickerDialog.datePicker.minDate = minDate.time
+                                datePickerDialog.show()
+                            }
                         },
                         colors = ButtonDefaults.buttonColors(
                             Color.Transparent

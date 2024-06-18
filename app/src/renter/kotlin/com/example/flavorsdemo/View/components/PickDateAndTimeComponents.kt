@@ -18,6 +18,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddLocation
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.TextField
@@ -75,13 +76,16 @@ fun TimePickerDialog(onDismissRequest: () -> Unit, onTimeSelected: (String) -> U
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Button(onClick = onDismissRequest) {
-                    Text(text = "Cancel")
+                Button(onClick = onDismissRequest, colors = ButtonDefaults.buttonColors(
+                    colorResource(id = R.color.light_blue))) {
+                    Text(text = "Cancel", color = Color.White)
                 }
                 Button(onClick = {
                     onTimeSelected(hours[selectedHour])
-                }) {
-                    Text(text = "OK")
+                }
+                    , colors = ButtonDefaults.buttonColors(
+                        colorResource(id = R.color.light_blue))) {
+                    Text(text = "OK", color = Color.White)
                 }
             }
         }
