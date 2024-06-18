@@ -3,14 +3,20 @@ package com.example.flavorsdemo.Model
 import java.util.UUID
 
 data class RemovedBookings (
-    val id : String,
-    val userId : String,
-    val startDate : String,
-    val endDate : String,
-    val car : String,
-    val description : String,
-    val status : String
+    var id : String,
+    var userId : String,
+    var startDate : String,
+    var endDate : String,
+    var car : String,
+    var description : String,
+    var price : String,
+    var hasGps: Boolean,
+    var hasCargoCarrier: Boolean,
+    var numberOfAdditionalDrivers: Int,
+    var numberOfChildSeats: Int,
+    var numberOfCameras: Int,
+    var status : String
 )
 {
-    constructor() : this(UUID.randomUUID().toString(),"","","","","","")
+    constructor() : this(UUID.randomUUID().toString(),"","","","","","", false, false, 0, 0, 0,"")
 }

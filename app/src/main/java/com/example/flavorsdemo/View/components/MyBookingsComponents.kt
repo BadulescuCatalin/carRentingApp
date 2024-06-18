@@ -31,9 +31,10 @@ import com.example.flavorsdemo.Model.Booking
 import com.example.flavorsdemo.Model.Office
 import com.example.flavorsdemo.R
 import com.example.flavorsdemo.ViewModel.CarViewModel
+import com.example.flavorsdemo.ViewModel.RemovedBookingsViewModel
 
 @Composable
-fun DisplayBooking(booking: Booking) {
+fun DisplayBooking(booking: Booking, onClickAction : () -> Unit) {
     val carViewModel: CarViewModel = viewModel()
     val cars by carViewModel.cars.observeAsState(initial = emptyList())
     val myCar = cars.find { it.id == booking.carId }
@@ -46,7 +47,9 @@ fun DisplayBooking(booking: Booking) {
     )
 
     Row(
-        modifier = Modifier.fillMaxSize().padding(8.dp).clickable {  },
+        modifier = Modifier.fillMaxSize().padding(8.dp).clickable {
+            onClickAction()
+        },
         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {

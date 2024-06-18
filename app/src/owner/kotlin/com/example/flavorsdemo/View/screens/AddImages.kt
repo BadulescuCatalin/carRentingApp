@@ -28,7 +28,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -53,6 +55,8 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.Screen
+import com.example.flavorsdemo.View.components.InfoTitle
+import com.example.flavorsdemo.View.components.InfoTitle2
 import com.example.flavorsdemo.View.components.car
 import com.example.flavorsdemo.View.components.carImages
 import com.example.flavorsdemo.View.components.fromWhere
@@ -120,7 +124,7 @@ fun AddImages(navController: NavHostController) {
                                 .height(56.dp)
                                 .padding(top = 8.dp, start = 24.dp, end = 24.dp, bottom = 16.dp)
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(colorResource(id = R.color.add_car_title_background))
+//                                .background(colorResource(id = R.color.add_car_title_background))
                                 .border(
                                     border = BorderStroke(
                                         0.5.dp,
@@ -130,7 +134,7 @@ fun AddImages(navController: NavHostController) {
                         ) {
                             Text(
                                 text = "Main Image",
-                                color = colorResource(id = R.color.white),
+                                color = colorResource(id = R.color.black),
                                 fontSize = 20.sp,
                                 modifier = Modifier
                                     .padding(horizontal = 16.dp)
@@ -140,8 +144,9 @@ fun AddImages(navController: NavHostController) {
                         }
                         Box(
                             modifier = Modifier
-                                .fillMaxWidth(0.9f)
-                                .padding(top = 16.dp, start = 24.dp)
+                                .fillMaxWidth(0.9F)
+                                .height(220.dp)
+                                .padding(top = 16.dp, start = 38.dp)
                         ) {
                             Image(
                                 painter = rememberAsyncImagePainter(
@@ -151,17 +156,18 @@ fun AddImages(navController: NavHostController) {
                                 ),
 
                                 contentDescription = "Selected Image",
-//                                contentScale = ContentScale.Fit,
-//                                modifier = Modifier
-//                                    .fillMaxWidth()
-//                                    .padding(top = 16.dp)
-//                                    .height(200.dp)
-////                                    .fillMaxHeight(0.4F)
-////                                    .scale(1.4F, 1.4F)
+                                contentScale = ContentScale.Fit,
                                 modifier = Modifier
+                                    .fillMaxWidth()
                                     .height(200.dp)
-                                    .fillMaxWidth(),
-                                contentScale = ContentScale.FillWidth
+                                    .fillMaxHeight(0.4F)
+                                    .scale(1.4F, 1.4F)
+                                    .padding(top = 26.dp)
+                                    .padding(horizontal = 40.dp),
+//                                modifier = Modifier
+//                                    .height(200.dp)
+//                                    .fillMaxWidth(),
+//                                contentScale = ContentScale.FillWidth
                             )
 
                             Button(
@@ -173,7 +179,7 @@ fun AddImages(navController: NavHostController) {
                                     .align(Alignment.TopEnd)
                                     .background(Color.Transparent)
 //                                    .padding(end = 24.dp)
-                                    .offset(x = 8.dp, y = (-24).dp),
+                                    .offset(x = 12.dp, y = (-20).dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Transparent
                                 )
@@ -186,13 +192,15 @@ fun AddImages(navController: NavHostController) {
                                         )
 
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Cancel,
-                                        contentDescription = "Delete Main Image",
-                                        tint = colorResource(id = R.color.white),
-                                        modifier = Modifier.background(Color.Transparent)
+                                    if (mainImage.value != null && mainImage.value != Uri.EMPTY) {
+                                        Icon(
+                                            imageVector = Icons.Default.Cancel,
+                                            contentDescription = "Delete Main Image",
+                                            tint = colorResource(id = R.color.white),
+                                            modifier = Modifier.background(Color.Transparent)
 
-                                    )
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -213,43 +221,74 @@ fun AddImages(navController: NavHostController) {
                     }
                 }
                 item {
-                    Box(
-                        modifier = androidx.compose.ui.Modifier
+
+//                    InfoTitle2(title = "Additional Immages (optional) ", "Add")
+                    Column(
+                        modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp)
-                            .padding(top = 8.dp, start = 24.dp, end = 24.dp, bottom = 16.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(colorResource(id = R.color.add_car_title_background))
-                            .border(
-                                border = BorderStroke(
-                                    0.5.dp,
-                                    Color.Black
-                                )
-                            ),
+                            .padding(top = 8.dp, start = 36.dp, end = 36.dp)
                     ) {
-                        Text(
-                            text =
-                            "Additional Images",
-                            color = colorResource(id = R.color.white),
-                            fontSize = 20.sp,
+                        Row(
                             modifier = Modifier
-                                .align(Alignment.Center)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("Additional Images", style = MaterialTheme.typography.titleLarge)
+                            Button(onClick = { pickImagesLauncher.launch("image/*") },
+                                modifier = Modifier.scale(0.85f).offset(y = 2.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    colorResource(id = R.color.light_blue)
+                                )
+                            ) {
+                                Text(text = "Add")
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Divider(
+                            color = Color.LightGray
                         )
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-                if (imageUris.size == 0) {
-                    item {
-                        Image(
-                            painter = painterResource(R.drawable.image_placeholder),
-                            contentDescription = "placeholder",
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier
-                                .padding(top = 24.dp)
-                                .fillMaxWidth()
-                                .scale(1.4F, 1.4F)
-                        )
-                    }
-                }
+//                item {
+//                    Box(
+//                        modifier = androidx.compose.ui.Modifier
+//                            .fillMaxWidth()
+//                            .height(56.dp)
+//                            .padding(top = 8.dp, start = 24.dp, end = 24.dp, bottom = 16.dp)
+//                            .clip(RoundedCornerShape(8.dp))
+//                            .background(colorResource(id = R.color.add_car_title_background))
+//                            .border(
+//                                border = BorderStroke(
+//                                    0.5.dp,
+//                                    Color.Black
+//                                )
+//                            ),
+//                    ) {
+//                        Text(
+//                            text =
+//                            "Additional Images",
+//                            color = colorResource(id = R.color.white),
+//                            fontSize = 20.sp,
+//                            modifier = Modifier
+//                                .align(Alignment.Center)
+//                        )
+//                    }
+//                }
+//                if (imageUris.size == 0) {
+//                    item {
+//                        Image(
+//                            painter = painterResource(R.drawable.image_placeholder),
+//                            contentDescription = "placeholder",
+//                            contentScale = ContentScale.Fit,
+//                            modifier = Modifier
+//                                .padding(top = 24.dp)
+//                                .fillMaxWidth()
+//                                .scale(1.4F, 1.4F)
+//                        )
+//                    }
+//                }
                 items(imageUris.size) { index ->
                     if (index > 0) {
                         Spacer(modifier = Modifier.height(40.dp))
@@ -305,21 +344,24 @@ fun AddImages(navController: NavHostController) {
                     }
                 }
                 item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .padding(start = 24.dp, end = 24.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            colorResource(id = R.color.light_blue)
-                        ),
-                        onClick = { pickImagesLauncher.launch("image/*") } // Updated to pick multiple images
-                    ) {
-                        Text(text = "Pick Additional Images from Gallery")
-                    }
-                    Spacer(modifier = Modifier.height(48.dp))
+                    Spacer(modifier = Modifier.height(148.dp))
                 }
+//                item {
+//                    Spacer(modifier = Modifier.height(16.dp))
+//                    Button(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(16.dp)
+//                            .padding(start = 24.dp, end = 24.dp),
+//                        colors = ButtonDefaults.buttonColors(
+//                            colorResource(id = R.color.light_blue)
+//                        ),
+//                        onClick = { pickImagesLauncher.launch("image/*") } // Updated to pick multiple images
+//                    ) {
+//                        Text(text = "Pick Additional Images from Gallery")
+//                    }
+//                    Spacer(modifier = Modifier.height(48.dp))
+//                }
             }
             if (showConfirmationDialog) {
                 ConfirmationDialog(onConfirm = {

@@ -273,7 +273,7 @@ fun AddCar(navController: NavHostController) {
                             ),
                             modifier = androidx.compose.ui.Modifier
                                 .fillMaxWidth()
-                                .height(200.dp)
+                                .height(300.dp)
                                 .scrollable(
                                     orientation = Orientation.Vertical,
                                     state = rememberScrollableState { delta ->
@@ -283,7 +283,7 @@ fun AddCar(navController: NavHostController) {
                                 )
                         )
                     }
-                    Spacer(modifier = Modifier.height(96.dp))
+                    Spacer(modifier = Modifier.height(112.dp))
                 }
             }
             if (showConfirmationDialog) {
