@@ -62,8 +62,10 @@ import com.example.flavorsdemo.View.components.carImages
 import com.example.flavorsdemo.View.components.fromWhere
 import com.example.flavorsdemo.View.components.imageMap
 import com.example.flavorsdemo.View.components.imageMaps
+import com.example.flavorsdemo.View.components.officesGlobal
 import com.example.flavorsdemo.ViewModel.CarImageViewModel
 import com.example.flavorsdemo.ViewModel.CarViewModelOwner
+import com.example.flavorsdemo.currentUser
 import kotlinx.coroutines.launch
 
 
@@ -390,7 +392,8 @@ fun AddImages(navController: NavHostController) {
                             car.fuelType == "" || car.transmission == "" ||
                             car.description == "" || car.numberOfSeats == "" ||
                             car.type == "" || car.numberOfDoors == "" ||
-                            car.extraUrbanFuelConsumption == "" || car.officeId == "" ||
+                            car.extraUrbanFuelConsumption == "" || (officesGlobal.filter { it.userId == currentUser.id }.size != 0 &&
+                                    car.officeId == "") ||
                             carImages.mainImage == Uri.EMPTY
                         ) {
                             Toast.makeText(
@@ -447,7 +450,10 @@ fun AddImages(navController: NavHostController) {
                                 car.fuelType == "" || car.transmission == "" ||
                                 car.description == "" || car.numberOfSeats == "" ||
                                 car.type == "" || car.numberOfDoors == "" ||
-                                car.extraUrbanFuelConsumption == "" || car.officeId == "" ||
+                                car.extraUrbanFuelConsumption == "" ||
+                                (officesGlobal.filter { it.userId == currentUser.id }.size != 0 &&
+                                        car.officeId == "")
+                                ||
                                 carImages.mainImage == Uri.EMPTY
                             ) {
                                 Toast.makeText(

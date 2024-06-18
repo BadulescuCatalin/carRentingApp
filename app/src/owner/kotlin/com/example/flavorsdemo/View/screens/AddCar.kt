@@ -306,7 +306,10 @@ fun AddCar(navController: NavHostController) {
                             car.fuelType == "" || car.transmission == "" ||
                             car.description == "" || car.numberOfSeats == "" ||
                             car.type == "" || car.numberOfDoors == "" ||
-                            car.extraUrbanFuelConsumption == "" || car.officeId == "" ||
+                            car.extraUrbanFuelConsumption == "" ||
+                            (officesGlobal.filter { it.userId == currentUser.id }.size != 0 &&
+                                    car.officeId == "")
+                            ||
                             carImages.mainImage == Uri.EMPTY) {
                             Toast.makeText(
                                 navController.context,
@@ -361,7 +364,10 @@ fun AddCar(navController: NavHostController) {
                                 car.fuelType == "" || car.transmission == "" ||
                                 car.description == "" || car.numberOfSeats == "" ||
                                 car.type == "" || car.numberOfDoors == "" ||
-                                car.extraUrbanFuelConsumption == "" || car.officeId == "" ||
+                                car.extraUrbanFuelConsumption == "" ||
+                                (officesGlobal.filter { it.userId == currentUser.id }.size != 0 &&
+                                        car.officeId == "")
+                                ||
                                 carImages.mainImage == Uri.EMPTY) {
                                 Toast.makeText(
                                     navController.context,
