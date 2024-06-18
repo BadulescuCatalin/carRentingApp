@@ -178,7 +178,7 @@ fun PopupEditField(title: String, value: String, onConfirm: () -> Unit, onDismis
             TextButton(
                 onClick = { onDismiss() }
             ) {
-                Text("Cancel")
+                Text("Cancel", color = colorResource(id = R.color.light_blue))
             }
         }
     )

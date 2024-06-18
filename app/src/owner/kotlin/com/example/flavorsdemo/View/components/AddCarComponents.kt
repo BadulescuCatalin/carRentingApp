@@ -307,6 +307,7 @@ fun TopBar(
 @Composable
 fun ConfirmationDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
+        containerColor = colorResource(id = R.color.white),
         onDismissRequest = { onDismiss() },
         title = { Text(text = "Confirm Deletion") },
         text = { Text(text = "Are you sure you want to delete this car? This action cannot be undone.") },
@@ -314,16 +315,19 @@ fun ConfirmationDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
             Button(
                 onClick = {
                     onConfirm()
-                }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    colorResource(id = R.color.light_blue)
+                )
             ) {
-                Text("Delete")
+                Text("Delete" )
             }
         },
         dismissButton = {
             TextButton(
                 onClick = { onDismiss() }
             ) {
-                Text("Cancel")
+                Text("Cancel", color = colorResource(id = R.color.light_blue))
             }
         }
     )

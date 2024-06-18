@@ -104,6 +104,15 @@ fun AddOffice(navController: NavHostController) {
             officeMainImage = uri ?: Uri.EMPTY
         }
     )
+    if (office.address != "" || office.city != "" || office.zipcode != "" || office.country != "") {
+        val fullAddress = "${office.address}, ${office.city}, ${office.zipcode}, ${office.country}"
+        val latLng = getLatLngFromAddress(context, fullAddress)
+        latLng?.let {
+            // Use latLng.latitude and latLng.longitude
+            office.latitude = latLng.latitude.toString()
+            office.longitude = latLng.longitude.toString()
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()

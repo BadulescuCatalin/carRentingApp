@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -81,7 +82,7 @@ fun OfficeMap(navController: NavHostController) {
     }
 
     val scope = rememberCoroutineScope()
-
+    Log.d("OfficeMap", "office: $office")
     LaunchedEffect(Unit) {
         if (ContextCompat.checkSelfPermission(
                 context,
@@ -100,7 +101,13 @@ fun OfficeMap(navController: NavHostController) {
         office.longitude = currentLocation!!.longitude.toString()
     }
     val markerState = rememberMarkerState(
-        position = LatLng(office.latitude.toDouble(), office.longitude.toDouble())
+
+        position =
+        if (office.latitude == "" || office.longitude == "")
+            LatLng(currentLocation!!.latitude, currentLocation!!.longitude)
+        else
+            LatLng(office.latitude.toDouble(), office.longitude.toDouble())
+//        LatLng(office.latitude.toDouble(), office.longitude.toDouble())
     )
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(markerState.position, 18f)

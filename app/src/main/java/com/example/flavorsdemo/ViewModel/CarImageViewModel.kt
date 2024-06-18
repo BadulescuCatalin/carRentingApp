@@ -1,6 +1,7 @@
 package com.example.flavorsdemo.ViewModel
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -38,6 +39,7 @@ class CarImageViewModel : ViewModel() {
     init {
         fetchCarMainImages()
         fetchAllCarImages()
+//        Log.d("CarImageViewModel", "init: $imageMap")
 //        fetchUserImage(currentUser.id)
     }
 
@@ -47,6 +49,7 @@ class CarImageViewModel : ViewModel() {
                 val storage = FirebaseStorage.getInstance()
                 val imagePath = "user/$userId/profile.jpg"
                 val imageRef = storage.getReference(imagePath)
+
                 val imageUrl = imageRef.downloadUrl.await().toString()
                 userProfileImage = imageUrl
                 _userImage.postValue(imageUrl)
@@ -64,15 +67,16 @@ class CarImageViewModel : ViewModel() {
                 val storage = FirebaseStorage.getInstance()
                 val documents = db.collection("cars").get().await()
                 val imageMap = mutableMapOf<String, String>()
-
                 documents.documents.forEach { document ->
                     val carId = document.id
+
                     val imagePath = "cars/$carId/main.jpg"
                     val imageRef = storage.getReference(imagePath)
+
+                    Log.d("CarImageViewModel", "carId: $imageRef")
                     val imageUrl = imageRef.downloadUrl.await().toString()
                     imageMap[carId] = imageUrl
                 }
-
                 _carImages.postValue(imageMap)
             } catch (e: Exception) {
                 // Handle exception, such as posting an error message or logging

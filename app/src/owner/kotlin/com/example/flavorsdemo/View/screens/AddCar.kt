@@ -52,7 +52,10 @@ import com.example.flavorsdemo.View.components.InfoTitle
 import com.example.flavorsdemo.View.components.car
 import com.example.flavorsdemo.View.components.carImages
 import com.example.flavorsdemo.View.components.fromWhere
+import com.example.flavorsdemo.View.components.imageMap
+import com.example.flavorsdemo.View.components.imageMaps
 import com.example.flavorsdemo.View.components.officesGlobal
+import com.example.flavorsdemo.ViewModel.CarImageViewModel
 import com.example.flavorsdemo.ViewModel.CarViewModelOwner
 import com.example.flavorsdemo.currentUser
 import kotlinx.coroutines.launch
@@ -61,6 +64,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddCar(navController: NavHostController) {
+    val carImageViewModel: CarImageViewModel = viewModel()
     var carBrand by remember { mutableStateOf(car.brand) }
     var carModel by remember { mutableStateOf(car.model) }
     var carYear by remember { mutableStateOf(car.year) }
@@ -320,7 +324,11 @@ fun AddCar(navController: NavHostController) {
                             coroutineScope.launch {
                                 viewModel.addCar(car)
                             }
-
+                            coroutineScope.launch {
+                                carImageViewModel.uploadCarImages(carImages, car.id)
+                                imageMap[car.id] = carImages.mainImage.toString()
+                                imageMaps[car.id] = carImages.imageList.map { it.toString() }
+                            }
                             navController.navigate(Screen.Home.route)
                         }
                     },
@@ -376,6 +384,16 @@ fun AddCar(navController: NavHostController) {
                                 ).show()
                             }  else {
                                 viewModel.updateCar(car)
+                                coroutineScope.launch {
+                                    //
+                                    carImageViewModel.deleteImage("cars/${car.id}/main.jpg")
+                                    carImages.imageList.forEachIndexed { index, uri ->
+                                        carImageViewModel.deleteImage("cars/${car.id}/${index}.jpg")
+                                    }
+                                    carImageViewModel.uploadCarImages(carImages, car.id)
+                                    imageMap[car.id] = carImages.mainImage.toString()
+                                    imageMaps[car.id] = carImages.imageList.map { it.toString() }
+                                }
                                 navController.navigate(Screen.Home.route)
                             }
                         }

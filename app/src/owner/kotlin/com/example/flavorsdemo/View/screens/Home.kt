@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -185,6 +186,8 @@ fun Home(
     carMainImages.forEach() {
         imageMap[it.key] = it.value
     }
+
+    Log.d("imageMap", imageMap.toString())
     val allCarImages = carImageViewModel.allCarImages.observeAsState(mapOf()).value
     allCarImages.forEach() {
         imageMaps[it.key] = it.value
@@ -302,6 +305,10 @@ fun Home(
                         )
                         Button(
                             onClick = {
+                                if (myOffices.isEmpty()) {
+                                    Toast.makeText(context, "You need to add an office first", Toast.LENGTH_SHORT).show()
+                                    return@Button
+                                }
                                 navController.navigate(Screen.AddCar.route)
                                 fromWhere = ""
                                 car = Car()

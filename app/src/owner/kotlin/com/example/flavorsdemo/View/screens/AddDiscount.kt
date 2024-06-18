@@ -70,6 +70,7 @@ fun AddDiscount(navController: NavHostController) {
         listOf("All", "Electric Cars", "Hybrid Cars", "Diesel Cars", "Petrol Cars", "Car Brand")
     val idxOf =
         when (discountGlobal.discountType) {
+            "" -> 0
             "All" -> 0
             "Electric" -> 1
             "Hybrid" -> 2

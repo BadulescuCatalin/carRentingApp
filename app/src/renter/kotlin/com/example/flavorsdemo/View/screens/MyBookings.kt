@@ -127,7 +127,7 @@ fun MyBooking(navController: NavHostController) {
                             shape = RoundedCornerShape(16.dp),
                             elevation = 4.dp
                         ) {
-                            DisplayBooking(booking = booking)
+                            DisplayBooking(booking = booking, onClickAction = {})
                         }
                     }
                 }
