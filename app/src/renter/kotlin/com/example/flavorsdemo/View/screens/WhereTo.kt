@@ -130,11 +130,12 @@ fun WhereTo(navController: NavHostController) {
         ) {
             fetchLocation(context) { location ->
 
-                    currentLocation = location
-                    lat = location.latitude
-                    long = location.longitude
-                    cameraPositionState.position = CameraPosition.fromLatLngZoom(currentLocation ?: LatLng(lat, long), 7f)
-                    Log.d("WhereTo", "$lat, $long")
+                currentLocation = location
+                lat = location.latitude
+                long = location.longitude
+                cameraPositionState.position =
+                    CameraPosition.fromLatLngZoom(currentLocation ?: LatLng(lat, long), 7f)
+                Log.d("WhereTo", "$lat, $long")
 
             }
 
@@ -369,6 +370,7 @@ fun WhereTo(navController: NavHostController) {
                             text = searchText,
                             onValueChange = {
                                 searchText = it
+
                                 showLazylist = true
 
                             },
@@ -392,7 +394,7 @@ fun WhereTo(navController: NavHostController) {
                         cameraPositionState =
                         cameraPositionState,
 
-                    ) {
+                        ) {
 
                         Log.d("NewDDD", "Current location: $currentLocation")
                         currentLocation?.let {
@@ -471,7 +473,7 @@ fun WhereTo(navController: NavHostController) {
 //                                        {selectedOffice = location},
 //                                        {showLazylist = false},
 //                                        {selectedOfficeGlobal = location})
-                                          false
+                                    false
 
                                 },
 
@@ -495,6 +497,15 @@ fun WhereTo(navController: NavHostController) {
                                             .clickable {
                                                 selectedOffice = suggestion
                                                 selectedOfficeGlobal = suggestion
+
+                                                cameraPositionState.position =
+                                                    CameraPosition.fromLatLngZoom(
+                                                        LatLng(
+                                                            selectedOffice!!.latitude.toDouble(),
+                                                            selectedOffice!!.longitude.toDouble()
+                                                        ), 15f
+                                                    )
+
                                                 scope.launch {
                                                     dividerColor = R.color.l_gray
                                                     scaffoldState.bottomSheetState.expand()
