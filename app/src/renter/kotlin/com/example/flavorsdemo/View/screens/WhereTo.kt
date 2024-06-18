@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -77,6 +78,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.CameraMoveStartedReason
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
@@ -93,9 +95,13 @@ fun WhereTo(navController: NavHostController) {
     )
     var dividerColor by remember { mutableStateOf(R.color.white) }
     val context = LocalContext.current
+    var zoom = 10f
     val officeViewModel: OfficeViewModel = viewModel()
     val offices by officeViewModel.offices.observeAsState(initial = emptyList())
     officesGlobal = offices
+    var modify = true
+    var lat = 0.0
+    var long = 0.0
     var showLazylist by remember { mutableStateOf(false) }
     var currentLocation by remember { mutableStateOf<LatLng?>(null) }
     var searchText by remember { mutableStateOf("") }
@@ -112,9 +118,10 @@ fun WhereTo(navController: NavHostController) {
             Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
         }
     }
-
     val scope = rememberCoroutineScope()
-
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(currentLocation ?: LatLng(lat, long), 7f)
+    }
     LaunchedEffect(Unit) {
         if (ContextCompat.checkSelfPermission(
                 context,
@@ -122,17 +129,25 @@ fun WhereTo(navController: NavHostController) {
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             fetchLocation(context) { location ->
-                currentLocation = location
+
+                    currentLocation = location
+                    lat = location.latitude
+                    long = location.longitude
+                    cameraPositionState.position = CameraPosition.fromLatLngZoom(currentLocation ?: LatLng(lat, long), 7f)
+                    Log.d("WhereTo", "$lat, $long")
+
             }
+
+            Log.d("WhereTo", "currentLocation: $currentLocation")
         } else {
             permissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
 
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(currentLocation ?: LatLng(0.0, 0.0), 10f)
-    }
-
+//    LaunchedEffect(markerState.position) {
+//        office.latitude = markerState.position.latitude.toString()
+//        office.longitude = markerState.position.longitude.toString()
+//    }
     val filteredOffices = if (searchText.isEmpty()) {
         emptyList()
     } else {
@@ -144,7 +159,6 @@ fun WhereTo(navController: NavHostController) {
                     it.country.contains(searchText, ignoreCase = true)
         }
     }
-
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
         sheetShape = RoundedCornerShape(35.dp), // Rounded corners
@@ -302,7 +316,7 @@ fun WhereTo(navController: NavHostController) {
 //                        )
                         .background(colorResource(id = R.color.light_blue))
                 ) {
-                    Text(text = "Select this location" , color = colorResource(id = R.color.white))
+                    Text(text = "Select this location", color = colorResource(id = R.color.white))
                 }
             }
         },
@@ -343,10 +357,10 @@ fun WhereTo(navController: NavHostController) {
                                 modifier = Modifier
                                     .offset(x = 16.dp)
                             ) {
-                               Text(
-                                   text = "Home",
-                                   color = colorResource(id = R.color.white)
-                               )
+                                Text(
+                                    text = "Home",
+                                    color = colorResource(id = R.color.white)
+                                )
                             }
                         }
                         SearchBar(
@@ -356,6 +370,7 @@ fun WhereTo(navController: NavHostController) {
                             onValueChange = {
                                 searchText = it
                                 showLazylist = true
+
                             },
                             navController = navController
                         )
@@ -366,17 +381,32 @@ fun WhereTo(navController: NavHostController) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     GoogleMap(
+
                         modifier = Modifier.fillMaxSize(),
-                        cameraPositionState = cameraPositionState,
+//                        cameraPositionState = rememberCameraPositionState {
+//                            position = CameraPosition.fromLatLngZoom(
+//                                currentLocation ?: LatLng(lat, long), 10f
+//                            )
+//                        }
+
+                        cameraPositionState =
+                        cameraPositionState,
+
                     ) {
+
+                        Log.d("NewDDD", "Current location: $currentLocation")
                         currentLocation?.let {
                             Marker(
                                 state = MarkerState(position = it),
                                 title = "You are here"
                             )
-                            cameraPositionState.position = CameraPosition.fromLatLngZoom(it, 7f)
+//                            cameraPositionState.position = CameraPosition.fromLatLngZoom(it, 7f)
+
+//                            cameraPositionState.position = CameraPosition.fromLatLngZoom( LatLng(lat, long), 7f)
                         }
+                        //cameraPositionState.position = CameraPosition.fromLatLngZoom(cameraPositionState.position.target, 7f)
                         officesGlobal.forEach { location ->
+
                             Marker(
                                 state = MarkerState(
                                     position = LatLng(
@@ -385,6 +415,7 @@ fun WhereTo(navController: NavHostController) {
                                     )
                                 ),
                                 draggable = false,
+
                                 title = location.name,
                                 snippet = location.address,
                                 icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE),
@@ -404,13 +435,47 @@ fun WhereTo(navController: NavHostController) {
                                     }
                                 },
                                 onClick = {
+                                    modify = false
+                                    lat = location.latitude.toDouble()
+                                    long = location.longitude.toDouble()
+
+                                    Log.d("WhereTo", "$lat, $long")
+
                                     searchText = location.name
                                     showLazylist = false
                                     selectedOffice = location
                                     selectedOfficeGlobal = location
-                                    false
-                                }
-                            )
+                                    cameraPositionState.position = CameraPosition.fromLatLngZoom(
+                                        //                                    searchText = location.name
+//                                    showLazylist = false
+//                                    selectedOffice = location
+
+//                                        selectedOfficeGlobal = location
+                                        LatLng(
+
+                                            location.latitude.toDouble(),
+                                            location.longitude.toDouble()
+                                        ), 7f
+                                    )
+
+//
+//                                    Log.d(
+//                                        "WhereTo",
+//                                        "Camera position: ${cameraPositionState.position}"
+//                                    )
+//                                    searchText = location.name
+//                                    showLazylist = false
+//                                    selectedOffice = location
+//                                    selectedOfficeGlobal = location
+//                                    ceva({searchText = location.name},
+//                                        {selectedOffice = location},
+//                                        {showLazylist = false},
+//                                        {selectedOfficeGlobal = location})
+                                          false
+
+                                },
+
+                                )
                         }
                     }
                     if (searchText.isNotEmpty() && showLazylist) {
@@ -426,6 +491,7 @@ fun WhereTo(navController: NavHostController) {
                                     Text(
                                         text = suggestion.name,
                                         modifier = Modifier
+                                            .fillMaxWidth()
                                             .clickable {
                                                 selectedOffice = suggestion
                                                 selectedOfficeGlobal = suggestion
