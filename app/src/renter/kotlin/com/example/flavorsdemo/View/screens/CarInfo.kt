@@ -1,5 +1,6 @@
 package com.example.flavorsdemo.View.screens
 
+import android.util.Log
 import android.widget.Gallery
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,9 +40,11 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.example.flavorsdemo.Model.User
 import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.Screen
 import com.example.flavorsdemo.View.components.AboutCar
@@ -49,10 +53,21 @@ import com.example.flavorsdemo.View.components.RatingBar
 import com.example.flavorsdemo.View.components.car
 import com.example.flavorsdemo.View.components.imageMap
 import com.example.flavorsdemo.View.components.infoCarTab
+import com.example.flavorsdemo.ViewModel.FeedbackViewModel
+import com.example.flavorsdemo.currentUser
+import com.google.firebase.firestore.getField
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun CarInfo(navController: NavHostController) {
+    val db = Firebase.firestore
     var infoTab by remember { mutableStateOf(infoCarTab) }
+    val feedbackViewModel : FeedbackViewModel = viewModel()
+    val feedbacks = feedbackViewModel.feedbacks.observeAsState(initial = emptyList())
+    val myFeedbacks by remember { feedbacks }
+    val carFeedback = myFeedbacks.filter { it.carId == car.id }
+//    val users = db.collection("users")
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -102,8 +117,9 @@ fun CarInfo(navController: NavHostController) {
             Row(
                 modifier = Modifier.fillMaxWidth()
             ) {
+                val rating = carFeedback.map { it.stars.toFloat() }.average().toFloat()
                 RatingBar(
-                    rating = 4.5f, modifier = Modifier.padding(top = 16.dp, start = 16.dp)
+                    rating = rating, modifier = Modifier.padding(top = 16.dp, start = 16.dp)
                 )
                 Image(
                     painter = painter,
@@ -190,54 +206,42 @@ fun CarInfo(navController: NavHostController) {
                 }
                 else -> {
                     Column {
-                        androidx.compose.material.Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp)
-                                .padding(horizontal = 8.dp),
-//                                .height(150.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            elevation = 4.dp
-                        ) {
-                            Column (
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
+                        Text("${carFeedback.size} Reviews", fontSize = 24.sp, modifier = Modifier.padding(16.dp))
 
-                            ) {
-                                Text("Vlad", fontSize = 16.sp)
-                                RatingBar(rating = 5f, modifier = Modifier.padding(top = 8.dp))
-                                Text(
-                                    "I recently rented this car for a week-long business trip, and I couldn't be more satisfied with my experience",
-                                    fontSize = 16.sp
-                                )
-                            }
-                        }
-                        androidx.compose.material.Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp)
-                                .padding(horizontal = 8.dp),
+                        for (carRev in carFeedback) {
+                            Column {
+                                androidx.compose.material.Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 4.dp)
+                                        .padding(horizontal = 8.dp),
 //                                .height(150.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            elevation = 4.dp
-                        ) {
-                            Column (
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
+                                    shape = RoundedCornerShape(16.dp),
+                                    elevation = 4.dp
+                                ) {
 
-                            ) {
-                                Text("Catalin", fontSize = 16.sp)
-                                RatingBar(rating = 4f, modifier = Modifier.padding(top = 8.dp))
-                                Text(
-                                    "Me and my family rented the car for a weekend getaway, and overall, it was a great experience",
-                                    fontSize = 16.sp
-                                )
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp)
+
+                                    ) {
+
+                                        Text(carRev.clientName, fontSize = 16.sp)
+                                        val rating = carRev.stars.toFloat()
+                                        RatingBar(
+                                            rating = rating,
+                                            modifier = Modifier.padding(top = 8.dp)
+                                        )
+                                        Text(
+                                            carRev.feedback,
+                                            fontSize = 16.sp
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
-
                 }
             }
         }

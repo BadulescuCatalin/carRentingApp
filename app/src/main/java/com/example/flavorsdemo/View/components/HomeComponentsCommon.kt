@@ -72,6 +72,7 @@ import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.Screen
 import com.example.flavorsdemo.ViewModel.CarImageViewModel
 import com.example.flavorsdemo.ViewModel.DiscountViewModel
+import com.example.flavorsdemo.ViewModel.FeedbackViewModel
 import com.example.flavorsdemo.currentUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -111,6 +112,13 @@ fun CarCard(
     carImageViewModel: CarImageViewModel,
     navController: NavHostController
 ) {
+    val feedbackViewModel : FeedbackViewModel = viewModel()
+    val feedbacks = feedbackViewModel.feedbacks.observeAsState(initial = emptyList())
+    val myFeedbacks by remember { feedbacks }
+    val carFeedback = myFeedbacks.filter { it.carId == thisCar.id }
+
+    val rating = if (carFeedback.isNotEmpty())carFeedback.map { it.stars.toFloat() }.average().toFloat() else 0.0f
+
     userProfileImage = "https://firebasestorage.googleapis.com/v0/b/carrentingapp-5537e.appspot.com/o/default%2Fprofile_image.jpg?alt=media&token=d9ff6858-0f12-48af-a721-d4bcb4ead832"
     carImageViewModel.fetchUserImage(currentUser.id)
     val discountViewModel: DiscountViewModel = viewModel()
@@ -191,7 +199,8 @@ fun CarCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    RatingBar(rating = 4.5F, modifier = Modifier)
+                    RatingBar(rating = rating, modifier = Modifier)
+//                    Text("Rating: $rating")
                     Spacer(modifier = Modifier.width(8.dp))
                     if (discount != null && discount.discountValue.split("%")[0].toFloat() > 0.0F){
 //                        Icon(

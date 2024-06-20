@@ -187,6 +187,7 @@ fun MyBooking(navController: NavHostController) {
                                 feedback.carId = deleteBooking.carId
                                 feedback.feedback = review.value
                                 feedback.stars = rating.toString()
+                                feedback.clientName = currentUser.firstName + " " + currentUser.lastName
                                 coroutineScope.launch {
                                     feedbackViewModel.addFeedback(feedback)
                                     bookingViewModel.deleteBooking(deleteBooking.id)

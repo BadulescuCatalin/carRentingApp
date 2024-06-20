@@ -7,8 +7,9 @@ data class Feedback (
     var userId: String,
     var carId : String,
     var stars: String,
+    var clientName : String,
     var feedback: String
 )
 {
-    constructor() : this(UUID.randomUUID().toString(), "", "", "", "")
+    constructor() : this(UUID.randomUUID().toString(), "", "", "", "", "")
 }
