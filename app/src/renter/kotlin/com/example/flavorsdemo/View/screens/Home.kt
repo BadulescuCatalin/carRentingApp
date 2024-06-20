@@ -171,22 +171,26 @@ fun Home(
     val carMainImages = carImageViewModel.carMainImages.observeAsState(mapOf()).value
 
     val totalCarCount = myBookings.size
-    val totalElectricCarCount = myBookings.filter { booking ->
+    var totalElectricCarCount = myBookings.filter { booking ->
         val car = cars.find { it.id == booking.carId }
         car?.fuelType == "Electric"
     }.size
+    Log.d("BOOKINGS", "totalCarCount: $totalCarCount")
+    Log.d("BOOKINGS", "totalElectricCarCount: $totalElectricCarCount")
+    if (totalElectricCarCount == 0) totalElectricCarCount = 1
     val percentage = totalElectricCarCount.toFloat() * 100.0f / totalCarCount.toFloat()
-
-
-    if (percentage >= 33) {
+    Log.d("BOOKINGS", "percentage: $percentage")
+    if (totalCarCount == 0) {
+        discountValueGlobal = 0F
+    } else if (percentage in 25.0..33.0) {
         discountValueGlobal = 5F
-    } else if (percentage >= 25) {
+    } else if (percentage in 20.0..25.0) {
         discountValueGlobal = 10F
-    } else if (percentage >= 20) {
+    } else if (percentage in 17.0..20.0) {
         discountValueGlobal = 15F
-    } else if (percentage >= 15) {
+    } else if (percentage in 14.0..17.0) {
         discountValueGlobal = 20F
-    } else {
+    } else if (percentage < 14.0) {
         discountValueGlobal = 25F
     }
     carMainImages.forEach() {
