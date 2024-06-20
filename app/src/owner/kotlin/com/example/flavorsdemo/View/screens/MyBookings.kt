@@ -83,7 +83,7 @@ fun MyBooking(navController: NavHostController) {
 //    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val myCompanyBookings = bookings.value.filter { it ->
-        it.status == "Active" && it.officeId in myOffices.map { it.id } &&
+        it.status != "ToBeDeleted"  && it.officeId in myOffices.map { it.id } &&
                 (LocalDate.parse(formattedDate, formatter)
                     .isBefore(LocalDate.parse(it.endDate, formatter)) &&
                         LocalDate.parse(formattedDate, formatter)
@@ -231,6 +231,7 @@ fun MyBooking(navController: NavHostController) {
 //                                myDeletedBooking.numberOfCameras = currentBooking.numberOfCameras
 //                                val bookingToUpdate = currentBooking
                                 currentBooking.status = "ToBeDeleted"
+                                currentBooking.reason = reason.value
                                 coroutineScope.launch {
                                     bookingViewModel.updateBooking(currentBooking)
                                     showPopup = false

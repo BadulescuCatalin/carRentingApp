@@ -3,6 +3,7 @@ package com.example.flavorsdemo.View.screens
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -37,13 +39,19 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.flavorsdemo.Model.Office
 import com.example.flavorsdemo.Model.SharedViewModel
 import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.components.CarCard
 import com.example.flavorsdemo.View.components.DownMenuBar
 import com.example.flavorsdemo.View.components.EcoFriendlyDialog
 import com.example.flavorsdemo.View.components.InfoBar
+import com.example.flavorsdemo.View.components.bookingToUpdate
+import com.example.flavorsdemo.View.components.car
 import com.example.flavorsdemo.View.components.carImages
+import com.example.flavorsdemo.View.components.carToDisplayAgain
+import com.example.flavorsdemo.View.components.dateEnd
+import com.example.flavorsdemo.View.components.dateStart
 import com.example.flavorsdemo.View.components.discountValueGlobal
 import com.example.flavorsdemo.View.components.ecoInfo
 import com.example.flavorsdemo.View.components.filterFuel
@@ -53,6 +61,7 @@ import com.example.flavorsdemo.View.components.imageMap
 import com.example.flavorsdemo.View.components.imageMapOffice
 import com.example.flavorsdemo.View.components.imageMaps
 import com.example.flavorsdemo.View.components.officesGlobal
+import com.example.flavorsdemo.View.components.selectedOfficeGlobal
 import com.example.flavorsdemo.View.components.user
 import com.example.flavorsdemo.ViewModel.BookingViewModel
 import com.example.flavorsdemo.ViewModel.CarImageViewModel
@@ -98,8 +107,14 @@ fun Home(
     var email = user?.email
     val cars by carViewModel.cars.observeAsState(initial = emptyList())
     val offices by officeViewModel.offices.observeAsState(initial = emptyList())
+
     officesGlobal = offices
-    var carsFiltered by remember { mutableStateOf(cars) }
+    val displayableCars = if (selectedOfficeGlobal.name != "")
+        cars.filter { it.officeId == selectedOfficeGlobal.id } else cars
+    var carsFiltered by remember { mutableStateOf(displayableCars) }
+
+
+    Log.d("CECE", carsFiltered.toString())
     var dummyOffice = listOf<String>("", "")
     var showLoading by remember { mutableStateOf(true) }
     var showEcoPopUp by remember { mutableStateOf(false) }
@@ -116,13 +131,15 @@ fun Home(
 //        cars.drop(cars.indexOf(car))
 //    }
     when (filterSortBy) {
-        "None" -> carsFiltered = cars
-        "Car Name" -> carsFiltered = cars.sortedBy { it.brand + it.model }
-        "Price Ascending" -> carsFiltered = cars.sortedBy { it.price.split("€")[0].toDouble() }
-        "Price Descending" -> carsFiltered =
-            cars.sortedByDescending { it.price.split("€")[0].toDouble() }
+        "None" -> carsFiltered = displayableCars
+        "Car Name" -> carsFiltered = displayableCars.sortedBy { it.brand + it.model }
+        "Price Ascending" -> carsFiltered =
+            displayableCars.sortedBy { it.price.split("€")[0].toDouble() }
 
-        "Car Rating" -> carsFiltered = cars // de calculat rating
+        "Price Descending" -> carsFiltered =
+            displayableCars.sortedByDescending { it.price.split("€")[0].toDouble() }
+
+        "Car Rating" -> carsFiltered = displayableCars // de calculat rating
     }
     when (filterTransmission) {
         "All" -> carsFiltered = carsFiltered
@@ -136,11 +153,21 @@ fun Home(
         "Electric" -> carsFiltered = carsFiltered.filter { it.fuelType == "Electric" }
         "Hybrid" -> carsFiltered = carsFiltered.filter { it.fuelType == "Hybrid" }
     }
-    carsFiltered = carsFiltered.filter { car ->
-        myBookings.find { booking ->
-            booking.carId == car.id && booking.startDate <= dateNow && booking.endDate >= dateNow
-        } == null
+//
+//    LocalDate.parse(formattedDate, formatter)
+//        .isAfter(LocalDate.parse(it.startDate, formatter)) ||
+//            LocalDate.parse(formattedDate, formatter)
+//                .isEqual(LocalDate.parse(it.endDate, formatter)) ||
+    if (dateStart != "" && dateEnd != "")
+        carsFiltered = carsFiltered.filter { car ->
+            myBookings.find { booking ->
+                booking.carId == car.id &&
+                        !((LocalDate.parse(booking.startDate, formatter)).isAfter(LocalDate.parse(dateEnd, formatter))
+                        ||  (LocalDate.parse(booking.endDate, formatter)).isBefore(LocalDate.parse(dateStart, formatter)))
+            } == null
     }
+
+    Log.d("CEA", myBookings.toString())
     val carMainImages = carImageViewModel.carMainImages.observeAsState(mapOf()).value
 
     val totalCarCount = myBookings.size
@@ -227,6 +254,17 @@ fun Home(
                             fontSize = 16.sp,
                             color = colorResource(id = R.color.black),
                             fontFamily = androidx.compose.ui.text.font.FontFamily.SansSerif,
+                        )
+                    }
+                }
+                if (bookingToUpdate.officeId != "") {
+                    item {
+
+                        CarCard(
+                            carToDisplayAgain,
+//                            carsFiltered[0],
+                            carImageViewModel,
+                            navController
                         )
                     }
                 }

@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddLocation
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -62,6 +63,7 @@ import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.flavorsdemo.FlavorConfig
+import com.example.flavorsdemo.Model.Booking
 import com.example.flavorsdemo.Model.Car
 import com.example.flavorsdemo.Model.CarImage
 import com.example.flavorsdemo.Model.Discount
@@ -99,6 +101,9 @@ var userProfileImage = Uri.EMPTY.toString()
 var timeEnd = ""
 var officeMainImage: Uri = Uri.EMPTY
 val auxiliarComponent = 0
+var discountedCarPrice = ""
+var bookingToUpdate = Booking()
+var carToDisplayAgain = Car()
 @SuppressLint("Range")
 @Composable
 fun CarCard(
@@ -150,7 +155,15 @@ fun CarCard(
                 if (FlavorConfig.userType == "Owner")
                     navController.navigate(Screen.AddCar.route)
                 else {
-                    car = thisCar
+                    if (discount != null && discount.discountValue.split("%")[0].toFloat() > 0.0F) {
+                        val discountValue = discount.discountValue.split("%")[0].toFloat()
+                        val newPrice =
+                            thisCar.price.split("€")[0].toFloat() - (thisCar.price.split("€")[0].toFloat() * discountValue / 100)
+                        discountedCarPrice = "$newPrice€"
+                    } else {
+                        discountedCarPrice = thisCar.price
+                    }
+                        car = thisCar
                     infoCarTab = "About"
                     if (dateEnd == "")
                         navController.navigate(Screen.WhereTo.route)
@@ -456,14 +469,15 @@ fun InfoBar(
             )
             Spacer(modifier = Modifier.weight(0.8f))
             Icon(
-                imageVector = Icons.Filled.Notifications,
+                imageVector = if(FlavorConfig.userType == "Owner") Icons.Filled.Notifications else Icons.Filled.AddLocation,
                 contentDescription = "Notifications",
                 tint = colorResource(id = R.color.white),
                 modifier = Modifier
                     .size(36.dp)
                     .padding(start = 8.dp)
                     .clickable {
-                        // alta pagina
+                        if (FlavorConfig.userType == "Renter")
+                            navController.navigate(Screen.WhereTo.route)
                     }
             )
             Spacer(modifier = Modifier.weight(0.1f))

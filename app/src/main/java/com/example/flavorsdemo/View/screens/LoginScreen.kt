@@ -50,6 +50,7 @@ import com.example.flavorsdemo.View.components.CustomTextField
 import com.example.flavorsdemo.currentUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 
@@ -158,6 +159,7 @@ fun Login(navController: NavHostController) {
                 wrongCredentials = false
                 sharedViewModel.fetchUserData(email ?: "")
                 val userDataa = sharedViewModel.userData.value
+                val role = Firebase.firestore
                 if (!isEmailEmpty && isEmailCorrect && !isPasswordEmpty
                     && userDataa != null && userDataa.userType == FlavorConfig.userType) {
                     sharedViewModel.fetchUserData(email ?: "")

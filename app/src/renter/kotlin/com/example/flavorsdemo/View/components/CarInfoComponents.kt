@@ -63,7 +63,7 @@ fun AboutCar() {
                         color = colorResource(id = R.color.light_blue)
                     )
                     Text(
-                        text = car.price + " / day",
+                        text = "$discountedCarPrice / day",
                         color = colorResource(id = R.color.light_blue)
                     )
                 }

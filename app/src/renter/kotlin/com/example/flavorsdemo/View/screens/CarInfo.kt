@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,7 +30,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -107,8 +110,12 @@ fun CarInfo(navController: NavHostController) {
                     contentDescription = "Car Image",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
+                        .height(200.dp).fillMaxHeight(0.4F)
+                        .scale(1.1F, 1.1F)
                         .offset(x = (-32).dp, y = (-32).dp)
+                        .padding(top = 26.dp).padding(bottom = 8.dp)
+                        .padding(horizontal = 40.dp),
+                    contentScale = ContentScale.Fit
                 )
             }
             Row(
@@ -201,7 +208,7 @@ fun CarInfo(navController: NavHostController) {
                                 Text("Vlad", fontSize = 16.sp)
                                 RatingBar(rating = 5f, modifier = Modifier.padding(top = 8.dp))
                                 Text(
-                                    "I recently rented a this car for a week-long business trip, and I couldn't be more satisfied with my experience",
+                                    "I recently rented this car for a week-long business trip, and I couldn't be more satisfied with my experience",
                                     fontSize = 16.sp
                                 )
                             }

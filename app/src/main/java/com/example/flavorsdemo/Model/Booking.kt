@@ -17,8 +17,9 @@ data class Booking(
     var numberOfAdditionalDrivers: Int,
     var numberOfChildSeats: Int,
     var numberOfCameras: Int,
-    var status: String
+    var status: String,
+    var reason : String
 
     ) {
-    constructor() : this(UUID.randomUUID().toString(), "", "", "", "", "", "", "", "", false, false, 0, 0, 0, "")
+    constructor() : this(UUID.randomUUID().toString(), "", "", "", "", "", "", "", "", false, false, 0, 0, 0, "", "")
 }

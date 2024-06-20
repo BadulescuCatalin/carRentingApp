@@ -78,7 +78,7 @@ fun DisplayBooking(booking: Booking, onClickAction : () -> Unit) {
                 color = colorResource(id = R.color.black)
             )
             Text(
-                text = "$${booking.price}",
+                text = "${booking.price.split(",")[0]}€",
                 fontSize = 14.sp,
                 color = colorResource(id = R.color.light_blue)
             )

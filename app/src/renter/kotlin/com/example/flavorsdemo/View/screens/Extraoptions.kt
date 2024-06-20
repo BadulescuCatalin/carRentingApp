@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,8 +28,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -55,20 +62,30 @@ import com.example.flavorsdemo.View.components.AddBabySeats
 import com.example.flavorsdemo.View.components.AddCarCamera
 import com.example.flavorsdemo.View.components.AddCargoCarrier
 import com.example.flavorsdemo.View.components.AddGps
+import com.example.flavorsdemo.View.components.bookingToUpdate
 import com.example.flavorsdemo.View.components.car
 import com.example.flavorsdemo.View.components.dateEnd
 import com.example.flavorsdemo.View.components.dateStart
+import com.example.flavorsdemo.View.components.discountedCarPrice
 import com.example.flavorsdemo.View.components.extraDriver
+import com.example.flavorsdemo.View.components.selectedOfficeGlobal
 import com.example.flavorsdemo.View.components.timeEnd
 import com.example.flavorsdemo.View.components.timeStart
 import com.example.flavorsdemo.ViewModel.BookingViewModel
+import com.example.flavorsdemo.ViewModel.OfficeViewModel
 import com.example.flavorsdemo.currentUser
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ExtraOptions(navController: NavHostController) {
+    val officeViewModel: OfficeViewModel = viewModel()
     var numberOfAdditionalDrivers by remember { mutableStateOf("") }
     var hasGps by remember { mutableStateOf(false) }
     var numberOfBabySeats by remember { mutableStateOf("") }
@@ -76,10 +93,16 @@ fun ExtraOptions(navController: NavHostController) {
     var hasCargoCarrier by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) } // State to control dialog visibility
     var showDialogPoints by remember { mutableStateOf(false) } // State to control dialog visibility
-    var totalPrice by remember { mutableStateOf(0.0f) }
+    var totalPrice by remember { mutableStateOf(0f) }
+    var discountedPrice by remember { mutableStateOf(-1.0f) }
     // Function to handle paying online
     val context = LocalContext.current
-
+    val firstName = remember { mutableStateOf("") }
+    val lastName = remember { mutableStateOf("") }
+    val cardNumber = remember { mutableStateOf("") }
+    val expirationDate = remember { mutableStateOf("") }
+    val cvv = remember { mutableStateOf("") }
+    var wantsDisocunt = false
     val bookingViewModel: BookingViewModel = viewModel()
     val coroutineScope = rememberCoroutineScope()
     fun onPayOnline() {
@@ -90,6 +113,7 @@ fun ExtraOptions(navController: NavHostController) {
         context.startActivity(intent)
     }
 
+    var showOnlinePaymentDialog by remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -222,10 +246,17 @@ fun ExtraOptions(navController: NavHostController) {
                         .fillMaxWidth()
                         .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 8.dp),
                 ) {
-                    val dayStart = dateStart.split("/")[0]
-                    val dayEnd = dateEnd.split("/")[0]
-                    val daysBetween = dayEnd.toInt() - dayStart.toInt() + 1
-                    val carCost = car.price.split("€")[0].toDouble() * daysBetween
+//                    val dayStart = dateStart.split("/")[0]
+//                    val dayEnd = dateEnd.split("/")[0]
+//                    val daysBetween = dayEnd.toInt() - dayStart.toInt() + 1
+                    val dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+
+                    val startDate = LocalDate.parse(dateStart, dateFormat)
+                    val endDate = LocalDate.parse(dateEnd, dateFormat)
+
+                    // Calculate the number of days between the two dates
+                    val daysBetween = ChronoUnit.DAYS.between(startDate, endDate) + 1
+                    val carCost = discountedCarPrice.split("€")[0].toDouble() * daysBetween
                     var additionalCost = 0
                     additionalCost += if (numberOfAdditionalCarCameras != "") numberOfAdditionalCarCameras.toInt() * 10 else 0
                     additionalCost += if (numberOfBabySeats != "") numberOfBabySeats.toInt() * 15 else 0
@@ -310,25 +341,29 @@ fun ExtraOptions(navController: NavHostController) {
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold
                             )
-                            Button(
-                                onClick = {
-                                    showDialog = true
-                                    showDialogPoints = false
-                                    currentUser.points = 0
-                                    totalPrice = newPrice
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    colorResource(id = R.color.light_blue)
-                                ),
-                                modifier = Modifier.align(Alignment.End)
-                            ) {
-                                Text(text = "Select", color = Color.White)
-                            }
+
                         }
                     }
                 }
             },
-            confirmButton = {},
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val discount = currentUser.points / 10
+                        val newPrice = totalPrice - discount
+                        totalPrice = newPrice
+                        discountedPrice = newPrice
+                        showDialog = true
+                        showDialogPoints = false
+                        wantsDisocunt = true
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        colorResource(id = R.color.light_blue)
+                    ),
+                ) {
+                    Text(text = "Select", color = Color.White)
+                }
+            },
             dismissButton = {
                 Button(
                     onClick = {
@@ -340,6 +375,228 @@ fun ExtraOptions(navController: NavHostController) {
                     ),
                 ) {
                     Text(text = "Close", color = Color.White)
+                }
+            }
+        )
+    }
+    if (showOnlinePaymentDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showOnlinePaymentDialog = false
+                showDialog = true
+            },
+            modifier = Modifier
+                .background(Color.White)
+                .clip(RoundedCornerShape(16.dp)),
+            containerColor = colorResource(id = R.color.white),
+            title = { Text(text = "Card Details") },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ) {
+
+                    Text("First Name")
+
+
+                    TextField(
+                        value = firstName.value,
+                        onValueChange = {
+                            firstName.value = it
+                        },
+                        placeholder = { Text("First Name") },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = colorResource(id = R.color.light_grey),
+                            disabledTextColor = Color.Black,
+                            focusedIndicatorColor = Color.Black,
+                            unfocusedIndicatorColor = Color.Black,
+                            disabledIndicatorColor = Color.Black,
+
+                            )
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Last Name")
+                    TextField(
+                        value = lastName.value,
+                        onValueChange = {
+                            lastName.value = it
+                        },
+                        placeholder = { Text("Last Name") },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = colorResource(id = R.color.light_grey),
+                            disabledTextColor = Color.Black,
+                            focusedIndicatorColor = Color.Black,
+                            unfocusedIndicatorColor = Color.Black,
+                            disabledIndicatorColor = Color.Black,
+
+                            )
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Card number")
+                    TextField(
+                        value = cardNumber.value,
+                        onValueChange = {
+                            cardNumber.value = it
+                        },
+                        placeholder = { Text("Card Number") },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = colorResource(id = R.color.light_grey),
+                            disabledTextColor = Color.Black,
+                            focusedIndicatorColor = Color.Black,
+                            unfocusedIndicatorColor = Color.Black,
+                            disabledIndicatorColor = Color.Black,
+
+                            )
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Expiration Date")
+                    TextField(
+                        value = expirationDate.value,
+                        onValueChange = {
+                            expirationDate.value = it
+                        },
+                        placeholder = { Text("Expiration Date") },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = colorResource(id = R.color.light_grey),
+                            disabledTextColor = Color.Black,
+                            focusedIndicatorColor = Color.Black,
+                            unfocusedIndicatorColor = Color.Black,
+                            disabledIndicatorColor = Color.Black,
+
+                            )
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("CVV")
+                    TextField(
+                        value = cvv.value,
+                        onValueChange = {
+                            cvv.value = it
+                        },
+                        placeholder = { Text("CVV") },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = colorResource(id = R.color.light_grey),
+                            disabledTextColor = Color.Black,
+                            focusedIndicatorColor = Color.Black,
+                            unfocusedIndicatorColor = Color.Black,
+                            disabledIndicatorColor = Color.Black,
+
+                            )
+                    )
+                }
+
+            },
+            confirmButton = {
+                androidx.compose.material3.Button(
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                        colorResource(id = R.color.light_blue)
+                    ),
+                    onClick = {
+                        if (firstName.value == "" || lastName.value == "" || cardNumber.value == "" || expirationDate.value == "" || cvv.value == "") {
+                            Toast.makeText(
+                                context,
+                                "Please complete the card details",
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                        } else {
+                            // de scazunt nr gps si chestii
+                            val booking = bookingToUpdate
+                            booking.price =
+                                (if (discountedPrice == -1.0f) "$totalPrice, 0" else discountedPrice.toString()) + ", " + (currentUser.points).toString()
+                            booking.endDate = dateEnd
+                            booking.endTime = timeEnd
+                            booking.numberOfAdditionalDrivers =
+                                if (numberOfAdditionalDrivers == "") 0 else numberOfAdditionalDrivers.toInt()
+                            booking.numberOfChildSeats =
+                                if (numberOfBabySeats == "") 0 else numberOfBabySeats.toInt()
+                            booking.numberOfCameras =
+                                if (numberOfAdditionalCarCameras == "") 0 else numberOfAdditionalCarCameras.toInt()
+                            booking.hasGps = hasGps
+                            booking.hasCargoCarrier = hasCargoCarrier
+                            booking.userId = currentUser.id
+                            booking.carId = car.id
+                            booking.officeId = car.officeId
+                            booking.endTime = timeEnd
+                            booking.startDate = dateStart
+                            booking.startTime = timeStart
+//                            val dayStart = dateStart.split("/")[0]
+//                            val dayEnd = dateEnd.split("/")[0]
+//                            val daysBetween = dayEnd.toInt() - dayStart.toInt() + 1
+                            val dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+
+                            // Parse the input dates
+                            val startDate = LocalDate.parse(dateStart, dateFormat)
+                            val endDate = LocalDate.parse(dateEnd, dateFormat)
+
+                            // Calculate the number of days between the two dates
+                            val daysBetween = ChronoUnit.DAYS.between(startDate, endDate) + 1
+
+                            val pointsEarned =
+                                (daysBetween * 5.0f + totalPrice / 20).toInt() // 5 puncte pe zi + 5% din pret
+//                            currentUser.points += pointsEarned
+                            if (discountedPrice != -1.0f) {
+                                currentUser.points = 0
+                                val db = FirebaseFirestore.getInstance()
+                                db.collection("users")
+                                    .document(currentUser.id)
+                                    .set(currentUser)
+                                    .addOnSuccessListener {
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Log.d(
+                                            "TAG",
+                                            "Error adding user in the database",
+                                            e
+                                        )
+                                    }
+                            }
+                            val officeToUpdate = selectedOfficeGlobal
+                            officeToUpdate.numberOfGps =
+                                (officeToUpdate.numberOfGps.toInt() - if (hasGps) 1 else 0).toString()
+                            officeToUpdate.numberOfChildSeats =
+                                (officeToUpdate.numberOfChildSeats.toInt() - if (numberOfBabySeats != "") numberOfBabySeats.toInt() else 0).toString()
+                            officeToUpdate.numberOfCameras =
+                                (officeToUpdate.numberOfCameras.toInt() - if (numberOfAdditionalCarCameras != "") numberOfAdditionalCarCameras.toInt() else 0).toString()
+                            officeToUpdate.numberOfAdditionalCarTrunks = (officeToUpdate.numberOfAdditionalCarTrunks.toInt() - if (hasCargoCarrier) 1 else 0).toString()
+                            coroutineScope.launch {
+                                officeViewModel.updateOffice(officeToUpdate)
+                            }
+
+                            // save to firestore + mvvm
+                            coroutineScope.launch {
+                                if (bookingToUpdate.officeId == "")
+                                    bookingViewModel.addBooking(booking)
+                                else bookingViewModel.updateBooking(booking)
+                            }
+                            showDialog = false
+                            showOnlinePaymentDialog = false
+                            Toast.makeText(context, "Booking added", Toast.LENGTH_SHORT)
+                                .show()
+                            navController.navigate(Screen.Home.route)
+                        }
+                    }
+                ) {
+
+                    Text("Pay")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showOnlinePaymentDialog = false
+                        showDialog = true
+                    }
+                ) {
+                    Text("Cancel", color = colorResource(id = R.color.light_blue))
                 }
             }
         )
@@ -374,12 +631,15 @@ fun ExtraOptions(navController: NavHostController) {
                                 fontSize = 14.sp
                             )
                             Text(
-                                text = "$totalPrice€",
+                                text = if (discountedPrice == -1.0f) "$totalPrice€" else "$discountedPrice€",
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold
                             )
                             Button(
-                                onClick = { onPayOnline() },
+                                onClick = {
+                                    showOnlinePaymentDialog = true
+                                    showDialog = false
+                                },
                                 colors = ButtonDefaults.buttonColors(
                                     colorResource(id = R.color.light_blue)
                                 ),
@@ -405,14 +665,15 @@ fun ExtraOptions(navController: NavHostController) {
                                 fontSize = 14.sp
                             )
                             Text(
-                                text = "$totalPrice€",
+                                text = if (discountedPrice == -1.0f) "$totalPrice€" else "$discountedPrice€",
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold
                             )
                             Button(
                                 onClick = {
-                                    val booking = Booking()
-                                    booking.price = totalPrice.toString()
+                                    val booking = bookingToUpdate
+                                    booking.price =
+                                        (if (discountedPrice == -1.0f) "$totalPrice, 0" else discountedPrice.toString()) + ", " + (currentUser.points).toString()
                                     booking.endDate = dateEnd
                                     booking.endTime = timeEnd
                                     booking.numberOfAdditionalDrivers =
@@ -429,28 +690,52 @@ fun ExtraOptions(navController: NavHostController) {
                                     booking.endTime = timeEnd
                                     booking.startDate = dateStart
                                     booking.startTime = timeStart
-                                    val dayStart = dateStart.split("/")[0]
-                                    val dayEnd = dateEnd.split("/")[0]
-                                    val daysBetween = dayEnd.toInt() - dayStart.toInt() + 1
-                                    val pointsEarned = (daysBetween * 5.0f + totalPrice  / 20).toInt() // 5 puncte pe zi + 5% din pret
-                                    currentUser.points += pointsEarned
-                                    val db = FirebaseFirestore.getInstance()
-                                    db.collection("users")
-                                        .document(currentUser.id)
-                                        .set(currentUser)
-                                        .addOnSuccessListener {
-                                        }
-                                        .addOnFailureListener { e ->
-                                            Log.d(
-                                                "TAG",
-                                                "Error adding user in the database",
-                                                e
-                                            )
-                                        }
+//                                    val dayStart = dateStart.split("/")[0]
+//                                    val dayEnd = dateEnd.split("/")[0]
+//                                    val daysBetween = dayEnd.toInt() - dayStart.toInt() + 1
+                                    val dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
+                                    // Parse the input dates
+                                    val startDate = LocalDate.parse(dateStart, dateFormat)
+                                    val endDate = LocalDate.parse(dateEnd, dateFormat)
+                                    val officeToUpdate = selectedOfficeGlobal
+                                    officeToUpdate.numberOfGps =
+                                        (officeToUpdate.numberOfGps.toInt() - if (hasGps) 1 else 0).toString()
+                                    officeToUpdate.numberOfChildSeats =
+                                        (officeToUpdate.numberOfChildSeats.toInt() - if (numberOfBabySeats != "") numberOfBabySeats.toInt() else 0).toString()
+                                    officeToUpdate.numberOfCameras =
+                                        (officeToUpdate.numberOfCameras.toInt() - if (numberOfAdditionalCarCameras != "") numberOfAdditionalCarCameras.toInt() else 0).toString()
+                                    officeToUpdate.numberOfAdditionalCarTrunks = (officeToUpdate.numberOfAdditionalCarTrunks.toInt() - if (hasCargoCarrier) 1 else 0).toString()
+                                    coroutineScope.launch {
+                                        officeViewModel.updateOffice(officeToUpdate)
+                                    }
+                                    // Calculate the number of days between the two dates
+                                    val daysBetween =
+                                        ChronoUnit.DAYS.between(startDate, endDate) + 1
+                                    val pointsEarned =
+                                        (daysBetween * 5.0f + totalPrice / 20).toInt() // 5 puncte pe zi + 5% din pret
+                                    if (discountedPrice != -1.0f) {
+                                        currentUser.points = 0
+//                                    currentUser.points += pointsEarned
+                                        val db = FirebaseFirestore.getInstance()
+                                        db.collection("users")
+                                            .document(currentUser.id)
+                                            .set(currentUser)
+                                            .addOnSuccessListener {
+                                            }
+                                            .addOnFailureListener { e ->
+                                                Log.d(
+                                                    "TAG",
+                                                    "Error adding user in the database",
+                                                    e
+                                                )
+                                            }
+                                    }
                                     // save to firestore + mvvm
                                     coroutineScope.launch {
-                                        bookingViewModel.addBooking(booking)
+                                        if (bookingToUpdate.officeId == "")
+                                            bookingViewModel.addBooking(booking)
+                                        else bookingViewModel.updateBooking(booking)
                                     }
                                     showDialog = false
                                     Toast.makeText(context, "Booking added", Toast.LENGTH_SHORT)
@@ -483,4 +768,5 @@ fun ExtraOptions(navController: NavHostController) {
         )
     }
 }
+
 

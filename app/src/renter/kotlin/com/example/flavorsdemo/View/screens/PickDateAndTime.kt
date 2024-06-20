@@ -3,6 +3,7 @@ package com.example.flavorsdemo.View.screens
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.graphics.drawable.Icon
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,6 +38,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -52,19 +54,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.flavorsdemo.Model.Office
 import com.example.flavorsdemo.R
 import com.example.flavorsdemo.View.Screen
 import com.example.flavorsdemo.View.components.SearchBarDateAndTime
+import com.example.flavorsdemo.View.components.bookingToUpdate
 import com.example.flavorsdemo.View.components.car
 import com.example.flavorsdemo.View.components.dateEnd
 import com.example.flavorsdemo.View.components.dateStart
 import com.example.flavorsdemo.View.components.discountGlobal
+import com.example.flavorsdemo.View.components.office
 import com.example.flavorsdemo.View.components.officesGlobal
 import com.example.flavorsdemo.View.components.selectedOfficeGlobal
 import com.example.flavorsdemo.View.components.timeEnd
 import com.example.flavorsdemo.View.components.timeStart
+import com.example.flavorsdemo.ViewModel.OfficeViewModel
 import com.google.android.play.integrity.internal.al
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -74,16 +80,29 @@ import java.util.Locale
 
 @Composable
 fun PickDateAndTime(navController: NavHostController) {
-    var pickUpDate by remember { mutableStateOf(dateStart) }
-    var pickUpTime by remember { mutableStateOf(if (timeStart == "")  "10:00" else timeStart) }
-    var dropOffDate by remember { mutableStateOf(dateEnd) }
-    var dropOffTime by remember { mutableStateOf(if (timeEnd == "")  "10:00" else timeEnd) }
+    val officeViewModel : OfficeViewModel = viewModel()
+    val offices by officeViewModel.offices.observeAsState(initial = emptyList())
+    var pickUpDate by remember { mutableStateOf(if(bookingToUpdate.officeId != "") bookingToUpdate.startDate else dateStart) }
+    var pickUpTime by remember { mutableStateOf(if(bookingToUpdate.officeId != "") bookingToUpdate.startTime else if (timeStart == "")  "10:00" else timeStart) }
+    var dropOffDate by remember { mutableStateOf(if(bookingToUpdate.officeId != "") bookingToUpdate.endDate else dateEnd) }
+    var dropOffTime by remember { mutableStateOf(if(bookingToUpdate.officeId != "") bookingToUpdate.endTime else if (timeEnd == "")  "10:00" else timeEnd) }
     var showDialogPickUp by remember { mutableStateOf(false) }
     var showDialogDropOff by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    var selectedOffice by remember { mutableStateOf<Office?>(null) }
-    var searchText by remember { mutableStateOf(selectedOfficeGlobal.name) }
-
+    val ss = officesGlobal.find { it.id == bookingToUpdate.officeId }
+    Log.d("SS", "SS: $ss")
+    var selectedOffice by remember { mutableStateOf<Office?>(
+        if(bookingToUpdate.officeId != "") ss else null
+    ) }
+    var searchText by remember { mutableStateOf(if(bookingToUpdate.officeId != "") (
+            ss?.name ?: selectedOfficeGlobal.name
+    ) else selectedOfficeGlobal.name) }
+    Log.d("PickDateAndTime", "T: $searchText")
+    Log.d("PickDateAndTime", "O: $offices")
+    Log.d("PickDateAndTime", "S: $selectedOffice")
+    Log.d("PickDateAndTime", "G: $selectedOfficeGlobal")
+    Log.d("PickDateAndTime", "B: ${bookingToUpdate.officeId}")
+    Log.d("PickDateAndTime", "N: ${bookingToUpdate.officeId}")
     var showLazylist by remember { mutableStateOf(false) }
     val filteredOffices = if (searchText.isEmpty()) {
         emptyList()
@@ -379,12 +398,14 @@ fun PickDateAndTime(navController: NavHostController) {
                     onClick = {
                         if (car.brand == "")
                             navController.navigate(Screen.Home.route)
-                        else navController.navigate(Screen.CarInfo.route)
+                        else navController.navigate(Screen.Home.route)
                         dateStart = pickUpDate
                         dateEnd = dropOffDate
                         timeStart = pickUpTime
                         timeEnd = dropOffTime
-
+                        if (selectedOfficeGlobal.name == "")
+                            selectedOfficeGlobal = selectedOffice!!
+                        Log.d("PickDateAndTime", "PickDateAndTime: $selectedOfficeGlobal")
                     },
                     modifier = Modifier
                         .fillMaxWidth()

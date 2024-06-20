@@ -2,6 +2,7 @@ package com.example.flavorsdemo.Repository
 
 import com.example.flavorsdemo.Model.Booking
 import com.example.flavorsdemo.Model.Car
+import com.example.flavorsdemo.View.components.bookingToUpdate
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -24,6 +25,7 @@ class BookingRepositoryImpl : BookingRepository{
 
     override suspend fun updateBooking(booking: Booking) {
         db.collection("bookings").document(booking.id).set(booking).await()
+        bookingToUpdate = Booking()
     }
 
     override suspend fun deleteBooking(bookingId: String) {

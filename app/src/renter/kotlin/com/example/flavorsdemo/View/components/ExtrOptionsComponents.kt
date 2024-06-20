@@ -1,5 +1,6 @@
 package com.example.flavorsdemo.View.components
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -29,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -108,6 +110,7 @@ fun extraDriver(searchValue: String, onValueChange: (String) -> Unit) {
 
 @Composable
 fun AddGps(onAddClick: () -> Unit, onRemoveClick: () -> Unit) {
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .background(Color.White)
@@ -140,6 +143,12 @@ fun AddGps(onAddClick: () -> Unit, onRemoveClick: () -> Unit) {
                     modifier = Modifier.offset(y = (-4).dp)
                 )
                 Spacer(modifier = Modifier.height(4.dp))
+                if (selectedOfficeGlobal.numberOfGps.toInt() <= 5) {
+                    Text(
+                        text = if(selectedOfficeGlobal.numberOfGps.toInt() == 0) "only ${selectedOfficeGlobal.numberOfGps} left" else "No GPS avaliable",
+                        color = Color.Red
+                    )
+                }
                 Row(
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -169,7 +178,17 @@ fun AddGps(onAddClick: () -> Unit, onRemoveClick: () -> Unit) {
                             }
                             Spacer(modifier = Modifier.width(8.dp))
                             Button(
-                                onClick = { onAddClick() },
+                                onClick = {
+                                    if (selectedOfficeGlobal.numberOfGps.toInt() == 0) {
+                                        onRemoveClick()
+                                        Toast.makeText(
+                                            context,
+                                            "There are no more GPS available",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                    onAddClick()
+                                },
                                 modifier = Modifier
                                     .scale(0.8f, 0.8f)
                                     .offset(y = (-8).dp),
@@ -229,6 +248,12 @@ fun AddBabySeats(searchValue: String, onValueChange: (String) -> Unit) {
                     modifier = Modifier.offset(y = (-4).dp),
                     lineHeight = 16.sp,
                 )
+                if (selectedOfficeGlobal.numberOfChildSeats.toInt() <= 5) {
+                    Text(
+                        text = "only ${selectedOfficeGlobal.numberOfChildSeats} left",
+                        color = Color.Red
+                    )
+                }
                 Spacer(modifier = Modifier.height(4.dp))
                 TextField(
                     value = value,
@@ -310,6 +335,13 @@ fun AddCarCamera(searchValue: String, onValueChange: (String) -> Unit) {
 //                    modifier = Modifier.padding(top = 8.dp)
                 )
                 Spacer(modifier = Modifier.height(4.dp))
+                if (selectedOfficeGlobal.numberOfCameras.toInt() <= 5) {
+                    Text(
+                        text = "only ${selectedOfficeGlobal.numberOfCameras} left",
+                        color = Color.Red
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
                 TextField(
                     value = value,
                     onValueChange = { value = it },
@@ -386,6 +418,12 @@ fun AddCargoCarrier(onAddClick: () -> Unit, onRemoveClick: () -> Unit) {
                     modifier = Modifier.padding(top = 8.dp)
                 )
                 Spacer(modifier = Modifier.height(4.dp))
+                if (selectedOfficeGlobal.numberOfAdditionalCarTrunks.toInt() <= 5) {
+                    Text(
+                        text = "only ${selectedOfficeGlobal.numberOfAdditionalCarTrunks} left",
+                        color = Color.Red
+                    )
+                }
                 Row(
                     modifier = Modifier.fillMaxWidth()
                 ) {
